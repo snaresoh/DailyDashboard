@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="训练日志" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>训练日志</title>
+
+  <!-- ============================================================
+       ⚙️  CONFIG — 修改这里连接你的 Google Sheet
+       ============================================================
+       1. 打开你的 Google Sheet
+       2. 点击「文件」>「共享」>「发布到网络」
+       3. 选择你的数据 Sheet，格式选 CSV，点击「发布」
+       4. 复制生成的链接，粘贴到 SHEET_CSV_URL
+       
+       Sheet 列格式（第一行为标题）：
+       日期 | Strain | Recovery | Readiness | CTL | ATL | TSB
+       ============================================================ -->
+  <script>
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSsCEHLVjwVEdnJe5lH9qn6YVjDZqyXyzjvjMKddxQ3sFE6WQCn8mDuXDL7RsL8MWvfsPIvg5YDpdWC/pub?output=csv';
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --card: #141414;
+      --card2: #1c1c1e;
+      --border: #2a2a2a;
+      --text: #f0f0f0;
+      --muted: #888;
+      --pink: #e040fb;
+      --teal: #00bfa5;
+      --amber: #ffb300;
+      --accent: #e040fb;
+      --safe-top: env(safe-area-inset-top, 44px);
+      --safe-bottom: env(safe-area-inset-bottom, 34px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans SC', sans-serif;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      padding: calc(var(--safe-top) + 12px) 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .header-date {
+      font-size: 13px;
+      color: var(--pink);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .refresh-btn {
+      width: 32px; height: 32px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.15s;
+    }
+    .refresh-btn:active { background: #2a2a2a; }
+
+    /* ── Main scroll area ── */
+    .main {
+      padding: 20px 16px calc(var(--safe-bottom) + 80px);
+      max-width: 430px;
+      margin: 0 auto;
+    }
+
+    /* ── Today date hero ── */
+    .today-hero {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+      font-family: 'Space Mono', monospace;
+      color: var(--text);
+    }
+
+    /* ── Stat grid ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s;
+    }
+    .stat-card:active { transform: scale(0.97); }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent-color, var(--border));
+      opacity: 0.8;
+    }
+
+    .stat-card.strain { --accent-color: var(--amber); }
+    .stat-card.recovery { --accent-color: var(--teal); }
+    .stat-card.readiness { --accent-color: #64b5f6; }
+    .stat-card.suggestion { --accent-color: var(--pink); }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .stat-card.strain .stat-value { color: var(--amber); }
+    .stat-card.recovery .stat-value { color: var(--teal); }
+    .stat-card.readiness .stat-value { color: #64b5f6; }
+
+    .suggestion-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #64b5f6;
+      display: inline-block;
+      margin-right: 6px;
+      box-shadow: 0 0 8px #64b5f6;
+    }
+    .suggestion-text {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    /* ── PMC Chart Card ── */
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 16px 16px;
+      margin-bottom: 16px;
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .chart-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .chart-canvas-wrap {
+      width: 100%;
+      height: 180px;
+      position: relative;
+    }
+
+    canvas#pmcChart {
+      width: 100% !important;
+      height: 180px !important;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    /* ── ACWR Card ── */
+    .acwr-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .acwr-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .acwr-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .acwr-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--pink);
+    }
+
+    .acwr-bar-wrap {
+      height: 8px;
+      background: #222;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .acwr-bar-zones {
+      position: absolute;
+      inset: 0;
+      display: flex;
+    }
+
+    .zone { height: 100%; }
+    .zone-low { background: #1a3a4a; flex: 0.8; }
+    .zone-ok  { background: #1a4a2a; flex: 0.6; }  /* 0.8–1.3 optimal */
+    .zone-hi  { background: #4a2a1a; flex: 1.6; }
+
+    .acwr-indicator {
+      position: absolute;
+      top: -2px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--pink);
+      box-shadow: 0 0 8px var(--pink);
+      transform: translateX(-50%);
+      transition: left 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .acwr-zones-label {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 9px;
+      color: #555;
+    }
+
+    /* ── History table ── */
+    .history-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .history-header {
+      padding: 16px 16px 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-count {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'Noto Sans SC', sans-serif;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .history-table th {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 8px 12px;
+      text-align: right;
+      background: #0f0f0f;
+      font-weight: 400;
+    }
+
+    .history-table th:first-child { text-align: left; }
+
+    .history-table td {
+      padding: 10px 12px;
+      font-size: 13px;
+      text-align: right;
+      border-top: 1px solid #1a1a1a;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .history-table td:first-child {
+      text-align: left;
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .history-table tr:first-child td { border-top: none; }
+    .history-table tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+
+    .val-strain { color: var(--amber); }
+    .val-rec { color: var(--teal); }
+    .val-read { color: #64b5f6; }
+    .val-tsb-pos { color: var(--teal); }
+    .val-tsb-neg { color: var(--pink); }
+
+    /* ── Bottom tab bar ── */
+    .tab-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(14,14,14,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding-bottom: var(--safe-bottom);
+      display: flex;
+    }
+
+    .tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 0 6px;
+      cursor: pointer;
+      gap: 3px;
+    }
+
+    .tab-icon { font-size: 20px; }
+    .tab-label { font-size: 10px; color: var(--muted); letter-spacing: 0.05em; }
+    .tab.active .tab-label { color: var(--pink); }
+    .tab.active .tab-icon { filter: drop-shadow(0 0 6px var(--pink)); }
+
+    /* ── Loading / Error states ── */
+    .state-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      text-align: center;
+      padding: 0 24px;
+      line-height: 1.6;
+    }
+
+    .setup-box {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .setup-box h3 {
+      color: var(--text);
+      font-size: 15px;
+      margin-bottom: 10px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .setup-box code {
+      background: #0f0f0f;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--pink);
+      font-size: 12px;
+    }
+
+    /* ── Fade in ── */
+    .fade-in {
+      animation: fadeIn 0.4s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div>
+    <div class="header-title">训练日志</div>
+  </div>
+  <div class="header-date" id="headerDate">—</div>
+  <div class="refresh-btn" onclick="loadData()" title="刷新">↻</div>
+</header>
+
+<!-- Main content -->
+<main class="main" id="main">
+  <div class="state-overlay">
+    <div class="spinner"></div>
+    <div>加载数据中…</div>
+  </div>
+</main>
+
+<!-- Bottom tab bar -->
+<nav class="tab-bar">
+  <div class="tab active">
+    <div class="tab-icon">⚡</div>
+    <div class="tab-label">TODAY</div>
+  </div>
+  <div class="tab" onclick="scrollToHistory()">
+    <div class="tab-icon">📋</div>
+    <div class="tab-label">历史</div>
+  </div>
+</nav>
+
+<!-- Chart.js from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<script>
+/* ── Flexible column lookup ── */
+function col(row, ...candidates) {
+  for (const k of candidates) {
+    if (row[k] !== undefined && row[k] !== '') return row[k];
+  }
+  // fuzzy: find any key that contains one of the candidates
+  const keys = Object.keys(row);
+  for (const c of candidates) {
+    const found = keys.find(k => k.replace(/\s/g,'').includes(c.replace(/\s/g,'')));
+    if (found && row[found] !== '') return row[found];
+  }
+  return '';
+}
+
+function colF(row, ...candidates) {
+  return parseFloat(col(row, ...candidates) || 0) || 0;
+}
+function parseCSV(text) {
+  // Robust CSV parser that handles quoted fields with newlines/commas
+  const rows = [];
+  let i = 0;
+  while (i < text.length) {
+    const row = [];
+    while (i < text.length && text[i] !== '\n') {
+      if (text[i] === '"') {
+        let val = '';
+        i++; // skip opening quote
+        while (i < text.length) {
+          if (text[i] === '"' && text[i+1] === '"') { val += '"'; i += 2; }
+          else if (text[i] === '"') { i++; break; }
+          else { val += text[i++]; }
+        }
+        row.push(val.trim());
+        if (text[i] === ',') i++;
+      } else {
+        let val = '';
+        while (i < text.length && text[i] !== ',' && text[i] !== '\n') val += text[i++];
+        row.push(val.trim());
+        if (text[i] === ',') i++;
+      }
+    }
+    if (text[i] === '\n') i++;
+    if (row.length > 1 || (row.length === 1 && row[0])) rows.push(row);
+  }
+  if (!rows.length) return [];
+  const headers = rows[0].map(h => h.replace(/\s+/g, ' ').trim()); // normalize whitespace in headers
+  return rows.slice(1).map(vals => {
+    const row = {};
+    headers.forEach((h, idx) => row[h] = vals[idx] || '');
+    return row;
+  }).filter(r => r[headers[0]]);
+}
+
+function getSuggestion(text) {
+  if (!text) return { text: '—', color: '#888' };
+  if (text.includes('强制停训')) return { text: '强制停训', color: '#ff5252' };
+  if (text.includes('强制休息')) return { text: '强制休息', color: '#ff9800' };
+  if (text.includes('上高强度')) return { text: '上高强度', color: '#00bfa5' };
+  if (text.includes('正常训练')) return { text: '正常训练', color: '#64b5f6' };
+  return { text: text.trim(), color: '#888' };
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatShort(dateStr) {
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return `${d.getMonth()+1}月${d.getDate()}日`;
+}
+
+let chartInstance = null;
+
+/* ── Render ── */
+function render(rows) {
+  if (!rows.length) {
+    document.getElementById('main').innerHTML = `
+      <div class="state-overlay">
+        <div class="error-msg">表格中没有数据行，<br>请检查 Google Sheet 内容。</div>
+      </div>`;
+    return;
+  }
+
+  const latest = rows[rows.length - 1];
+  const dateKey   = Object.keys(latest)[0]; // first column = Date
+  const strain    = colF(latest, 'Strain');
+  const recovery  = colF(latest, 'Recovery');
+  const readiness = colF(latest, 'Readiness');
+  const ctl       = colF(latest, 'CTL(体能)', 'CTL');
+  const atl       = colF(latest, 'ATL(疲劳)', 'ATL');
+  const tsb       = colF(latest, 'TSB(恢复)', 'TSB') || (ctl - atl);
+  const acwr      = colF(latest, 'ACWR(急慢性负荷比)', 'ACWR') || (atl > 0 ? atl / Math.max(ctl,1) : 0);
+  const sgText    = col(latest, '今日行动指南');
+
+  const todayStr = formatDate(latest[dateKey]);
+  document.getElementById('headerDate').textContent = todayStr;
+
+  const sg = getSuggestion(sgText);
+  const acwrPct = Math.min(Math.max((acwr / 2) * 100, 2), 98);
+  const tsbColor = tsb >= 0 ? 'val-tsb-pos' : 'val-tsb-neg';
+
+  // Last 28 days for chart
+  const recent = rows.slice(-28);
+  const labels = recent.map(r => formatShort(r[dateKey]));
+  const ctlArr = recent.map(r => colF(r, 'CTL(体能)', 'CTL'));
+  const atlArr = recent.map(r => colF(r, 'ATL(疲劳)', 'ATL'));
+  const tsbArr = recent.map(r => colF(r, 'TSB(恢复)', 'TSB'));
+
+  // History table (most recent 14)
+  const histRows = [...rows].reverse().slice(0, 14);
+
+  document.getElementById('main').innerHTML = `
+    <div class="fade-in">
+      <div class="today-hero">${todayStr}</div>
+
+      <div class="stat-grid">
+        <div class="stat-card strain">
+          <div class="stat-label">Strain</div>
+          <div class="stat-value">${isNaN(strain)?'—':strain.toFixed(1)}</div>
+        </div>
+        <div class="stat-card recovery">
+          <div class="stat-label">Recovery</div>
+          <div class="stat-value">${isNaN(recovery)?'—':Math.round(recovery)}</div>
+        </div>
+        <div class="stat-card readiness">
+          <div class="stat-label">Readiness</div>
+          <div class="stat-value">${isNaN(readiness)?'—':Math.round(readiness)}</div>
+        </div>
+        <div class="stat-card suggestion">
+          <div class="stat-label">Suggestion</div>
+          <div class="suggestion-text">
+            <span class="suggestion-dot" style="background:${sg.color};box-shadow:0 0 8px ${sg.color}"></span>${sg.text}
+          </div>
+        </div>
+      </div>
+
+      <!-- PMC Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">PMC</div>
+          <div style="font-size:11px;color:var(--muted)">近 28 天</div>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="pmcChart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#e040fb"></div>TSB（恢复）</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#00bfa5"></div>CTL（体能）</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ffb300"></div>ATL（疲劳）</div>
+        </div>
+      </div>
+
+      <!-- ACWR -->
+      <div class="acwr-card">
+        <div class="acwr-header">
+          <div class="acwr-label">ACWR（急慢性负荷比）</div>
+          <div class="acwr-value">${acwr.toFixed(2)}</div>
+        </div>
+        <div class="acwr-bar-wrap">
+          <div class="acwr-bar-zones">
+            <div class="zone zone-low"></div>
+            <div class="zone zone-ok"></div>
+            <div class="zone zone-hi"></div>
+          </div>
+          <div class="acwr-indicator" style="left:${acwrPct}%"></div>
+        </div>
+        <div class="acwr-zones-label">
+          <span>0</span><span>0.8</span><span>1.3</span><span>2.0+</span>
+        </div>
+      </div>
+
+      <!-- CTL/ATL/TSB today summary -->
+      <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr; gap:8px">
+        <div class="stat-card" style="padding:12px">
+          <div class="stat-label">CTL</div>
+          <div class="stat-value" style="font-size:22px;color:var(--teal)">${ctlArr[ctlArr.length-1]?.toFixed(1)||'—'}</div>
+        </div>
+        <div class="stat-card" style="padding:12px">
+          <div class="stat-label">ATL</div>
+          <div class="stat-value" style="font-size:22px;color:var(--amber)">${atlArr[atlArr.length-1]?.toFixed(1)||'—'}</div>
+        </div>
+        <div class="stat-card" style="padding:12px">
+          <div class="stat-label">TSB</div>
+          <div class="stat-value ${tsbColor}" style="font-size:22px">${tsbArr[tsbArr.length-1]?.toFixed(1)||'—'}</div>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="history-card" id="historySection">
+        <div class="history-header">
+          <span>历史记录</span>
+          <span class="history-count">最近 ${histRows.length} 条</span>
+        </div>
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>Strain</th>
+              <th>恢复</th>
+              <th>准备</th>
+              <th>TSB</th>
+              <th>建议</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${histRows.map(r => {
+              const ts = colF(r, 'TSB(恢复)', 'TSB');
+              const sg2 = getSuggestion(col(r, '今日行动指南'));
+              return `<tr>
+                <td>${formatShort(r[dateKey])}</td>
+                <td class="val-strain">${colF(r,'Strain').toFixed(0)}</td>
+                <td class="val-rec">${Math.round(colF(r,'Recovery'))}</td>
+                <td class="val-read">${Math.round(colF(r,'Readiness'))}</td>
+                <td class="${ts>=0?'val-tsb-pos':'val-tsb-neg'}">${ts.toFixed(1)}</td>
+                <td style="color:${sg2.color};font-family:'Noto Sans SC',sans-serif;font-size:11px">${sg2.text}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // Draw Chart
+  if (chartInstance) chartInstance.destroy();
+  const ctx = document.getElementById('pmcChart').getContext('2d');
+  chartInstance = new Chart(ctx, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'CTL',
+          data: ctlArr,
+          backgroundColor: 'rgba(0,191,165,0.35)',
+          borderColor: 'rgba(0,191,165,0)',
+          borderRadius: 3,
+          order: 3,
+        },
+        {
+          type: 'line',
+          label: 'ATL',
+          data: atlArr,
+          borderColor: '#ffb300',
+          backgroundColor: 'rgba(255,179,0,0.0)',
+          borderWidth: 1.5,
+          pointRadius: 3,
+          pointBackgroundColor: '#ffb300',
+          tension: 0.3,
+          order: 1,
+        },
+        {
+          type: 'line',
+          label: 'TSB',
+          data: tsbArr,
+          borderColor: '#e040fb',
+          backgroundColor: 'rgba(224,64,251,0.0)',
+          borderWidth: 1.5,
+          pointRadius: 3,
+          pointBackgroundColor: '#e040fb',
+          tension: 0.3,
+          order: 2,
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1c1c1e',
+          borderColor: '#2a2a2a',
+          borderWidth: 1,
+          titleColor: '#888',
+          bodyColor: '#f0f0f0',
+          padding: 10,
+          titleFont: { family: 'Space Mono', size: 10 },
+          bodyFont: { family: 'Space Mono', size: 11 },
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#555',
+            font: { size: 9 },
+            maxRotation: 0,
+            maxTicksLimit: 7,
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: '#2a2a2a' }
+        },
+        y: {
+          ticks: { color: '#555', font: { size: 9 }, maxTicksLimit: 5 },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: '#2a2a2a' }
+        }
+      }
+    }
+  });
+}
+
+/* ── Setup guide when URL not configured ── */
+function showSetup() {
+  document.getElementById('main').innerHTML = `
+    <div class="fade-in">
+      <div class="today-hero">配置数据源</div>
+      <div class="setup-box">
+        <h3>📋 第一步：发布 Google Sheet 为 CSV</h3>
+        <ol style="padding-left:18px;line-height:2.2">
+          <li>打开你的 Google Sheet</li>
+          <li>点击顶部菜单：<strong>文件 → 共享 → 发布到网络</strong></li>
+          <li>在弹窗里选择你的数据工作表</li>
+          <li>格式选择 <code>CSV</code></li>
+          <li>点击「发布」，复制生成的链接</li>
+        </ol>
+      </div>
+      <div class="setup-box">
+        <h3>✏️ 第二步：修改此文件</h3>
+        <p>用文本编辑器打开 <code>fitness-dashboard.html</code>，找到顶部：</p>
+        <br/>
+        <code>const SHEET_CSV_URL = 'YOUR_GOOGLE_SHEET_CSV_URL_HERE';</code>
+        <br/><br/>
+        <p>替换成你刚才复制的链接即可。</p>
+      </div>
+      <div class="setup-box">
+        <h3>📊 第三步：确保 Sheet 列标题如下</h3>
+        <p>第一行（标题行）需包含这些列名：</p>
+        <br/>
+        <code>日期, Strain, Recovery, Readiness, CTL, ATL, TSB</code>
+        <br/><br/>
+        <p>（顺序可以不同，但名称需匹配）</p>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Load data ── */
+async function loadData() {
+  if (!SHEET_CSV_URL || SHEET_CSV_URL === 'YOUR_GOOGLE_SHEET_CSV_URL_HERE') {
+    showSetup();
+    return;
+  }
+
+  document.getElementById('main').innerHTML = `
+    <div class="state-overlay">
+      <div class="spinner"></div>
+      <div>加载数据中…</div>
+    </div>`;
+
+  try {
+    // Use CORS proxy for Google Sheets
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(SHEET_CSV_URL)}`;
+    const res = await fetch(proxyUrl, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    render(rows);
+  } catch (e) {
+    document.getElementById('main').innerHTML = `
+      <div class="state-overlay">
+        <div class="error-msg">
+          ⚠️ 数据加载失败<br><br>
+          ${e.message}<br><br>
+          请检查：<br>
+          1. Google Sheet 是否已发布为 CSV<br>
+          2. 网络连接是否正常<br>
+          3. URL 是否正确粘贴
+        </div>
+        <button onclick="loadData()" style="
+          background:var(--card2);border:1px solid var(--border);
+          color:var(--text);padding:10px 24px;border-radius:10px;
+          font-size:14px;cursor:pointer;">重试</button>
+      </div>`;
+  }
+}
+
+function scrollToHistory() {
+  const el = document.getElementById('historySection');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Init
+loadData();
+</script>
+</body>
+</html>
