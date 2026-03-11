@@ -1,682 +1,528 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="训练日志" />
-  <meta name="theme-color" content="#0d0d0d" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="训练日志"/>
+  <meta name="theme-color" content="#0d0d0d"/>
   <title>训练日志</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
   <style>
-    :root {
-      --bg:       #0d0d0d;
-      --card:     #161616;
-      --card2:    #1e1e1e;
-      --border:   #272727;
-      --text:     #efefef;
-      --muted:    #666;
-      --muted2:   #444;
-      --pink:     #ff3cac;
-      --red:      #ff4444;
-      --teal:     #26d0a0;
-      --blue:     #5b9cf6;
-      --amber:    #f5a623;
-      --ctl-bar:  rgba(91,156,246,0.22);
-      --ctl-line: #5b9cf6;
-      --atl-line: #ff3cac;
-      --tsb-line: #ff4444;
+    :root{
+      --bg:#0d0d0d;--card:#161616;--card2:#1e1e1e;--border:#272727;
+      --text:#efefef;--muted:#666;--muted2:#3a3a3a;
+      --pink:#ff3cac;--red:#ff4444;--teal:#26d0a0;--blue:#5b9cf6;--amber:#f5a623;
+      --ctl-line:#5b9cf6;--atl-line:#ff3cac;--tsb-line:#ff4444;
+      --tab-h:calc(env(safe-area-inset-bottom,0px) + 58px);
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html{font-size:16px}
+    body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;min-height:100dvh;overscroll-behavior:none;overflow-x:hidden}
 
-    *, *::before, *::after {
-      box-sizing: border-box; margin: 0; padding: 0;
-      -webkit-tap-highlight-color: transparent;
+    /* PAGES + SWIPE */
+    .pages-wrap{display:flex;width:200%;transition:transform .32s cubic-bezier(.4,0,.2,1)}
+    .pages-wrap.no-anim{transition:none}
+    .page{width:50%;min-height:100dvh;display:flex;flex-direction:column}
+
+    /* HEADER */
+    .header{
+      position:sticky;top:0;z-index:50;
+      padding:calc(env(safe-area-inset-top,44px) + 10px) 20px 12px;
+      background:rgba(13,13,13,0.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
     }
+    .header-left{display:flex;flex-direction:column;gap:2px}
+    .header-eyebrow{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
+    .header-date{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--text);letter-spacing:0.03em}
+    .header-stale{font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;margin-top:1px}
+    .refresh-btn{width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);transition:color .15s,background .15s;user-select:none}
+    .refresh-btn:active{background:#2a2a2a;color:var(--text)}
+    .refresh-btn.spinning{animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    html { font-size: 16px; }
+    /* SCROLL */
+    .scroll{padding:20px 16px calc(var(--tab-h) + 20px);max-width:430px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Noto Sans SC', sans-serif;
-      min-height: 100dvh;
-      overscroll-behavior: none;
+    /* TAB BAR */
+    .tabbar{
+      position:fixed;bottom:0;left:0;right:0;z-index:100;
+      height:var(--tab-h);padding-bottom:env(safe-area-inset-bottom,0px);
+      background:rgba(13,13,13,0.95);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      border-top:1px solid var(--border);
+      display:flex;align-items:flex-start;justify-content:space-around;
     }
+    .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding-top:10px;cursor:pointer;user-select:none}
+    .tab-icon{font-size:18px;line-height:1;transition:filter .15s}
+    .tab-lbl{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;transition:color .15s}
+    .tab-btn.active .tab-lbl{color:var(--pink)}
+    .tab-btn.active .tab-icon{filter:drop-shadow(0 0 5px var(--pink))}
 
-    /* ─── HEADER ─── */
-    .header {
-      position: sticky; top: 0; z-index: 50;
-      padding: calc(env(safe-area-inset-top, 44px) + 10px) 20px 12px;
-      background: rgba(13,13,13,0.88);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
+    /* 2x2 STAT GRID */
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .stat-card{
+      background:var(--card);border:1px solid var(--border);border-radius:18px;
+      padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;
+      position:relative;overflow:hidden;transition:transform .12s;
     }
+    .stat-card:active{transform:scale(0.97)}
+    .stat-card::after{content:'';position:absolute;top:0;left:16px;right:16px;height:1.5px;background:var(--accent,var(--border));border-radius:0 0 2px 2px}
+    .stat-card.c-recovery{--accent:var(--teal)}.stat-card.c-readiness{--accent:var(--blue)}
+    .stat-card.c-strain{--accent:var(--amber)}.stat-card.c-suggest{--accent:var(--pink)}
+    .stat-card.rest-day{opacity:0.5}
+    .stat-lbl{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
 
-    .header-left { display: flex; flex-direction: column; gap: 2px; }
+    /* ring layout */
+    .stat-main{display:flex;align-items:center;gap:10px}
+    .ring-wrap{position:relative;width:52px;height:52px;flex-shrink:0}
+    .ring-wrap svg{width:52px;height:52px;transform:rotate(-90deg)}
+    .ring-bg{fill:none;stroke:var(--border);stroke-width:4}
+    .ring-fg{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1),stroke .4s}
+    .ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:14px;font-weight:500;line-height:1}
+    .stat-right{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+    .stat-val-lg{font-family:'DM Mono',monospace;font-size:30px;font-weight:500;line-height:1;letter-spacing:-0.02em}
+    .stat-card.c-recovery .stat-val-lg{color:var(--teal)}.stat-card.c-readiness .stat-val-lg{color:var(--blue)}.stat-card.c-strain .stat-val-lg{color:var(--amber)}
+    .stat-delta{font-size:10px;font-family:'DM Mono',monospace}
+    .delta-up{color:#26d0a0}.delta-down{color:#ff4444}.delta-flat{color:var(--muted)}
+    .rest-badge{display:inline-block;font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:2px 6px;margin-top:3px;letter-spacing:0.06em}
 
-    .header-eyebrow {
-      font-size: 10px; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
+    /* suggest card */
+    .suggest-pill{display:inline-flex;align-items:center;gap:7px;margin-top:2px}
+    .suggest-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .suggest-txt{font-size:16px;font-weight:700;line-height:1.2}
 
-    .header-date {
-      font-family: 'DM Mono', monospace;
-      font-size: 17px; font-weight: 500;
-      color: var(--text); letter-spacing: 0.04em;
-    }
+    /* ACWR */
+    .acwr-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 18px 16px}
+    .acwr-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+    .acwr-title{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
+    .acwr-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:500}
+    .acwr-track{position:relative;height:10px;border-radius:999px;overflow:visible;
+      background:linear-gradient(to right,#1a3550 0%,#1a3550 25%,#0d3d28 25%,#0d3d28 60%,#3d1f0d 60%,#3d1f0d 80%,#3d0d0d 80%,#3d0d0d 100%)}
+    .acwr-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 3px rgba(255,60,172,0.25),0 0 12px rgba(255,60,172,0.5);transition:left .5s cubic-bezier(.34,1.4,.64,1)}
+    .acwr-ticks{display:flex;justify-content:space-between;margin-top:7px;padding:0 1px;font-size:9px;color:var(--muted2);font-family:'DM Mono',monospace}
+    .acwr-zones{display:flex;justify-content:space-between;margin-top:3px;padding:0 1px;font-size:9px}
 
-    .refresh-btn {
-      width: 36px; height: 36px;
-      background: var(--card2); border: 1px solid var(--border);
-      border-radius: 10px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; color: var(--muted);
-      transition: color 0.15s, background 0.15s;
-      user-select: none;
-    }
-    .refresh-btn:active { background: #2a2a2a; color: var(--text); }
-    .refresh-btn.spinning { animation: spin 0.7s linear infinite; }
+    /* CHART */
+    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 14px 14px}
+    .chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 4px}
+    .chart-title{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;letter-spacing:0.06em}
+    .rpill{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.05em;padding:4px 10px;border-radius:999px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;background:transparent}
+    .rpill:active{opacity:0.7}.rpill.active{background:var(--pink);border-color:var(--pink);color:#fff}
+    .chart-wrap{height:190px;position:relative}
+    canvas{display:block}
+    .chart-legend{display:flex;gap:18px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+    .leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+    .leg-swatch{width:20px;height:3px;border-radius:2px}
+    .leg-swatch.bar{height:10px;border-radius:3px;opacity:0.7}
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* 1x3 METRICS */
+    .metric-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .metric-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 12px 16px;display:flex;flex-direction:column;gap:5px;position:relative;overflow:hidden}
+    .metric-card::after{content:'';position:absolute;top:0;left:10px;right:10px;height:1.5px;background:var(--accent,var(--border))}
+    .metric-card.c-ctl{--accent:var(--ctl-line)}.metric-card.c-atl{--accent:var(--atl-line)}.metric-card.c-tsb{--accent:var(--tsb-line)}
+    .metric-lbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
+    .metric-val{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;line-height:1}
+    .metric-card.c-ctl .metric-val{color:var(--ctl-line)}.metric-card.c-atl .metric-val{color:var(--atl-line)}.metric-card.c-tsb .metric-val{color:var(--tsb-line)}
+    .metric-sub{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:1px}
 
-    /* ─── SCROLL AREA ─── */
-    .scroll {
-      padding: 20px 16px calc(env(safe-area-inset-bottom, 0px) + 72px);
-      max-width: 430px; margin: 0 auto;
-      display: flex; flex-direction: column; gap: 14px;
-    }
+    /* LOG PAGE */
+    .log-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+    .log-card:active{border-color:var(--pink)}
+    .log-summary{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .log-summary-left{display:flex;flex-direction:column;gap:4px;min-width:0}
+    .log-date-row{display:flex;align-items:center;gap:8px}
+    .log-date{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text)}
+    .log-sg{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid currentColor;letter-spacing:0.04em;white-space:nowrap}
+    .rest-tag{font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:1px 6px;letter-spacing:0.06em}
+    .log-summary-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .log-quick{display:flex;gap:10px}
+    .log-qstat{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+    .log-qval{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;line-height:1}
+    .log-qlbl{font-size:8px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase}
+    .sparkline{width:52px;height:22px;flex-shrink:0}
+    .log-chevron{font-size:11px;color:var(--muted);transition:transform .2s;flex-shrink:0}
+    .log-card.expanded .log-chevron{transform:rotate(180deg)}
 
-    /* ─── SECTION LABEL ─── */
-    .section-label {
-      font-size: 10px; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      padding: 0 2px;
-      margin-bottom: -6px;
-    }
+    /* detail (collapsed by default) */
+    .log-detail{padding:0 14px 14px;border-top:1px solid var(--border);display:none;flex-direction:column;gap:10px}
+    .log-card.expanded .log-detail{display:flex}
+    .log-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+    .log-row.cols2{grid-template-columns:1fr 1fr}
+    .log-stat{display:flex;flex-direction:column;gap:2px}
+    .log-stat-lbl{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
+    .log-stat-val{display:flex;align-items:baseline;gap:3px;font-family:'DM Mono',monospace;font-size:18px;font-weight:500;line-height:1}
+    .trend{font-size:11px;line-height:1;flex-shrink:0}
+    .trend.up{color:#26d0a0}.trend.down{color:#ff4444}.trend.flat{color:#555}
+    .cv-strain{color:var(--amber)}.cv-recovery{color:var(--teal)}.cv-readiness{color:var(--blue)}
+    .cv-ctl{color:var(--ctl-line)}.cv-atl{color:var(--atl-line)}
+    .cv-tsb-pos{color:#26d0a0}.cv-tsb-neg{color:#ff4444}.cv-acwr{color:var(--pink)}
 
-    /* ─── 2×2 STAT GRID ─── */
-    .stat-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    /* month divider */
+    .month-divider{display:flex;align-items:center;gap:10px;padding:4px 2px}
+    .month-divider span{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.12em;white-space:nowrap}
+    .month-divider::before,.month-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
-    .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px 18px 18px;
-      display: flex; flex-direction: column; gap: 6px;
-      position: relative; overflow: hidden;
-      transition: transform 0.12s;
-    }
-    .stat-card:active { transform: scale(0.97); }
+    /* STATES */
+    .state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;color:var(--muted);font-size:13px;text-align:center}
+    .spinner{width:30px;height:30px;border:2px solid var(--border);border-top-color:var(--pink);border-radius:50%;animation:spin .75s linear infinite}
+    .err{color:#ff6b6b;max-width:280px;line-height:1.7}
 
-    /* top accent line */
-    .stat-card::after {
-      content: '';
-      position: absolute; top: 0; left: 16px; right: 16px; height: 1.5px;
-      background: var(--accent, var(--border));
-      border-radius: 0 0 2px 2px;
-    }
-
-    .stat-card.c-recovery  { --accent: var(--teal); }
-    .stat-card.c-readiness { --accent: var(--blue); }
-    .stat-card.c-strain    { --accent: var(--amber); }
-    .stat-card.c-suggest   { --accent: var(--pink); }
-
-    .stat-lbl {
-      font-size: 10px; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .stat-val {
-      font-family: 'DM Mono', monospace;
-      font-size: 36px; font-weight: 500; line-height: 1;
-      letter-spacing: -0.02em;
-    }
-
-    .stat-card.c-recovery  .stat-val { color: var(--teal); }
-    .stat-card.c-readiness .stat-val { color: var(--blue); }
-    .stat-card.c-strain    .stat-val { color: var(--amber); }
-
-    /* suggestion card */
-    .suggest-pill {
-      display: inline-flex; align-items: center; gap: 7px;
-      margin-top: 2px;
-    }
-
-    .suggest-dot {
-      width: 9px; height: 9px; border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .suggest-txt {
-      font-size: 17px; font-weight: 700; line-height: 1.2;
-    }
-
-    /* ─── ACWR CARD ─── */
-    .acwr-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px 18px 16px;
-    }
-
-    .acwr-top {
-      display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 14px;
-    }
-
-    .acwr-title {
-      font-size: 11px; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .acwr-val {
-      font-family: 'DM Mono', monospace;
-      font-size: 22px; font-weight: 500;
-      color: var(--text);
-    }
-
-    /* coloured gradient track */
-    .acwr-track {
-      position: relative; height: 10px;
-      border-radius: 999px; overflow: visible;
-      background: linear-gradient(
-        to right,
-        #1a3550 0%, #1a3550 30%,      /* < 0.8 low */
-        #0d3d28 30%, #0d3d28 55%,      /* 0.8–1.3 green zone */
-        #3d1f0d 55%, #3d1f0d 75%,      /* 1.3–1.5 caution */
-        #3d0d0d 75%, #3d0d0d 100%      /* > 1.5 danger */
-      );
-    }
-
-    .acwr-thumb {
-      position: absolute; top: 50%; transform: translate(-50%, -50%);
-      width: 16px; height: 16px; border-radius: 50%;
-      background: var(--pink);
-      box-shadow: 0 0 0 3px rgba(255,60,172,0.25), 0 0 12px rgba(255,60,172,0.5);
-      transition: left 0.5s cubic-bezier(0.34,1.4,0.64,1);
-    }
-
-    .acwr-ticks {
-      display: flex; justify-content: space-between;
-      margin-top: 7px; padding: 0 1px;
-      font-size: 9px; color: var(--muted2);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .acwr-zones {
-      display: flex; justify-content: space-between;
-      margin-top: 3px; padding: 0 1px;
-      font-size: 9px; color: var(--muted2);
-    }
-
-    /* ─── PMC CHART CARD ─── */
-    .chart-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px 14px 14px;
-    }
-
-    .chart-head {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px; padding: 0 4px;
-    }
-
-    .chart-title {
-      font-family: 'DM Mono', monospace;
-      font-size: 15px; font-weight: 500; letter-spacing: 0.06em;
-    }
-
-    .chart-sub {
-      font-size: 10px; color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
-
-    /* ─── RANGE PILLS ─── */
-    .rpill {
-      font-size: 10px; font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
-      padding: 4px 10px; border-radius: 999px;
-      border: 1px solid var(--border); color: var(--muted);
-      cursor: pointer; transition: all 0.15s; user-select: none; background: transparent;
-    }
-    .rpill:active { opacity: 0.7; }
-    .rpill.active { background: var(--pink); border-color: var(--pink); color: #fff; }
-
-    .chart-wrap { height: 190px; position: relative; }
-
-    canvas { display: block; }
-
-    .chart-legend {
-      display: flex; gap: 18px; justify-content: center;
-      margin-top: 14px; flex-wrap: wrap;
-    }
-
-    .leg {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 10px; color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .leg-swatch {
-      width: 20px; height: 3px; border-radius: 2px;
-    }
-
-    .leg-swatch.bar {
-      height: 10px; border-radius: 3px; opacity: 0.7;
-    }
-
-    /* ─── 1×3 METRIC ROW ─── */
-    .metric-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-    }
-
-    .metric-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 12px 16px;
-      display: flex; flex-direction: column; gap: 5px;
-      position: relative; overflow: hidden;
-    }
-
-    .metric-card::after {
-      content: '';
-      position: absolute; top: 0; left: 10px; right: 10px; height: 1.5px;
-      background: var(--accent, var(--border));
-    }
-
-    .metric-card.c-ctl { --accent: var(--ctl-line); }
-    .metric-card.c-atl { --accent: var(--atl-line); }
-    .metric-card.c-tsb { --accent: var(--tsb-line); }
-
-    .metric-lbl {
-      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--muted); font-family: 'DM Mono', monospace;
-    }
-
-    .metric-val {
-      font-family: 'DM Mono', monospace;
-      font-size: 24px; font-weight: 500; line-height: 1;
-    }
-
-    .metric-card.c-ctl .metric-val { color: var(--ctl-line); }
-    .metric-card.c-atl .metric-val { color: var(--atl-line); }
-    .metric-card.c-tsb .metric-val { color: var(--tsb-line); }
-
-    .metric-sub {
-      font-size: 9px; color: var(--muted); font-family: 'DM Mono', monospace;
-      margin-top: 1px;
-    }
-
-    /* ─── STATES ─── */
-    .state {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; min-height: 60vh; gap: 14px;
-      color: var(--muted); font-size: 13px; text-align: center;
-    }
-
-    .spinner {
-      width: 30px; height: 30px;
-      border: 2px solid var(--border);
-      border-top-color: var(--pink);
-      border-radius: 50%;
-      animation: spin 0.75s linear infinite;
-    }
-
-    .err { color: #ff6b6b; max-width: 280px; line-height: 1.7; }
-
-    /* ─── FADE IN ─── */
-    .fade { animation: fadeUp 0.35s ease both; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .fade:nth-child(2) { animation-delay: 0.04s; }
-    .fade:nth-child(3) { animation-delay: 0.08s; }
-    .fade:nth-child(4) { animation-delay: 0.12s; }
-    .fade:nth-child(5) { animation-delay: 0.16s; }
-    .fade:nth-child(6) { animation-delay: 0.20s; }
-
-    /* ─── PAGES ─── */
-    .page { display: none; }
-    .page.active { display: block; }
-
-    /* ─── TAB BAR ─── */
-    .tabbar {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 80;
-      background: rgba(13,13,13,0.94);
-      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-      border-top: 1px solid var(--border);
-      display: flex;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-    .tab-btn {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 10px 0 8px; gap: 3px; cursor: pointer; user-select: none;
-    }
-    .tab-icon { font-size: 18px; line-height: 1; transition: filter 0.15s; }
-    .tab-lbl  { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-family: 'DM Mono', monospace; transition: color 0.15s; }
-    .tab-btn.active .tab-lbl  { color: var(--pink); }
-    .tab-btn.active .tab-icon { filter: drop-shadow(0 0 5px var(--pink)); }
-
-    /* ─── LOG PAGE CARDS ─── */
-    .log-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
-    }
-    .log-date-row {
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .log-date {
-      font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500;
-      color: var(--text); letter-spacing: 0.04em;
-    }
-    .log-sg {
-      font-size: 11px; font-weight: 700; padding: 3px 9px;
-      border-radius: 999px; border: 1px solid currentColor;
-      letter-spacing: 0.04em;
-    }
-    .log-divider { height: 1px; background: var(--border); }
-
-    /* stat rows inside log card */
-    .log-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-    .log-row.cols2 { grid-template-columns: 1fr 1fr; }
-
-    .log-stat { display: flex; flex-direction: column; gap: 2px; }
-    .log-stat-lbl { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-family: 'DM Mono', monospace; }
-    .log-stat-val {
-      display: flex; align-items: baseline; gap: 4px;
-      font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; line-height: 1;
-    }
-    .log-stat-val .unit { font-size: 11px; color: var(--muted); font-weight: 400; }
-
-    /* trend icons */
-    .trend { font-size: 11px; line-height: 1; flex-shrink: 0; margin-left: 1px; }
-    .trend.up   { color: #26d0a0; }
-    .trend.down { color: #ff4444; }
-    .trend.flat { color: #555; }
-
-    /* color per metric */
-    .cv-strain   { color: var(--amber); }
-    .cv-recovery { color: var(--teal); }
-    .cv-readiness{ color: var(--blue); }
-    .cv-ctl      { color: var(--ctl-line); }
-    .cv-atl      { color: var(--atl-line); }
-    .cv-tsb-pos  { color: #26d0a0; }
-    .cv-tsb-neg  { color: #ff4444; }
-    .cv-acwr     { color: var(--pink); }
-    .cv-text     { color: var(--text); }
+    /* FADE */
+    .fade{animation:fadeUp .35s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fade:nth-child(2){animation-delay:.04s}.fade:nth-child(3){animation-delay:.08s}
+    .fade:nth-child(4){animation-delay:.12s}.fade:nth-child(5){animation-delay:.16s}
   </style>
 </head>
 <body>
 
-<!-- ══ TODAY PAGE ══ -->
-<div class="page active" id="page-today">
-<header class="header">
-  <div class="header-left">
-    <span class="header-eyebrow">训练日志</span>
-    <span class="header-date" id="hDate">—</span>
+<div class="pages-wrap" id="pagesWrap">
+
+  <!-- TODAY PAGE -->
+  <div class="page" id="page-today">
+    <header class="header">
+      <div class="header-left">
+        <span class="header-eyebrow">训练日志</span>
+        <span class="header-date" id="hDate">—</span>
+        <span class="header-stale" id="hStale" style="display:none"></span>
+      </div>
+      <div class="refresh-btn" id="refreshBtn" onclick="loadData()">↻</div>
+    </header>
+    <main class="scroll" id="main">
+      <div class="state"><div class="spinner"></div><span>加载数据中…</span></div>
+    </main>
   </div>
-  <div class="refresh-btn" id="refreshBtn" onclick="loadData()">↻</div>
-</header>
-<main class="scroll" id="main">
-  <div class="state"><div class="spinner"></div><span>加载数据中…</span></div>
-</main>
+
+  <!-- LOG PAGE -->
+  <div class="page" id="page-log">
+    <header class="header">
+      <div class="header-left">
+        <span class="header-eyebrow">训练日志</span>
+        <span class="header-date">全部记录</span>
+      </div>
+    </header>
+    <main class="scroll" id="log-main">
+      <div class="state"><span style="color:var(--muted);font-size:13px">请先在 TODAY 加载数据</span></div>
+    </main>
+  </div>
+
 </div>
 
-<!-- ══ LOG PAGE ══ -->
-<div class="page" id="page-log">
-<header class="header">
-  <div class="header-left">
-    <span class="header-eyebrow">训练日志</span>
-    <span class="header-date">全部记录</span>
-  </div>
-</header>
-<main class="scroll" id="log-main">
-  <div class="state"><span style="color:var(--muted);font-size:13px">请先在 TODAY 加载数据</span></div>
-</main>
-</div>
-
-<!-- ══ TAB BAR ══ -->
 <nav class="tabbar">
-  <div class="tab-btn active" id="tab-today" onclick="switchTab('today')">
-    <div class="tab-icon">⚡</div>
-    <div class="tab-lbl">Today</div>
+  <div class="tab-btn active" id="tab-today" onclick="switchTab(0)">
+    <div class="tab-icon">⚡</div><div class="tab-lbl">Today</div>
   </div>
-  <div class="tab-btn" id="tab-log" onclick="switchTab('log')">
-    <div class="tab-icon">📋</div>
-    <div class="tab-lbl">Log</div>
+  <div class="tab-btn" id="tab-log" onclick="switchTab(1)">
+    <div class="tab-icon">📋</div><div class="tab-lbl">Log</div>
   </div>
 </nav>
 
 <script>
-// ─── CONFIG ────────────────────────────────────────────────────────────────
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSsCEHLVjwVEdnJe5lH9qn6YVjDZqyXyzjvjMKddxQ3sFE6WQCn8mDuXDL7RsL8MWvfsPIvg5YDpdWC/pub?gid=1454006024&single=true&output=csv';
-// ───────────────────────────────────────────────────────────────────────────
+// ── CONFIG ──────────────────────────────────────────────────────
+const CSV_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSsCEHLVjwVEdnJe5lH9qn6YVjDZqyXyzjvjMKddxQ3sFE6WQCn8mDuXDL7RsL8MWvfsPIvg5YDpdWC/pub?gid=1454006024&single=true&output=csv';
+const CACHE_KEY = 'trainingCache_v1';
 
-// ─── CSV PARSER (handles quoted fields with embedded commas/newlines) ───────
-function parseCSV(raw) {
-  const rows = []; let i = 0, n = raw.length;
-  while (i < n) {
-    const row = []; let eol = false;
-    while (!eol && i < n) {
-      let val = '';
-      if (raw[i] === '"') {
-        i++;
-        while (i < n) {
-          if (raw[i] === '"' && raw[i+1] === '"') { val += '"'; i += 2; }
-          else if (raw[i] === '"') { i++; break; }
-          else val += raw[i++];
-        }
-      } else {
-        while (i < n && raw[i] !== ',' && raw[i] !== '\r' && raw[i] !== '\n') val += raw[i++];
-      }
+// ── TAB / SWIPE ─────────────────────────────────────────────────
+let currentTab = 0;
+function switchTab(idx, animate=true) {
+  currentTab = idx;
+  const wrap = document.getElementById('pagesWrap');
+  if (!animate) wrap.classList.add('no-anim');
+  wrap.style.transform = idx===0 ? 'translateX(0)' : 'translateX(-50%)';
+  if (!animate) requestAnimationFrame(()=>wrap.classList.remove('no-anim'));
+  ['tab-today','tab-log'].forEach((t,i)=>document.getElementById(t).classList.toggle('active',i===idx));
+  if (idx===1 && allRows.length) renderLog(allRows);
+}
+// swipe gesture
+(function(){
+  let sx=0,sy=0,ok=false;
+  const w=document.getElementById('pagesWrap');
+  w.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;ok=true},{passive:true});
+  w.addEventListener('touchend',e=>{
+    if(!ok)return;ok=false;
+    const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>Math.abs(dy)*1.5&&Math.abs(dx)>40)switchTab(dx<0?1:0);
+  },{passive:true});
+})();
+
+// ── CSV PARSER ──────────────────────────────────────────────────
+function parseCSV(raw){
+  const rows=[];let i=0,n=raw.length;
+  while(i<n){
+    const row=[];let eol=false;
+    while(!eol&&i<n){
+      let val='';
+      if(raw[i]==='"'){i++;while(i<n){if(raw[i]==='"'&&raw[i+1]==='"'){val+='"';i+=2;}else if(raw[i]==='"'){i++;break;}else val+=raw[i++];}}
+      else{while(i<n&&raw[i]!==','&&raw[i]!=='\r'&&raw[i]!=='\n')val+=raw[i++];}
       row.push(val.trim());
-      if (i < n && raw[i] === ',') i++;
-      else eol = true;
+      if(i<n&&raw[i]===',')i++;else eol=true;
     }
-    while (i < n && (raw[i] === '\r' || raw[i] === '\n')) i++;
-    if (row.some(v => v)) rows.push(row);
+    while(i<n&&(raw[i]==='\r'||raw[i]==='\n'))i++;
+    if(row.some(v=>v))rows.push(row);
   }
-  if (!rows.length) return [];
-  const hdrs = rows[0].map(h => h.replace(/\s+/g,' ').trim());
-  return rows.slice(1).map(cols => {
-    const obj = {};
-    hdrs.forEach((h, idx) => { obj[h] = (cols[idx] || '').trim(); });
-    return obj;
-  }).filter(r => r[hdrs[0]]);
+  if(!rows.length)return[];
+  const hdrs=rows[0].map(h=>h.replace(/\s+/g,' ').trim());
+  return rows.slice(1).map(cols=>{const obj={};hdrs.forEach((h,idx)=>{obj[h]=(cols[idx]||'').trim();});return obj;}).filter(r=>r[hdrs[0]]);
 }
 
-function f(v) { return parseFloat(v) || 0; }
+// ── HELPERS ─────────────────────────────────────────────────────
+function f(v){return parseFloat(v)||0;}
 
-// ─── SUGGESTION CONFIG ──────────────────────────────────────────────────────
-function sgConfig(text) {
-  if (!text) return { color: '#888', glow: 'rgba(136,136,136,0.3)' };
-  if (text.includes('强制停训')) return { color: '#ff4444', glow: 'rgba(255,68,68,0.4)' };
-  if (text.includes('强制休息')) return { color: '#ff9800', glow: 'rgba(255,152,0,0.4)' };
-  if (text.includes('上高强度')) return { color: '#26d0a0', glow: 'rgba(38,208,160,0.4)' };
-  if (text.includes('正常训练')) return { color: '#5b9cf6', glow: 'rgba(91,156,246,0.4)' };
-  return { color: '#aaa', glow: 'rgba(170,170,170,0.3)' };
+function sgConfig(text){
+  if(!text)return{color:'#888',glow:'rgba(136,136,136,0.3)'};
+  if(text.includes('强制停训'))return{color:'#ff4444',glow:'rgba(255,68,68,0.4)'};
+  if(text.includes('强制休息'))return{color:'#ff9800',glow:'rgba(255,152,0,0.4)'};
+  if(text.includes('上高强度'))return{color:'#26d0a0',glow:'rgba(38,208,160,0.4)'};
+  if(text.includes('正常训练'))return{color:'#5b9cf6',glow:'rgba(91,156,246,0.4)'};
+  return{color:'#aaa',glow:'rgba(170,170,170,0.3)'};
 }
 
-// ─── DATE FORMAT ─────────────────────────────────────────────────────────────
-function fmtDate(s) {
-  if (!s) return '—';
-  // Handle YYYY-MM-DD or YYYY/MM/DD
-  const d = new Date(s.replace(/\//g,'-'));
-  if (isNaN(d)) return s;
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function acwrColor(v){
+  if(v<=0)return'var(--muted)';
+  if(v<0.8)return'#5b9cf6';
+  if(v<=1.3)return'#26d0a0';
+  if(v<=1.5)return'#f5a623';
+  return'#ff4444';
 }
 
-function fmtShort(s) {
-  const d = new Date((s||'').replace(/\//g,'-'));
-  if (isNaN(d)) return s||'';
-  return `${d.getMonth()+1}/${d.getDate()}`;
+function ringColor(v){return v>=70?'#26d0a0':v>=40?'#f5a623':'#ff4444';}
+
+function ringDash(pct,r){
+  const c=2*Math.PI*r;
+  return{arr:c,off:c*(1-Math.min(Math.max(pct,0),1))};
 }
 
-// ─── CHART INSTANCE ────────────────────────────────────────────────────────
-let chartInst  = null;
-let chartRange = '30d';
+function fmtDate(s){
+  if(!s)return'—';
+  const d=new Date(s.replace(/\//g,'-'));if(isNaN(d))return s;
+  const wk=['日','一','二','三','四','五','六'];
+  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} 周${wk[d.getDay()]}`;
+}
 
-function getSlice(range) {
-  if (range === '7d') {
-    const now = new Date(), mon = new Date(now);
-    mon.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
-    mon.setHours(0,0,0,0);
-    const r = allRows.filter(r => { const d = new Date((r['Date']||'').replace(/\//g,'-')); return !isNaN(d) && d >= mon; });
-    return r.length ? r : allRows.slice(-7);
+function fmtShort(s){const d=new Date((s||'').replace(/\//g,'-'));if(isNaN(d))return s||'';return`${d.getMonth()+1}/${d.getDate()}`;}
+
+function fmtMonthKey(s){const d=new Date((s||'').replace(/\//g,'-'));if(isNaN(d))return'?';return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+
+function fmtMonthLabel(k){const[y,m]=k.split('-');return`${y}年${parseInt(m)}月`;}
+
+function daysSince(s){const d=new Date((s||'').replace(/\//g,'-'));if(isNaN(d))return null;return Math.floor((Date.now()-d.getTime())/86400000);}
+
+function deltaHTML(curr,prev,dec=0){
+  if(prev===null||prev===undefined)return'';
+  const d=curr-prev,eps=Math.pow(10,-dec)*0.5,a=Math.abs(d).toFixed(dec);
+  if(Math.abs(d)<eps)return`<span class="stat-delta delta-flat">— vs 昨日</span>`;
+  const cls=d>0?'delta-up':'delta-down',sign=d>0?'+':'−';
+  return`<span class="stat-delta ${cls}">${sign}${a} vs 昨日</span>`;
+}
+
+function trendIcon(curr,prev,dec=0){
+  if(prev===null||prev===undefined)return'';
+  const d=curr-prev,eps=Math.pow(10,-dec)*0.5;
+  if(Math.abs(d)<eps)return'<span class="trend flat">—</span>';
+  return d>0?'<span class="trend up">↑</span>':'<span class="trend down">↓</span>';
+}
+
+// ── SPARKLINE ───────────────────────────────────────────────────
+function sparkSVG(vals){
+  const w=52,h=22,p=2;
+  if(!vals||vals.length<2)return`<svg class="sparkline" viewBox="0 0 ${w} ${h}"></svg>`;
+  const mn=Math.min(...vals),mx=Math.max(...vals),rng=mx-mn||1;
+  const pts=vals.map((v,i)=>{
+    const x=p+(i/(vals.length-1))*(w-p*2);
+    const y=(h-p)-((v-mn)/rng)*(h-p*2);
+    return`${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const[lx,ly]=pts[pts.length-1].split(',');
+  const lv=vals[vals.length-1];
+  const col=lv>=0?'#26d0a0':'#ff4444';
+  return`<svg class="sparkline" viewBox="0 0 ${w} ${h}" fill="none">
+    <polyline points="${pts.join(' ')}" stroke="${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="${lx}" cy="${ly}" r="2.5" fill="${col}"/>
+  </svg>`;
+}
+
+// ── CHART STATE ─────────────────────────────────────────────────
+let chartInst=null,chartRange='30d',allRows=[];
+
+function getSlice(range){
+  if(range==='7d'){
+    const now=new Date(),mon=new Date(now);
+    mon.setDate(now.getDate()-(now.getDay()===0?6:now.getDay()-1));mon.setHours(0,0,0,0);
+    const r=allRows.filter(r=>{const d=new Date((r['Date']||'').replace(/\//g,'-'));return!isNaN(d)&&d>=mon;});
+    return r.length?r:allRows.slice(-7);
   }
-  if (range === 'ytd') {
-    const yr = new Date().getFullYear();
-    const r = allRows.filter(r => { const d = new Date((r['Date']||'').replace(/\//g,'-')); return !isNaN(d) && d.getFullYear() === yr; });
-    return r.length ? r : allRows;
+  if(range==='ytd'){
+    const yr=new Date().getFullYear();
+    const r=allRows.filter(r=>{const d=new Date((r['Date']||'').replace(/\//g,'-'));return!isNaN(d)&&d.getFullYear()===yr;});
+    return r.length?r:allRows;
   }
   return allRows.slice(-30);
 }
 
-function drawChart(range) {
-  chartRange = range;
-  document.querySelectorAll('.rpill').forEach(p => p.classList.toggle('active', p.dataset.range === range));
-  const slice   = getSlice(range);
-  const labels  = slice.map(r => fmtShort(r['Date']));
-  const ctlData = slice.map(r => f(r['CTL(体能)']));
-  const atlData = slice.map(r => f(r['ATL(疲劳)']));
-  const tsbData = slice.map(r => f(r['TSB(恢复)']));
-  if (chartInst) chartInst.destroy();
-  const ctx = document.getElementById('pmcCanvas').getContext('2d');
-  chartInst = new Chart(ctx, {
-    data: { labels, datasets: [
-      { type:'bar',  label:'CTL', data:ctlData, backgroundColor:'rgba(91,156,246,0.28)', borderWidth:0, borderRadius:3, order:3, yAxisID:'y' },
-      { type:'line', label:'ATL', data:atlData, borderColor:'#ff3cac', backgroundColor:'transparent', borderWidth:2, pointRadius:2.5, pointBackgroundColor:'#ff3cac', tension:0.35, order:1, yAxisID:'y' },
-      { type:'line', label:'TSB', data:tsbData, borderColor:'#ff4444', backgroundColor:'transparent', borderWidth:2, pointRadius:2.5, pointBackgroundColor:'#ff4444', tension:0.35, order:2, yAxisID:'y' },
+function drawChart(range){
+  chartRange=range;
+  document.querySelectorAll('.rpill').forEach(p=>p.classList.toggle('active',p.dataset.range===range));
+  const slice=getSlice(range);
+  const labels=slice.map(r=>fmtShort(r['Date']));
+  const ctlData=slice.map(r=>f(r['CTL(体能)']));
+  const atlData=slice.map(r=>f(r['ATL(疲劳)']));
+  const tsbData=slice.map(r=>f(r['TSB(恢复)']));
+
+  if(chartInst)chartInst.destroy();
+  const ctx=document.getElementById('pmcCanvas').getContext('2d');
+
+  // inline plugins
+  const zeroLine={id:'zeroLine',afterDraw(chart){
+    const{ctx:c,scales:{y,x}}=chart;
+    if(!y)return;const yZ=y.getPixelForValue(0);
+    if(yZ<chart.chartArea.top||yZ>chart.chartArea.bottom)return;
+    c.save();c.beginPath();c.moveTo(chart.chartArea.left,yZ);c.lineTo(chart.chartArea.right,yZ);
+    c.strokeStyle='rgba(255,255,255,0.18)';c.lineWidth=1;c.setLineDash([4,4]);c.stroke();c.restore();
+  }};
+
+  const lastGlow={id:'lastGlow',afterDatasetsDraw(chart){
+    const{ctx:c}=chart;
+    chart.data.datasets.forEach((ds,di)=>{
+      if(ds.type!=='line')return;
+      const meta=chart.getDatasetMeta(di);
+      const last=meta.data[meta.data.length-1];if(!last)return;
+      const{x,y}=last.getCenterPoint();
+      c.save();
+      c.beginPath();c.arc(x,y,6,0,Math.PI*2);c.fillStyle=ds.borderColor+'2a';c.fill();
+      c.beginPath();c.arc(x,y,3.5,0,Math.PI*2);c.fillStyle=ds.borderColor;c.shadowColor=ds.borderColor;c.shadowBlur=8;c.fill();
+      c.restore();
+    });
+  }};
+
+  chartInst=new Chart(ctx,{
+    plugins:[zeroLine,lastGlow],
+    data:{labels,datasets:[
+      {type:'bar', label:'CTL',data:ctlData,backgroundColor:'rgba(91,156,246,0.25)',borderWidth:0,borderRadius:3,order:3,yAxisID:'y'},
+      {type:'line',label:'ATL',data:atlData,borderColor:'#ff3cac',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:0.35,order:1,yAxisID:'y'},
+      {type:'line',label:'TSB',data:tsbData,borderColor:'#ff4444',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:0.35,order:2,yAxisID:'y'},
     ]},
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      plugins:{ legend:{ display:false }, tooltip:{ backgroundColor:'#1a1a1a', borderColor:'#303030', borderWidth:1, titleColor:'#888', bodyColor:'#eee', padding:10, titleFont:{ family:'DM Mono', size:10 }, bodyFont:{ family:'DM Mono', size:11 }, callbacks:{ label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}` } } },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1a',borderColor:'#303030',borderWidth:1,titleColor:'#888',bodyColor:'#eee',padding:10,titleFont:{family:'DM Mono',size:10},bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}`}}},
       scales:{
-        x:{ ticks:{ color:'#555', font:{ family:'DM Mono', size:9 }, maxRotation:0, maxTicksLimit:8 }, grid:{ color:'rgba(255,255,255,0.03)' }, border:{ color:'#252525' } },
-        y:{ ticks:{ color:'#555', font:{ family:'DM Mono', size:9 }, maxTicksLimit:6 }, grid:{ color:'rgba(255,255,255,0.04)' }, border:{ color:'#252525' } }
+        x:{ticks:{color:'#555',font:{family:'DM Mono',size:9},maxRotation:0,maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'#252525'}},
+        y:{ticks:{color:'#555',font:{family:'DM Mono',size:9},maxTicksLimit:6},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'#252525'}}
       }
     }
   });
 }
 
-// ─── RENDER ────────────────────────────────────────────────────────────────
-function render(rows) {
-  allRows = rows;
-  const main = document.getElementById('main');
+// ── RENDER TODAY ─────────────────────────────────────────────────
+function render(rows){
+  allRows=rows;
+  const main=document.getElementById('main');
+  if(!rows.length){main.innerHTML=`<div class="state"><span class="err">表格没有数据。</span></div>`;return;}
 
-  if (!rows.length) {
-    main.innerHTML = `<div class="state"><span class="err">表格没有数据，请检查 Sheet。</span></div>`;
-    return;
-  }
+  const today=rows[rows.length-1];
+  const prev=rows.length>1?rows[rows.length-2]:null;
 
-  // ── Today = last row ──
-  const today = rows[rows.length - 1];
+  const date=today['Date']||'';
+  const strain=f(today['Strain']),recovery=f(today['Recovery']),readiness=f(today['Readiness']);
+  const ctl=f(today['CTL(体能)']),atl=f(today['ATL(疲劳)']),tsb=f(today['TSB(恢复)']);
+  const acwr=f(today['ACWR(急慢性负荷比)']);
+  const sgText=today['今日行动指南']||'';
 
-  // Column A–I (exact names from your sheet)
-  const date      = today['Date']              || '';
-  const strain    = f(today['Strain']);
-  const recovery  = f(today['Recovery']);
-  const readiness = f(today['Readiness']);
-  const ctl       = f(today['CTL(体能)']);
-  const atl       = f(today['ATL(疲劳)']);
-  const tsb       = f(today['TSB(恢复)']);
-  const acwr      = f(today['ACWR(急慢性负荷比)']);
-  const sgText    = today['今日行动指南'] || '';
+  const pStrain=prev?f(prev['Strain']):null;
+  const pRecovery=prev?f(prev['Recovery']):null;
+  const pReadiness=prev?f(prev['Readiness']):null;
 
-  const sg = sgConfig(sgText);
-  const todayFmt = fmtDate(date);
-  document.getElementById('hDate').textContent = todayFmt;
+  // stale check
+  document.getElementById('hDate').textContent=fmtDate(date);
+  const ds=daysSince(date);
+  const staleEl=document.getElementById('hStale');
+  if(ds!==null&&ds>0){staleEl.textContent=`⚠ 最近数据来自 ${ds} 天前`;staleEl.style.display='block';}
+  else staleEl.style.display='none';
 
-  // ACWR thumb: data reaches ~3.2, map over 0–3.0 range
-  const acwrPct = Math.min(Math.max((acwr / 3.0) * 100, 2), 98).toFixed(1);
+  const sg=sgConfig(sgText);
+  const isRest=strain===0;
+  const acwrPct=Math.min(Math.max((acwr/3)*100,2),98).toFixed(1);
+  const R=22;
+  const recD=ringDash(recovery/100,R),readD=ringDash(readiness/100,R);
 
-  main.innerHTML = `
-    <!-- 2×2 stat cards -->
-    <div class="fade">
-      <div class="stat-grid">
+  main.innerHTML=`
+    <div class="fade"><div class="stat-grid">
 
-        <div class="stat-card c-strain">
-          <span class="stat-lbl">Strain</span>
-          <span class="stat-val">${strain.toFixed(0)}</span>
-        </div>
-
-        <div class="stat-card c-recovery">
-          <span class="stat-lbl">Recovery</span>
-          <span class="stat-val">${recovery.toFixed(0)}</span>
-        </div>
-
-        <div class="stat-card c-readiness">
-          <span class="stat-lbl">Readiness</span>
-          <span class="stat-val">${readiness.toFixed(0)}</span>
-        </div>
-
-        <div class="stat-card c-suggest">
-          <span class="stat-lbl">今日建议</span>
-          <div class="suggest-pill">
-            <span class="suggest-dot" style="background:${sg.color};box-shadow:0 0 8px ${sg.glow}"></span>
-            <span class="suggest-txt" style="color:${sg.color}">${sgText || '—'}</span>
+      <div class="stat-card c-strain${isRest?' rest-day':''}">
+        <span class="stat-lbl">Strain</span>
+        <div class="stat-main">
+          <div class="stat-right">
+            <span class="stat-val-lg">${strain.toFixed(0)}</span>
+            ${isRest?`<span class="rest-badge">休息日</span>`:deltaHTML(strain,pStrain,0)}
           </div>
         </div>
-
       </div>
-    </div>
 
-    <!-- ACWR -->
+      <div class="stat-card c-recovery">
+        <span class="stat-lbl">Recovery</span>
+        <div class="stat-main">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 52 52"><circle class="ring-bg" cx="26" cy="26" r="${R}"/><circle class="ring-fg" cx="26" cy="26" r="${R}" stroke="${ringColor(recovery)}" stroke-dasharray="${recD.arr.toFixed(1)}" stroke-dashoffset="${recD.off.toFixed(1)}"/></svg>
+            <div class="ring-num" style="color:${ringColor(recovery)}">${recovery.toFixed(0)}</div>
+          </div>
+          <div class="stat-right">
+            <span class="stat-val-lg">${recovery.toFixed(0)}</span>
+            ${deltaHTML(recovery,pRecovery,0)}
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card c-readiness">
+        <span class="stat-lbl">Readiness</span>
+        <div class="stat-main">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 52 52"><circle class="ring-bg" cx="26" cy="26" r="${R}"/><circle class="ring-fg" cx="26" cy="26" r="${R}" stroke="${ringColor(readiness)}" stroke-dasharray="${readD.arr.toFixed(1)}" stroke-dashoffset="${readD.off.toFixed(1)}"/></svg>
+            <div class="ring-num" style="color:${ringColor(readiness)}">${readiness.toFixed(0)}</div>
+          </div>
+          <div class="stat-right">
+            <span class="stat-val-lg">${readiness.toFixed(0)}</span>
+            ${deltaHTML(readiness,pReadiness,0)}
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card c-suggest">
+        <span class="stat-lbl">今日建议</span>
+        <div class="suggest-pill">
+          <span class="suggest-dot" style="background:${sg.color};box-shadow:0 0 8px ${sg.glow}"></span>
+          <span class="suggest-txt" style="color:${sg.color}">${sgText||'—'}</span>
+        </div>
+      </div>
+
+    </div></div>
+
     <div class="acwr-card fade">
       <div class="acwr-top">
         <span class="acwr-title">ACWR &nbsp;急慢性负荷比</span>
-        <span class="acwr-val">${acwr.toFixed(2)}</span>
+        <span class="acwr-val" style="color:${acwrColor(acwr)}">${acwr>0?acwr.toFixed(2):'—'}</span>
       </div>
-      <div class="acwr-track">
-        <div class="acwr-thumb" id="acwrThumb" style="left:${acwrPct}%"></div>
-      </div>
-      <div class="acwr-ticks">
-        <span>0</span><span>0.75</span><span>1.5</span><span>2.25</span><span>3.0+</span>
-      </div>
+      <div class="acwr-track"><div class="acwr-thumb" style="left:${acwr>0?acwrPct:2}%"></div></div>
+      <div class="acwr-ticks"><span>0</span><span>0.75</span><span>1.5</span><span>2.25</span><span>3.0+</span></div>
       <div class="acwr-zones">
-        <span style="color:#2a5070">偏低</span>
-        <span style="color:#1a6040">最佳区间</span>
-        <span style="color:#6b3a1a">注意</span>
-        <span style="color:#6b1a1a">过载</span>
+        <span style="color:#2a5070">偏低</span><span style="color:#1a6040">最佳</span>
+        <span style="color:#6b3a1a">注意</span><span style="color:#6b1a1a">过载</span>
       </div>
     </div>
 
-    <!-- PMC Chart -->
     <div class="chart-card fade">
       <div class="chart-head">
         <span class="chart-title">PMC</span>
-        <div style="display:flex;gap:6px;">
+        <div style="display:flex;gap:6px">
           <span class="rpill" data-range="7d" onclick="drawChart('7d')">本周</span>
           <span class="rpill active" data-range="30d" onclick="drawChart('30d')">近30天</span>
           <span class="rpill" data-range="ytd" onclick="drawChart('ytd')">今年</span>
         </div>
       </div>
-      <div class="chart-wrap">
-        <canvas id="pmcCanvas"></canvas>
-      </div>
+      <div class="chart-wrap"><canvas id="pmcCanvas"></canvas></div>
       <div class="chart-legend">
         <div class="leg"><div class="leg-swatch bar" style="background:#5b9cf6"></div>CTL 体能</div>
         <div class="leg"><div class="leg-swatch" style="background:#ff3cac"></div>ATL 疲劳</div>
@@ -684,217 +530,149 @@ function render(rows) {
       </div>
     </div>
 
-    <!-- 1×3 CTL / ATL / TSB -->
     <div class="metric-row fade">
-      <div class="metric-card c-ctl">
-        <span class="metric-lbl">CTL</span>
-        <span class="metric-val">${ctl.toFixed(1)}</span>
-        <span class="metric-sub">体能</span>
-      </div>
-      <div class="metric-card c-atl">
-        <span class="metric-lbl">ATL</span>
-        <span class="metric-val">${atl.toFixed(1)}</span>
-        <span class="metric-sub">疲劳</span>
-      </div>
-      <div class="metric-card c-tsb">
-        <span class="metric-lbl">TSB</span>
-        <span class="metric-val" style="color:${tsb >= 0 ? '#26d0a0' : '#ff4444'}">${tsb.toFixed(1)}</span>
-        <span class="metric-sub">恢复</span>
-      </div>
+      <div class="metric-card c-ctl"><span class="metric-lbl">CTL</span><span class="metric-val">${ctl.toFixed(1)}</span><span class="metric-sub">体能</span></div>
+      <div class="metric-card c-atl"><span class="metric-lbl">ATL</span><span class="metric-val">${atl.toFixed(1)}</span><span class="metric-sub">疲劳</span></div>
+      <div class="metric-card c-tsb"><span class="metric-lbl">TSB</span><span class="metric-val" style="color:${tsb>=0?'#26d0a0':'#ff4444'}">${tsb.toFixed(1)}</span><span class="metric-sub">恢复</span></div>
     </div>
   `;
-
   drawChart(chartRange);
 }
 
-// ─── GLOBAL DATA CACHE ─────────────────────────────────────────────────────
-let allRows = [];
+// ── RENDER LOG ───────────────────────────────────────────────────
+const LOG_PS=30;let logPage=0,logObs=null;
 
-// ─── TAB SWITCHING ─────────────────────────────────────────────────────────
-function switchTab(tab) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + tab).classList.add('active');
-  document.getElementById('tab-'  + tab).classList.add('active');
-  if (tab === 'log' && allRows.length) renderLog(allRows);
-}
+function renderLogPage(rev,page){
+  const start=page*LOG_PS,chunk=rev.slice(start,start+LOG_PS);
+  if(!chunk.length)return;
+  const con=document.getElementById('log-cards');
+  const wk=['日','一','二','三','四','五','六'];
+  let lastMon=con.dataset.lastMonth||'';
 
-// ─── TREND ICON ────────────────────────────────────────────────────────────
-function trend(curr, prev, decimals = 0, invert = false) {
-  if (prev === null || prev === undefined) return '';
-  const diff = curr - prev;
-  const eps  = Math.pow(10, -decimals) * 0.5; // tolerance
-  if (Math.abs(diff) < eps) return '<span class="trend flat">—</span>';
-  const going_up = diff > 0;
-  const isGood   = invert ? !going_up : going_up;
-  // For TSB: positive is good (no invert); for ATL: up is bad (invert=true)
-  return going_up
-    ? `<span class="trend up">↑</span>`
-    : `<span class="trend down">↓</span>`;
-}
+  chunk.forEach((r,ci)=>{
+    const ri=start+ci,prev=rev[ri+1]||null;
+    const date=r['Date']||'';
+    const strain=f(r['Strain']),recovery=f(r['Recovery']),readiness=f(r['Readiness']);
+    const ctl=f(r['CTL(体能)']),atl=f(r['ATL(疲劳)']),tsb=f(r['TSB(恢复)']);
+    const acwr=f(r['ACWR(急慢性负荷比)']);
+    const sgText=r['今日行动指南']||'';
+    const pStrain=prev?f(prev['Strain']):null;
+    const pRecovery=prev?f(prev['Recovery']):null;
+    const pReadiness=prev?f(prev['Readiness']):null;
+    const pCtl=prev?f(prev['CTL(体能)']):null;
+    const pAtl=prev?f(prev['ATL(疲劳)']):null;
+    const pTsb=prev?f(prev['TSB(恢复)']):null;
+    const pAcwr=prev?f(prev['ACWR(急慢性负荷比)']):null;
+    const sg=sgConfig(sgText),isRest=strain===0;
+    const d=new Date((date).replace(/\//g,'-'));
+    const dateLabel=isNaN(d)?date:`${d.getMonth()+1}月${d.getDate()}日 周${wk[d.getDay()]}`;
 
-// ─── RENDER LOG PAGE (paginated, 30/page, infinite scroll) ────────────────
-const LOG_PAGE_SIZE = 30;
-let logPage = 0;      // how many pages already rendered
-let logObserver = null;
+    // month divider
+    const mkey=fmtMonthKey(date);
+    if(mkey!==lastMon){
+      lastMon=mkey;con.dataset.lastMonth=mkey;
+      const mdiv=document.createElement('div');mdiv.className='month-divider';
+      mdiv.innerHTML=`<span>${fmtMonthLabel(mkey)}</span>`;con.appendChild(mdiv);
+    }
 
-function renderLogPage(rev, page) {
-  const start = page * LOG_PAGE_SIZE;
-  const chunk = rev.slice(start, start + LOG_PAGE_SIZE);
-  if (!chunk.length) return;
+    // sparkline: 7-day TSB window ending at this row (in chronological order)
+    const sparkVals=rev.slice(Math.max(0,ri-6),ri+1).map(x=>f(x['TSB(恢复)'])).reverse();
 
-  const container = document.getElementById('log-cards');
-  const weekdays  = ['日','一','二','三','四','五','六'];
-
-  chunk.forEach((r, ci) => {
-    // index in the full reversed array
-    const ri   = start + ci;
-    const prev = rev[ri + 1] || null;
-
-    const date      = r['Date'] || '';
-    const strain    = f(r['Strain']);
-    const recovery  = f(r['Recovery']);
-    const readiness = f(r['Readiness']);
-    const ctl       = f(r['CTL(体能)']);
-    const atl       = f(r['ATL(疲劳)']);
-    const tsb       = f(r['TSB(恢复)']);
-    const acwr      = f(r['ACWR(急慢性负荷比)']);
-    const sgText    = r['今日行动指南'] || '';
-
-    const pStrain    = prev ? f(prev['Strain'])    : null;
-    const pRecovery  = prev ? f(prev['Recovery'])  : null;
-    const pReadiness = prev ? f(prev['Readiness']) : null;
-    const pCtl       = prev ? f(prev['CTL(体能)']) : null;
-    const pAtl       = prev ? f(prev['ATL(疲劳)']) : null;
-    const pTsb       = prev ? f(prev['TSB(恢复)']) : null;
-    const pAcwr      = prev ? f(prev['ACWR(急慢性负荷比)']) : null;
-
-    const sg = sgConfig(sgText);
-    const d  = new Date((date).replace(/\//g, '-'));
-    const dateLabel = isNaN(d) ? date
-      : `${d.getMonth()+1}月${d.getDate()}日 周${weekdays[d.getDay()]}`;
-
-    const card = document.createElement('div');
-    card.className = 'log-card';
-    card.innerHTML = `
-      <div class="log-date-row">
-        <span class="log-date">${dateLabel}</span>
-        ${sgText ? `<span class="log-sg" style="color:${sg.color};border-color:${sg.color}20;background:${sg.color}12">${sgText}</span>` : ''}
-      </div>
-      <div class="log-divider"></div>
-      <div class="log-row">
-        <div class="log-stat">
-          <span class="log-stat-lbl">Strain</span>
-          <div class="log-stat-val cv-strain">${strain.toFixed(0)}${trend(strain,pStrain,0)}</div>
+    const card=document.createElement('div');
+    card.className='log-card';
+    card.innerHTML=`
+      <div class="log-summary" onclick="this.parentElement.classList.toggle('expanded')">
+        <div class="log-summary-left">
+          <div class="log-date-row">
+            <span class="log-date">${dateLabel}</span>
+            ${isRest?`<span class="rest-tag">休息</span>`:''}
+          </div>
+          ${sgText?`<span class="log-sg" style="color:${sg.color};border-color:${sg.color}30;background:${sg.color}10;width:fit-content">${sgText}</span>`:''}
         </div>
-        <div class="log-stat">
-          <span class="log-stat-lbl">Recovery</span>
-          <div class="log-stat-val cv-recovery">${recovery.toFixed(0)}${trend(recovery,pRecovery,0)}</div>
-        </div>
-        <div class="log-stat">
-          <span class="log-stat-lbl">Readiness</span>
-          <div class="log-stat-val cv-readiness">${readiness.toFixed(0)}${trend(readiness,pReadiness,0)}</div>
+        <div class="log-summary-right">
+          <div class="log-quick">
+            <div class="log-qstat"><span class="log-qval" style="color:var(--teal)">${recovery.toFixed(0)}</span><span class="log-qlbl">Rec</span></div>
+            <div class="log-qstat"><span class="log-qval" style="color:var(--blue)">${readiness.toFixed(0)}</span><span class="log-qlbl">Read</span></div>
+            <div class="log-qstat"><span class="log-qval" style="color:${tsb>=0?'#26d0a0':'#ff4444'}">${tsb.toFixed(1)}</span><span class="log-qlbl">TSB</span></div>
+          </div>
+          ${sparkSVG(sparkVals)}
+          <span class="log-chevron">▾</span>
         </div>
       </div>
-      <div class="log-row">
-        <div class="log-stat">
-          <span class="log-stat-lbl">CTL 体能</span>
-          <div class="log-stat-val cv-ctl">${ctl.toFixed(1)}${trend(ctl,pCtl,1)}</div>
+      <div class="log-detail">
+        <div class="log-row">
+          <div class="log-stat"><span class="log-stat-lbl">Strain</span><div class="log-stat-val cv-strain">${strain.toFixed(0)}${trendIcon(strain,pStrain,0)}</div></div>
+          <div class="log-stat"><span class="log-stat-lbl">Recovery</span><div class="log-stat-val cv-recovery">${recovery.toFixed(0)}${trendIcon(recovery,pRecovery,0)}</div></div>
+          <div class="log-stat"><span class="log-stat-lbl">Readiness</span><div class="log-stat-val cv-readiness">${readiness.toFixed(0)}${trendIcon(readiness,pReadiness,0)}</div></div>
         </div>
-        <div class="log-stat">
-          <span class="log-stat-lbl">ATL 疲劳</span>
-          <div class="log-stat-val cv-atl">${atl.toFixed(1)}${trend(atl,pAtl,1)}</div>
+        <div class="log-row">
+          <div class="log-stat"><span class="log-stat-lbl">CTL 体能</span><div class="log-stat-val cv-ctl">${ctl.toFixed(1)}${trendIcon(ctl,pCtl,1)}</div></div>
+          <div class="log-stat"><span class="log-stat-lbl">ATL 疲劳</span><div class="log-stat-val cv-atl">${atl.toFixed(1)}${trendIcon(atl,pAtl,1)}</div></div>
+          <div class="log-stat"><span class="log-stat-lbl">TSB 恢复</span><div class="log-stat-val ${tsb>=0?'cv-tsb-pos':'cv-tsb-neg'}">${tsb.toFixed(1)}${trendIcon(tsb,pTsb,1)}</div></div>
         </div>
-        <div class="log-stat">
-          <span class="log-stat-lbl">TSB 恢复</span>
-          <div class="log-stat-val ${tsb>=0?'cv-tsb-pos':'cv-tsb-neg'}">${tsb.toFixed(1)}${trend(tsb,pTsb,1)}</div>
-        </div>
-      </div>
-      <div class="log-row cols2">
-        <div class="log-stat">
-          <span class="log-stat-lbl">ACWR</span>
-          <div class="log-stat-val cv-acwr">${acwr>0?acwr.toFixed(2):'—'}${acwr>0?trend(acwr,pAcwr,2):''}</div>
+        <div class="log-row cols2">
+          <div class="log-stat"><span class="log-stat-lbl">ACWR</span><div class="log-stat-val" style="color:${acwrColor(acwr)}">${acwr>0?acwr.toFixed(2):'—'}${acwr>0?trendIcon(acwr,pAcwr,2):''}</div></div>
         </div>
       </div>`;
-    container.appendChild(card);
+    con.appendChild(card);
   });
 }
 
-function renderLog(rows) {
-  const el = document.getElementById('log-main');
-  if (!rows.length) { el.innerHTML = `<div class="state"><span>无数据</span></div>`; return; }
-
-  const rev = [...rows].reverse();
-
-  // Reset state
-  logPage = 0;
-  if (logObserver) logObserver.disconnect();
-
-  el.innerHTML = `
-    <div id="log-cards" style="display:flex;flex-direction:column;gap:12px;"></div>
+function renderLog(rows){
+  const el=document.getElementById('log-main');
+  if(!rows.length){el.innerHTML=`<div class="state"><span>无数据</span></div>`;return;}
+  const rev=[...rows].reverse();
+  logPage=0;if(logObs)logObs.disconnect();
+  el.innerHTML=`
+    <div id="log-cards" style="display:flex;flex-direction:column;gap:10px;"></div>
     <div id="log-sentinel" style="height:1px;margin-bottom:8px;"></div>
-    <div id="log-end" style="display:none;text-align:center;padding:16px 0;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.1em;">— 已加载全部 ${rev.length} 条 —</div>
-  `;
-
-  // Render first page immediately
-  renderLogPage(rev, 0);
-  logPage = 1;
-
-  // Check if all loaded already
-  if (rev.length <= LOG_PAGE_SIZE) {
-    document.getElementById('log-sentinel').style.display = 'none';
-    document.getElementById('log-end').style.display = 'block';
-    return;
-  }
-
-  // IntersectionObserver for infinite scroll
-  const sentinel = document.getElementById('log-sentinel');
-  logObserver = new IntersectionObserver(entries => {
-    if (!entries[0].isIntersecting) return;
-    const start = logPage * LOG_PAGE_SIZE;
-    if (start >= rev.length) {
-      logObserver.disconnect();
-      sentinel.style.display = 'none';
-      document.getElementById('log-end').style.display = 'block';
-      return;
-    }
-    renderLogPage(rev, logPage);
-    logPage++;
-  }, { rootMargin: '200px' });
-
-  logObserver.observe(sentinel);
+    <div id="log-end" style="display:none;text-align:center;padding:16px 0;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.1em;">— 已加载全部 ${rev.length} 条 —</div>`;
+  renderLogPage(rev,0);logPage=1;
+  if(rev.length<=LOG_PS){document.getElementById('log-sentinel').style.display='none';document.getElementById('log-end').style.display='block';return;}
+  const sentinel=document.getElementById('log-sentinel');
+  logObs=new IntersectionObserver(entries=>{
+    if(!entries[0].isIntersecting)return;
+    if(logPage*LOG_PS>=rev.length){logObs.disconnect();sentinel.style.display='none';document.getElementById('log-end').style.display='block';return;}
+    renderLogPage(rev,logPage++);
+  },{rootMargin:'200px'});
+  logObs.observe(sentinel);
 }
 
-// ─── LOAD ──────────────────────────────────────────────────────────────────
-async function loadData() {
-  const btn = document.getElementById('refreshBtn');
+// ── CACHE ────────────────────────────────────────────────────────
+function saveCache(t){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),csv:t}));}catch(e){}}
+function loadCache(){try{const d=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');return d?d.csv:null;}catch(e){return null;}}
+
+// ── LOAD ─────────────────────────────────────────────────────────
+async function loadData(){
+  const btn=document.getElementById('refreshBtn');
   btn.classList.add('spinning');
-
-  document.getElementById('main').innerHTML =
-    `<div class="state"><div class="spinner"></div><span>加载数据中…</span></div>`;
-
-  try {
-    const proxy = `https://corsproxy.io/?${encodeURIComponent(CSV_URL)}`;
-    const res = await fetch(proxy, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    const rows = parseCSV(text);
-    render(rows);
-  } catch (e) {
-    document.getElementById('main').innerHTML = `
-      <div class="state">
-        <span class="err">⚠️ 加载失败<br><br>${e.message}<br><br>请检查网络或 Sheet 链接。</span>
-        <button onclick="loadData()" style="
-          margin-top:8px; background:var(--card2); border:1px solid var(--border);
-          color:var(--text); padding:10px 28px; border-radius:12px;
-          font-size:14px; cursor:pointer; font-family:'Noto Sans SC',sans-serif;">
-          重试
-        </button>
-      </div>`;
-  } finally {
-    btn.classList.remove('spinning');
-  }
+  document.getElementById('main').innerHTML=`<div class="state"><div class="spinner"></div><span>加载数据中…</span></div>`;
+  try{
+    const res=await fetch(`https://corsproxy.io/?${encodeURIComponent(CSV_URL)}`,{cache:'no-store'});
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const text=await res.text();
+    saveCache(text);render(parseCSV(text));
+  }catch(e){
+    const cached=loadCache();
+    if(cached){
+      render(parseCSV(cached));
+      const s=document.getElementById('hStale');
+      s.textContent='⚠ 离线模式 · 显示上次缓存';s.style.display='block';
+    }else{
+      document.getElementById('main').innerHTML=`
+        <div class="state"><span class="err">⚠️ 加载失败<br><br>${e.message}</span>
+        <button onclick="loadData()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px 28px;border-radius:12px;font-size:14px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;">重试</button></div>`;
+    }
+  }finally{btn.classList.remove('spinning');}
 }
+
+// ── PULL TO REFRESH ──────────────────────────────────────────────
+(function(){
+  let sy=0,ok=false;
+  const m=document.getElementById('main');
+  m.addEventListener('touchstart',e=>{if(m.scrollTop===0){sy=e.touches[0].clientY;ok=true;}},{passive:true});
+  m.addEventListener('touchend',e=>{if(!ok)return;ok=false;if(e.changedTouches[0].clientY-sy>60)loadData();},{passive:true});
+})();
 
 loadData();
 </script>
