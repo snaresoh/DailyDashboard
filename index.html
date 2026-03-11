@@ -315,6 +315,17 @@
       margin-top: 1px;
     }
 
+    /* ─── RANGE PILLS ─── */
+    .rpill {
+      font-size: 10px; font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
+      padding: 4px 10px; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted);
+      cursor: pointer; transition: all 0.15s; user-select: none;
+      background: transparent;
+    }
+    .rpill:active { opacity: 0.7; }
+    .rpill.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
     /* ─── STATES ─── */
     .state {
       display: flex; flex-direction: column; align-items: center;
@@ -401,6 +412,23 @@ function parseCSV(raw) {
 
 function f(v) { return parseFloat(v) || 0; }
 
+// ─── FUZZY KEY LOOKUP ───────────────────────────────────────────────────────
+// Strips whitespace & brackets so "ACWR (急慢性负荷比)" matches "ACWR(急慢性负荷比)"
+function getKey(row, ...candidates) {
+  const norm = s => s.replace(/[\s()（）]/g, '').toLowerCase();
+  for (const k of candidates) {
+    if (row[k] !== undefined && row[k] !== '') return row[k];
+  }
+  const keys = Object.keys(row);
+  for (const c of candidates) {
+    const nc = norm(c);
+    const found = keys.find(k => norm(k) === nc);
+    if (found !== undefined && row[found] !== '') return row[found];
+  }
+  return '';
+}
+function fk(row, ...keys) { return parseFloat(getKey(row, ...keys)) || 0; }
+
 // ─── SUGGESTION CONFIG ──────────────────────────────────────────────────────
 function sgConfig(text) {
   if (!text) return { color: '#888', glow: 'rgba(136,136,136,0.3)' };
@@ -426,11 +454,74 @@ function fmtShort(s) {
   return `${d.getMonth()+1}/${d.getDate()}`;
 }
 
-// ─── CHART INSTANCE ────────────────────────────────────────────────────────
+// ─── CHART STATE ───────────────────────────────────────────────────────────
 let chartInst = null;
+let allRows    = [];
+let chartRange = '30d'; // '7d' | '30d' | 'ytd'
+
+function getSlice(range) {
+  if (range === '7d') {
+    // Mon of current week → today
+    const now = new Date();
+    const mon = new Date(now);
+    mon.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+    mon.setHours(0,0,0,0);
+    const filtered = allRows.filter(r => {
+      const d = new Date((r['Date']||'').replace(/\//g,'-'));
+      return !isNaN(d) && d >= mon;
+    });
+    return filtered.length ? filtered : allRows.slice(-7);
+  }
+  if (range === 'ytd') {
+    const yr = new Date().getFullYear();
+    const filtered = allRows.filter(r => {
+      const d = new Date((r['Date']||'').replace(/\//g,'-'));
+      return !isNaN(d) && d.getFullYear() === yr;
+    });
+    return filtered.length ? filtered : allRows;
+  }
+  return allRows.slice(-30); // '30d'
+}
+
+function drawChart(range) {
+  chartRange = range;
+  document.querySelectorAll('.rpill').forEach(p =>
+    p.classList.toggle('active', p.dataset.range === range)
+  );
+  const slice   = getSlice(range);
+  const labels  = slice.map(r => fmtShort(r['Date']));
+  const ctlData = slice.map(r => f(r['CTL(体能)']));
+  const atlData = slice.map(r => f(r['ATL(疲劳)']));
+  const tsbData = slice.map(r => f(r['TSB(恢复)']));
+  if (chartInst) chartInst.destroy();
+  const ctx = document.getElementById('pmcCanvas').getContext('2d');
+  chartInst = new Chart(ctx, {
+    data: {
+      labels,
+      datasets: [
+        { type:'bar',  label:'CTL', data:ctlData, backgroundColor:'rgba(91,156,246,0.28)', borderWidth:0, borderRadius:3, order:3, yAxisID:'y' },
+        { type:'line', label:'ATL', data:atlData, borderColor:'#ff3cac', backgroundColor:'transparent', borderWidth:2, pointRadius:2.5, pointBackgroundColor:'#ff3cac', tension:0.35, order:1, yAxisID:'y' },
+        { type:'line', label:'TSB', data:tsbData, borderColor:'#ff4444', backgroundColor:'transparent', borderWidth:2, pointRadius:2.5, pointBackgroundColor:'#ff4444', tension:0.35, order:2, yAxisID:'y' },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ backgroundColor:'#1a1a1a', borderColor:'#303030', borderWidth:1, titleColor:'#888', bodyColor:'#eee', padding:10, titleFont:{ family:'DM Mono', size:10 }, bodyFont:{ family:'DM Mono', size:11 }, callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}` } }
+      },
+      scales:{
+        x:{ ticks:{ color:'#555', font:{ family:'DM Mono', size:9 }, maxRotation:0, maxTicksLimit:8 }, grid:{ color:'rgba(255,255,255,0.03)' }, border:{ color:'#252525' } },
+        y:{ ticks:{ color:'#555', font:{ family:'DM Mono', size:9 }, maxTicksLimit:6 }, grid:{ color:'rgba(255,255,255,0.04)' }, border:{ color:'#252525' } }
+      }
+    }
+  });
+}
 
 // ─── RENDER ────────────────────────────────────────────────────────────────
 function render(rows) {
+  allRows = rows;   // cache for range switching
   const main = document.getElementById('main');
 
   if (!rows.length) {
@@ -449,22 +540,15 @@ function render(rows) {
   const ctl       = f(today['CTL(体能)']);
   const atl       = f(today['ATL(疲劳)']);
   const tsb       = f(today['TSB(恢复)']);
-  const acwr      = f(today['ACWR(急慢性负荷比)']);
-  const sgText    = today['今日行动指南'] || '';
+  const acwr      = fk(today, 'ACWR(急慢性负荷比)', 'ACWR (急慢性负荷比)', 'ACWR');
+  const sgText    = getKey(today, '今日行动指南') || today['今日行动指南'] || '';
 
   const sg = sgConfig(sgText);
   const todayFmt = fmtDate(date);
   document.getElementById('hDate').textContent = todayFmt;
 
-  // ACWR thumb position: map 0–2.0 range to 0–100%
-  const acwrPct = Math.min(Math.max((acwr / 2.0) * 100, 2), 98).toFixed(1);
-
-  // ── Last 30 rows (including today) for chart ──
-  const slice = rows.slice(-30);
-  const labels  = slice.map(r => fmtShort(r['Date']));
-  const ctlData = slice.map(r => f(r['CTL(体能)']));
-  const atlData = slice.map(r => f(r['ATL(疲劳)']));
-  const tsbData = slice.map(r => f(r['TSB(恢复)']));
+  // ACWR thumb: your data reaches ~3.2, so map over 0–3.0 range
+  const acwrPct = Math.min(Math.max((acwr / 3.0) * 100, 2), 98).toFixed(1);
 
   main.innerHTML = `
     <!-- 2×2 stat cards -->
@@ -507,7 +591,7 @@ function render(rows) {
         <div class="acwr-thumb" id="acwrThumb" style="left:${acwrPct}%"></div>
       </div>
       <div class="acwr-ticks">
-        <span>0</span><span>0.5</span><span>1.0</span><span>1.5</span><span>2.0</span>
+        <span>0</span><span>0.75</span><span>1.5</span><span>2.25</span><span>3.0+</span>
       </div>
       <div class="acwr-zones">
         <span style="color:#2a5070">偏低</span>
@@ -521,7 +605,11 @@ function render(rows) {
     <div class="chart-card fade">
       <div class="chart-head">
         <span class="chart-title">PMC</span>
-        <span class="chart-sub">近 30 天</span>
+        <div style="display:flex;gap:6px;">
+          <span class="rpill" data-range="7d"  onclick="drawChart('7d')">本周</span>
+          <span class="rpill active" data-range="30d" onclick="drawChart('30d')">近30天</span>
+          <span class="rpill" data-range="ytd" onclick="drawChart('ytd')">今年</span>
+        </div>
       </div>
       <div class="chart-wrap">
         <canvas id="pmcCanvas"></canvas>
@@ -553,89 +641,7 @@ function render(rows) {
     </div>
   `;
 
-  // ── Draw Chart ──────────────────────────────────────────────────────────
-  if (chartInst) chartInst.destroy();
-  const ctx = document.getElementById('pmcCanvas').getContext('2d');
-  chartInst = new Chart(ctx, {
-    data: {
-      labels,
-      datasets: [
-        {
-          type: 'bar',
-          label: 'CTL',
-          data: ctlData,
-          backgroundColor: 'rgba(91,156,246,0.28)',
-          borderColor: 'rgba(91,156,246,0.5)',
-          borderWidth: 0,
-          borderRadius: 3,
-          order: 3,
-          yAxisID: 'y',
-        },
-        {
-          type: 'line',
-          label: 'ATL',
-          data: atlData,
-          borderColor: '#ff3cac',
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 2.5,
-          pointBackgroundColor: '#ff3cac',
-          tension: 0.35,
-          order: 1,
-          yAxisID: 'y',
-        },
-        {
-          type: 'line',
-          label: 'TSB',
-          data: tsbData,
-          borderColor: '#ff4444',
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 2.5,
-          pointBackgroundColor: '#ff4444',
-          tension: 0.35,
-          order: 2,
-          yAxisID: 'y',
-        },
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1a1a1a',
-          borderColor: '#303030',
-          borderWidth: 1,
-          titleColor: '#888',
-          bodyColor: '#eee',
-          padding: 10,
-          titleFont: { family: 'DM Mono', size: 10 },
-          bodyFont: { family: 'DM Mono', size: 11 },
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}`
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: '#555', font: { family: 'DM Mono', size: 9 },
-            maxRotation: 0, maxTicksLimit: 8,
-          },
-          grid: { color: 'rgba(255,255,255,0.03)' },
-          border: { color: '#252525' },
-        },
-        y: {
-          ticks: { color: '#555', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 6 },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          border: { color: '#252525' },
-        },
-      },
-    }
-  });
+  drawChart(chartRange);
 }
 
 // ─── LOAD ──────────────────────────────────────────────────────────────────
