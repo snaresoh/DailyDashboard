@@ -247,6 +247,16 @@
       font-family: 'DM Mono', monospace;
     }
 
+    /* ─── RANGE PILLS ─── */
+    .rpill {
+      font-size: 10px; font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
+      padding: 4px 10px; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted);
+      cursor: pointer; transition: all 0.15s; user-select: none; background: transparent;
+    }
+    .rpill:active { opacity: 0.7; }
+    .rpill.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
     .chart-wrap { height: 190px; position: relative; }
 
     canvas { display: block; }
@@ -525,7 +535,52 @@ function fmtShort(s) {
 }
 
 // ─── CHART INSTANCE ────────────────────────────────────────────────────────
-let chartInst = null;
+let chartInst  = null;
+let chartRange = '30d';
+
+function getSlice(range) {
+  if (range === '7d') {
+    const now = new Date(), mon = new Date(now);
+    mon.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+    mon.setHours(0,0,0,0);
+    const r = allRows.filter(r => { const d = new Date((r['Date']||'').replace(/\//g,'-')); return !isNaN(d) && d >= mon; });
+    return r.length ? r : allRows.slice(-7);
+  }
+  if (range === 'ytd') {
+    const yr = new Date().getFullYear();
+    const r = allRows.filter(r => { const d = new Date((r['Date']||'').replace(/\//g,'-')); return !isNaN(d) && d.getFullYear() === yr; });
+    return r.length ? r : allRows;
+  }
+  return allRows.slice(-30);
+}
+
+function drawChart(range) {
+  chartRange = range;
+  document.querySelectorAll('.rpill').forEach(p => p.classList.toggle('active', p.dataset.range === range));
+  const slice   = getSlice(range);
+  const labels  = slice.map(r => fmtShort(r['Date']));
+  const ctlData = slice.map(r => f(r['CTL(体能)']));
+  const atlData = slice.map(r => f(r['ATL(疲劳)']));
+  const tsbData = slice.map(r => f(r['TSB(恢复)']));
+  if (chartInst) chartInst.destroy();
+  const ctx = document.getElementById('pmcCanvas').getContext('2d');
+  chartInst = new Chart(ctx, {
+    data: { labels, datasets: [
+      { type:'bar',  label:'CTL', data:ctlData, backgroundColor:'rgba(91,156,246,0.28)', borderWidth:0, borderRadius:3, order:3, yAxisID:'y' },
+      { type:'line', label:'ATL', data:atlData, borderColor:'#ff3cac', backgroundColor:'transparent', borderWidth:2, pointRadius:2.5, pointBackgroundColor:'#ff3cac', tension:0.35, order:1, yAxisID:'y' },
+      { type:'line', label:'TSB', data:tsbData, borderColor:'#ff4444', backgroundColor:'transparent', borderWidth:2, pointRadius:2.5, pointBackgroundColor:'#ff4444', tension:0.35, order:2, yAxisID:'y' },
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:false }, tooltip:{ backgroundColor:'#1a1a1a', borderColor:'#303030', borderWidth:1, titleColor:'#888', bodyColor:'#eee', padding:10, titleFont:{ family:'DM Mono', size:10 }, bodyFont:{ family:'DM Mono', size:11 }, callbacks:{ label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}` } } },
+      scales:{
+        x:{ ticks:{ color:'#555', font:{ family:'DM Mono', size:9 }, maxRotation:0, maxTicksLimit:8 }, grid:{ color:'rgba(255,255,255,0.03)' }, border:{ color:'#252525' } },
+        y:{ ticks:{ color:'#555', font:{ family:'DM Mono', size:9 }, maxTicksLimit:6 }, grid:{ color:'rgba(255,255,255,0.04)' }, border:{ color:'#252525' } }
+      }
+    }
+  });
+}
 
 // ─── RENDER ────────────────────────────────────────────────────────────────
 function render(rows) {
@@ -555,15 +610,8 @@ function render(rows) {
   const todayFmt = fmtDate(date);
   document.getElementById('hDate').textContent = todayFmt;
 
-  // ACWR thumb position: map 0–2.0 range to 0–100%
-  const acwrPct = Math.min(Math.max((acwr / 2.0) * 100, 2), 98).toFixed(1);
-
-  // ── Last 30 rows (including today) for chart ──
-  const slice = rows.slice(-30);
-  const labels  = slice.map(r => fmtShort(r['Date']));
-  const ctlData = slice.map(r => f(r['CTL(体能)']));
-  const atlData = slice.map(r => f(r['ATL(疲劳)']));
-  const tsbData = slice.map(r => f(r['TSB(恢复)']));
+  // ACWR thumb: data reaches ~3.2, map over 0–3.0 range
+  const acwrPct = Math.min(Math.max((acwr / 3.0) * 100, 2), 98).toFixed(1);
 
   main.innerHTML = `
     <!-- 2×2 stat cards -->
@@ -606,7 +654,7 @@ function render(rows) {
         <div class="acwr-thumb" id="acwrThumb" style="left:${acwrPct}%"></div>
       </div>
       <div class="acwr-ticks">
-        <span>0</span><span>0.5</span><span>1.0</span><span>1.5</span><span>2.0</span>
+        <span>0</span><span>0.75</span><span>1.5</span><span>2.25</span><span>3.0+</span>
       </div>
       <div class="acwr-zones">
         <span style="color:#2a5070">偏低</span>
@@ -620,7 +668,11 @@ function render(rows) {
     <div class="chart-card fade">
       <div class="chart-head">
         <span class="chart-title">PMC</span>
-        <span class="chart-sub">近 30 天</span>
+        <div style="display:flex;gap:6px;">
+          <span class="rpill" data-range="7d" onclick="drawChart('7d')">本周</span>
+          <span class="rpill active" data-range="30d" onclick="drawChart('30d')">近30天</span>
+          <span class="rpill" data-range="ytd" onclick="drawChart('ytd')">今年</span>
+        </div>
       </div>
       <div class="chart-wrap">
         <canvas id="pmcCanvas"></canvas>
@@ -652,89 +704,7 @@ function render(rows) {
     </div>
   `;
 
-  // ── Draw Chart ──────────────────────────────────────────────────────────
-  if (chartInst) chartInst.destroy();
-  const ctx = document.getElementById('pmcCanvas').getContext('2d');
-  chartInst = new Chart(ctx, {
-    data: {
-      labels,
-      datasets: [
-        {
-          type: 'bar',
-          label: 'CTL',
-          data: ctlData,
-          backgroundColor: 'rgba(91,156,246,0.28)',
-          borderColor: 'rgba(91,156,246,0.5)',
-          borderWidth: 0,
-          borderRadius: 3,
-          order: 3,
-          yAxisID: 'y',
-        },
-        {
-          type: 'line',
-          label: 'ATL',
-          data: atlData,
-          borderColor: '#ff3cac',
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 2.5,
-          pointBackgroundColor: '#ff3cac',
-          tension: 0.35,
-          order: 1,
-          yAxisID: 'y',
-        },
-        {
-          type: 'line',
-          label: 'TSB',
-          data: tsbData,
-          borderColor: '#ff4444',
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 2.5,
-          pointBackgroundColor: '#ff4444',
-          tension: 0.35,
-          order: 2,
-          yAxisID: 'y',
-        },
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1a1a1a',
-          borderColor: '#303030',
-          borderWidth: 1,
-          titleColor: '#888',
-          bodyColor: '#eee',
-          padding: 10,
-          titleFont: { family: 'DM Mono', size: 10 },
-          bodyFont: { family: 'DM Mono', size: 11 },
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}`
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: '#555', font: { family: 'DM Mono', size: 9 },
-            maxRotation: 0, maxTicksLimit: 8,
-          },
-          grid: { color: 'rgba(255,255,255,0.03)' },
-          border: { color: '#252525' },
-        },
-        y: {
-          ticks: { color: '#555', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 6 },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          border: { color: '#252525' },
-        },
-      },
-    }
-  });
+  drawChart(chartRange);
 }
 
 // ─── GLOBAL DATA CACHE ─────────────────────────────────────────────────────
@@ -763,94 +733,136 @@ function trend(curr, prev, decimals = 0, invert = false) {
     : `<span class="trend down">↓</span>`;
 }
 
-// ─── RENDER LOG PAGE ───────────────────────────────────────────────────────
-function renderLog(rows) {
-  const el = document.getElementById('log-main');
-  if (!rows.length) { el.innerHTML = `<div class="state"><span>无数据</span></div>`; return; }
+// ─── RENDER LOG PAGE (paginated, 30/page, infinite scroll) ────────────────
+const LOG_PAGE_SIZE = 30;
+let logPage = 0;      // how many pages already rendered
+let logObserver = null;
 
-  // Reverse for newest-first display
-  const rev = [...rows].reverse();
+function renderLogPage(rev, page) {
+  const start = page * LOG_PAGE_SIZE;
+  const chunk = rev.slice(start, start + LOG_PAGE_SIZE);
+  if (!chunk.length) return;
 
-  const cards = rev.map((r, i) => {
-    const prev = rev[i + 1] || null; // the day before (next in reversed array)
+  const container = document.getElementById('log-cards');
+  const weekdays  = ['日','一','二','三','四','五','六'];
 
-    const date     = r['Date'] || '';
-    const strain   = f(r['Strain']);
-    const recovery = f(r['Recovery']);
-    const readiness= f(r['Readiness']);
-    const ctl      = f(r['CTL(体能)']);
-    const atl      = f(r['ATL(疲劳)']);
-    const tsb      = f(r['TSB(恢复)']);
-    const acwr     = f(r['ACWR(急慢性负荷比)']);
-    const sgText   = r['今日行动指南'] || '';
+  chunk.forEach((r, ci) => {
+    // index in the full reversed array
+    const ri   = start + ci;
+    const prev = rev[ri + 1] || null;
 
-    const pStrain   = prev ? f(prev['Strain'])   : null;
-    const pRecovery = prev ? f(prev['Recovery']) : null;
-    const pReadiness= prev ? f(prev['Readiness']): null;
-    const pCtl      = prev ? f(prev['CTL(体能)']): null;
-    const pAtl      = prev ? f(prev['ATL(疲劳)']): null;
-    const pTsb      = prev ? f(prev['TSB(恢复)']): null;
-    const pAcwr     = prev ? f(prev['ACWR(急慢性负荷比)']): null;
+    const date      = r['Date'] || '';
+    const strain    = f(r['Strain']);
+    const recovery  = f(r['Recovery']);
+    const readiness = f(r['Readiness']);
+    const ctl       = f(r['CTL(体能)']);
+    const atl       = f(r['ATL(疲劳)']);
+    const tsb       = f(r['TSB(恢复)']);
+    const acwr      = f(r['ACWR(急慢性负荷比)']);
+    const sgText    = r['今日行动指南'] || '';
+
+    const pStrain    = prev ? f(prev['Strain'])    : null;
+    const pRecovery  = prev ? f(prev['Recovery'])  : null;
+    const pReadiness = prev ? f(prev['Readiness']) : null;
+    const pCtl       = prev ? f(prev['CTL(体能)']) : null;
+    const pAtl       = prev ? f(prev['ATL(疲劳)']) : null;
+    const pTsb       = prev ? f(prev['TSB(恢复)']) : null;
+    const pAcwr      = prev ? f(prev['ACWR(急慢性负荷比)']) : null;
 
     const sg = sgConfig(sgText);
-
-    // Date display: weekday + date
-    const d = new Date((date).replace(/\//g, '-'));
-    const weekdays = ['日','一','二','三','四','五','六'];
+    const d  = new Date((date).replace(/\//g, '-'));
     const dateLabel = isNaN(d) ? date
       : `${d.getMonth()+1}月${d.getDate()}日 周${weekdays[d.getDay()]}`;
 
-    return `
-    <div class="log-card">
+    const card = document.createElement('div');
+    card.className = 'log-card';
+    card.innerHTML = `
       <div class="log-date-row">
         <span class="log-date">${dateLabel}</span>
         ${sgText ? `<span class="log-sg" style="color:${sg.color};border-color:${sg.color}20;background:${sg.color}12">${sgText}</span>` : ''}
       </div>
       <div class="log-divider"></div>
-
-      <!-- Row 1: Strain · Recovery · Readiness -->
       <div class="log-row">
         <div class="log-stat">
           <span class="log-stat-lbl">Strain</span>
-          <div class="log-stat-val cv-strain">${strain.toFixed(0)}${trend(strain, pStrain, 0)}</div>
+          <div class="log-stat-val cv-strain">${strain.toFixed(0)}${trend(strain,pStrain,0)}</div>
         </div>
         <div class="log-stat">
           <span class="log-stat-lbl">Recovery</span>
-          <div class="log-stat-val cv-recovery">${recovery.toFixed(0)}${trend(recovery, pRecovery, 0)}</div>
+          <div class="log-stat-val cv-recovery">${recovery.toFixed(0)}${trend(recovery,pRecovery,0)}</div>
         </div>
         <div class="log-stat">
           <span class="log-stat-lbl">Readiness</span>
-          <div class="log-stat-val cv-readiness">${readiness.toFixed(0)}${trend(readiness, pReadiness, 0)}</div>
+          <div class="log-stat-val cv-readiness">${readiness.toFixed(0)}${trend(readiness,pReadiness,0)}</div>
         </div>
       </div>
-
-      <!-- Row 2: CTL · ATL · TSB -->
       <div class="log-row">
         <div class="log-stat">
           <span class="log-stat-lbl">CTL 体能</span>
-          <div class="log-stat-val cv-ctl">${ctl.toFixed(1)}${trend(ctl, pCtl, 1)}</div>
+          <div class="log-stat-val cv-ctl">${ctl.toFixed(1)}${trend(ctl,pCtl,1)}</div>
         </div>
         <div class="log-stat">
           <span class="log-stat-lbl">ATL 疲劳</span>
-          <div class="log-stat-val cv-atl">${atl.toFixed(1)}${trend(atl, pAtl, 1)}</div>
+          <div class="log-stat-val cv-atl">${atl.toFixed(1)}${trend(atl,pAtl,1)}</div>
         </div>
         <div class="log-stat">
           <span class="log-stat-lbl">TSB 恢复</span>
-          <div class="log-stat-val ${tsb >= 0 ? 'cv-tsb-pos' : 'cv-tsb-neg'}">${tsb.toFixed(1)}${trend(tsb, pTsb, 1)}</div>
+          <div class="log-stat-val ${tsb>=0?'cv-tsb-pos':'cv-tsb-neg'}">${tsb.toFixed(1)}${trend(tsb,pTsb,1)}</div>
         </div>
       </div>
-
-      <!-- Row 3: ACWR -->
       <div class="log-row cols2">
         <div class="log-stat">
           <span class="log-stat-lbl">ACWR</span>
-          <div class="log-stat-val cv-acwr">${acwr > 0 ? acwr.toFixed(2) : '—'}${acwr > 0 ? trend(acwr, pAcwr, 2) : ''}</div>
+          <div class="log-stat-val cv-acwr">${acwr>0?acwr.toFixed(2):'—'}${acwr>0?trend(acwr,pAcwr,2):''}</div>
         </div>
-      </div>
-    </div>`;
+      </div>`;
+    container.appendChild(card);
   });
+}
 
-  el.innerHTML = cards.join('');
+function renderLog(rows) {
+  const el = document.getElementById('log-main');
+  if (!rows.length) { el.innerHTML = `<div class="state"><span>无数据</span></div>`; return; }
+
+  const rev = [...rows].reverse();
+
+  // Reset state
+  logPage = 0;
+  if (logObserver) logObserver.disconnect();
+
+  el.innerHTML = `
+    <div id="log-cards" style="display:flex;flex-direction:column;gap:12px;"></div>
+    <div id="log-sentinel" style="height:1px;margin-bottom:8px;"></div>
+    <div id="log-end" style="display:none;text-align:center;padding:16px 0;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.1em;">— 已加载全部 ${rev.length} 条 —</div>
+  `;
+
+  // Render first page immediately
+  renderLogPage(rev, 0);
+  logPage = 1;
+
+  // Check if all loaded already
+  if (rev.length <= LOG_PAGE_SIZE) {
+    document.getElementById('log-sentinel').style.display = 'none';
+    document.getElementById('log-end').style.display = 'block';
+    return;
+  }
+
+  // IntersectionObserver for infinite scroll
+  const sentinel = document.getElementById('log-sentinel');
+  logObserver = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    const start = logPage * LOG_PAGE_SIZE;
+    if (start >= rev.length) {
+      logObserver.disconnect();
+      sentinel.style.display = 'none';
+      document.getElementById('log-end').style.display = 'block';
+      return;
+    }
+    renderLogPage(rev, logPage);
+    logPage++;
+  }, { rootMargin: '200px' });
+
+  logObserver.observe(sentinel);
 }
 
 // ─── LOAD ──────────────────────────────────────────────────────────────────
