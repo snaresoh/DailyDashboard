@@ -666,15 +666,7 @@ async function loadData(){
   }finally{btn.classList.remove('spinning');}
 }
 
-// ── PULL TO REFRESH ──────────────────────────────────────────────
-(function(){
-  let sy=0,ok=false;
-  const m=document.getElementById('main');
-  m.addEventListener('touchstart',e=>{if(m.scrollTop===0){sy=e.touches[0].clientY;ok=true;}},{passive:true});
-  m.addEventListener('touchend',e=>{if(!ok)return;ok=false;if(e.changedTouches[0].clientY-sy>60)loadData();},{passive:true});
-})();
 
-loadData();
 </script>
 </body>
 </html>
