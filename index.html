@@ -632,17 +632,12 @@ function renderLog(rows){
 function saveCache(t){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),csv:t}));}catch(e){}}
 function loadCache(){try{const d=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');return d?d.csv:null;}catch(e){return null;}}
 
-// ── LOAD (multi-proxy fallback) ──────────────────────────────────
-const PROXIES = [
-  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  u => `https://proxy.cors.sh/${u}`,
-  u => `https://thingproxy.freeboard.io/fetch/${u}`,
-];
+// ── LOAD ─────────────────────────────────────────────────────────
+const WORKER_URL = 'https://polished-pond-d9e9.chenrinan.workers.dev';
 
 function fetchWithTimeout(url, ms=8000) {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('timeout')), ms);
+    const timer = setTimeout(() => reject(new Error('请求超时')), ms);
     fetch(url, { cache:'no-store' })
       .then(r => { clearTimeout(timer); resolve(r); })
       .catch(e => { clearTimeout(timer); reject(e); });
@@ -650,17 +645,11 @@ function fetchWithTimeout(url, ms=8000) {
 }
 
 async function fetchCSV() {
-  let lastErr;
-  for (const proxyFn of PROXIES) {
-    try {
-      const res = await fetchWithTimeout(proxyFn(CSV_URL));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      if (!text || text.length < 10) throw new Error('empty response');
-      return text;
-    } catch(e) { lastErr = e; }
-  }
-  throw lastErr;
+  const res = await fetchWithTimeout(WORKER_URL);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  if (!text || text.length < 10) throw new Error('empty response');
+  return text;
 }
 
 async function loadData(){
