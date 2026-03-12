@@ -24,9 +24,9 @@
     body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;min-height:100dvh;overscroll-behavior:none;overflow-x:hidden}
 
     /* PAGES + SWIPE */
-    .pages-wrap{display:flex;width:200%;transition:transform .32s cubic-bezier(.4,0,.2,1)}
+    .pages-wrap{display:flex;width:200%;transition:transform .32s cubic-bezier(.4,0,.2,1);touch-action:pan-y}
     .pages-wrap.no-anim{transition:none}
-    .page{width:50%;min-height:100dvh;display:flex;flex-direction:column}
+    .page{width:50%;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 
     /* HEADER */
     .header{
@@ -237,17 +237,7 @@ function switchTab(idx, animate=true) {
   ['tab-today','tab-log'].forEach((t,i)=>document.getElementById(t).classList.toggle('active',i===idx));
   if (idx===1 && allRows.length) renderLog(allRows);
 }
-// swipe gesture
-(function(){
-  let sx=0,sy=0,ok=false;
-  const w=document.getElementById('pagesWrap');
-  w.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;ok=true},{passive:true});
-  w.addEventListener('touchend',e=>{
-    if(!ok)return;ok=false;
-    const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
-    if(Math.abs(dx)>Math.abs(dy)*1.5&&Math.abs(dx)>40)switchTab(dx<0?1:0);
-  },{passive:true});
-})();
+
 
 // ── CSV PARSER ──────────────────────────────────────────────────
 function parseCSV(raw){
@@ -642,15 +632,35 @@ function renderLog(rows){
 function saveCache(t){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),csv:t}));}catch(e){}}
 function loadCache(){try{const d=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');return d?d.csv:null;}catch(e){return null;}}
 
-// ── LOAD ─────────────────────────────────────────────────────────
+// ── LOAD (multi-proxy fallback) ──────────────────────────────────
+// Proxies tried in order; first success wins.
+const PROXIES = [
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://proxy.cors.sh/${u}`,
+  u => `https://thingproxy.freeboard.io/fetch/${u}`,
+];
+
+async function fetchCSV() {
+  let lastErr;
+  for (const proxyFn of PROXIES) {
+    try {
+      const res = await fetch(proxyFn(CSV_URL), { cache:'no-store', signal: AbortSignal.timeout(8000) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      if (!text || text.length < 10) throw new Error('empty response');
+      return text;
+    } catch(e) { lastErr = e; }
+  }
+  throw lastErr;
+}
+
 async function loadData(){
   const btn=document.getElementById('refreshBtn');
   btn.classList.add('spinning');
   document.getElementById('main').innerHTML=`<div class="state"><div class="spinner"></div><span>加载数据中…</span></div>`;
   try{
-    const res=await fetch(`https://corsproxy.io/?${encodeURIComponent(CSV_URL)}`,{cache:'no-store'});
-    if(!res.ok)throw new Error(`HTTP ${res.status}`);
-    const text=await res.text();
+    const text = await fetchCSV();
     saveCache(text);render(parseCSV(text));
   }catch(e){
     const cached=loadCache();
@@ -660,13 +670,19 @@ async function loadData(){
       s.textContent='⚠ 离线模式 · 显示上次缓存';s.style.display='block';
     }else{
       document.getElementById('main').innerHTML=`
-        <div class="state"><span class="err">⚠️ 加载失败<br><br>${e.message}</span>
+        <div class="state"><span class="err">⚠️ 所有代理均失败<br><br>${e.message}<br><br>请检查网络后重试。</span>
         <button onclick="loadData()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px 28px;border-radius:12px;font-size:14px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;">重试</button></div>`;
     }
   }finally{btn.classList.remove('spinning');}
 }
 
-
+// ── PULL TO REFRESH ──────────────────────────────────────────────
+(function(){
+  let sy=0,ok=false;
+  const m=document.getElementById('main');
+  m.addEventListener('touchstart',e=>{if(m.scrollTop===0){sy=e.touches[0].clientY;ok=true;}},{passive:true});
+  m.addEventListener('touchend',e=>{if(!ok)return;ok=false;if(e.changedTouches[0].clientY-sy>60)loadData();},{passive:true});
+})();
 
 loadData();
 </script>
