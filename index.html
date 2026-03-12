@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="训练日志"/>
@@ -24,9 +24,11 @@
     body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;min-height:100dvh;overscroll-behavior:none;overflow-x:hidden}
 
     /* PAGES + SWIPE */
-    .pages-wrap{display:flex;width:200%;transition:transform .32s cubic-bezier(.4,0,.2,1);touch-action:pan-y}
+    .pages-wrap{display:flex;width:200%;transition:transform .32s cubic-bezier(.4,0,.2,1)}
     .pages-wrap.no-anim{transition:none}
     .page{width:50%;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+    /* prevent any horizontal scroll/swipe at body level */
+    html,body{overflow-x:hidden;touch-action:pan-y;overscroll-behavior-x:none}
 
     /* HEADER */
     .header{
@@ -620,11 +622,12 @@ function renderLog(rows){
   renderLogPage(rev,0);logPage=1;
   if(rev.length<=LOG_PS){document.getElementById('log-sentinel').style.display='none';document.getElementById('log-end').style.display='block';return;}
   const sentinel=document.getElementById('log-sentinel');
+  const scrollRoot=document.getElementById('log-main');
   logObs=new IntersectionObserver(entries=>{
     if(!entries[0].isIntersecting)return;
     if(logPage*LOG_PS>=rev.length){logObs.disconnect();sentinel.style.display='none';document.getElementById('log-end').style.display='block';return;}
     renderLogPage(rev,logPage++);
-  },{rootMargin:'200px'});
+  },{root:scrollRoot, rootMargin:'200px'});
   logObs.observe(sentinel);
 }
 
