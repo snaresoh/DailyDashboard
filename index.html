@@ -80,9 +80,22 @@
     .t-hero-delta{font-size:11px;font-family:'DM Mono',monospace;margin-top:2px}
     .d-up{color:var(--teal)}.d-dn{color:var(--red)}.d-flat{color:var(--muted)}
 
-    /* body state section */
-    .t-section{padding:20px 20px;border-bottom:1px solid var(--border)}
-    .t-sec-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:16px}
+    /* body state section — 2-col grid */
+    .t-section{padding:16px 20px 18px;border-bottom:1px solid var(--border)}
+    .t-sec-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px}
+    .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+    .t-cell{display:flex;flex-direction:column;gap:4px;padding:12px 0;border-bottom:1px solid var(--border2)}
+    .t-cell:nth-child(odd){padding-right:16px;border-right:1px solid var(--border2)}
+    .t-cell:nth-child(even){padding-left:16px}
+    /* last row: remove bottom border from last 1 or 2 cells */
+    .t-cell:nth-last-child(-n+2){border-bottom:none}
+    .t-cell-lbl{font-size:11px;color:var(--muted);font-weight:400;letter-spacing:.01em}
+    .t-cell-val-row{display:flex;align-items:baseline;gap:6px}
+    .t-cell-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:300;color:var(--text);line-height:1;letter-spacing:-.01em}
+    .t-cell-unit{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em}
+    .t-cell-trend{font-size:13px;line-height:1}
+    .t-cell-trend.up{color:var(--teal)}.t-cell-trend.dn{color:var(--red)}.t-cell-trend.flat{color:var(--muted)}
+    /* keep single-row for hero sub items */
     .t-row{display:flex;align-items:baseline;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border2)}
     .t-row:last-child{border-bottom:none}
     .t-row-lbl{font-size:13px;color:var(--sub);font-weight:400;letter-spacing:.01em}
@@ -106,9 +119,9 @@
     .t-leg-bar{width:16px;height:8px;border-radius:2px;flex-shrink:0;opacity:.6}
 
     /* ── CALENDAR PAGE ── */
-    .cal-header{padding:16px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .cal-month-nav{display:flex;align-items:center;gap:12px}
-    .cal-month-lbl{font-size:17px;font-weight:400;letter-spacing:-.01em;min-width:100px;text-align:center}
+    .cal-header{padding:16px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+    .cal-month-nav{display:flex;align-items:center;gap:16px;justify-content:center;width:100%}
+    .cal-month-lbl{font-size:17px;font-weight:400;letter-spacing:-.01em;min-width:120px;text-align:center}
     .cal-nav-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);cursor:pointer;user-select:none;transition:background .15s}
     .cal-nav-btn:active{background:var(--border)}
 
@@ -132,19 +145,19 @@
 
     /* load heat colors - light mode */
     .load-0{background:transparent;color:var(--muted)}
-    .load-1{background:#dff0ea;color:#2a6a55}
-    .load-2{background:#b5dfcd;color:#1e5542}
-    .load-3{background:#7ec9ab;color:#14412f}
-    .load-4{background:#4db48b;color:#0a2e1e}
-    .load-5{background:#1e9e6e;color:#fff}
+    .load-1{background:#fff3cd;color:#7a4f00}
+    .load-2{background:#ffe0a0;color:#6b3800}
+    .load-3{background:#ffbb66;color:#5a2800}
+    .load-4{background:#ff8833;color:#fff}
+    .load-5{background:#e03a1e;color:#fff}
     .load-rest{background:var(--bg2);color:var(--muted)}
     @media(prefers-color-scheme:dark){
       .load-0{background:transparent;color:var(--muted)}
-      .load-1{background:#0f2920;color:#4db48b}
-      .load-2{background:#153c2c;color:#5ecb9e}
-      .load-3{background:#1c5039;color:#7ed9b5}
-      .load-4{background:#226344;color:#a0e8cc}
-      .load-5{background:#2ed9a8;color:#0a1a12}
+      .load-1{background:#2a2000;color:#ffcc44}
+      .load-2{background:#3a2800;color:#ffaa33}
+      .load-3{background:#4a2a00;color:#ff8833}
+      .load-4{background:#5a2200;color:#ffaa66}
+      .load-5{background:#6a1800;color:#ff9999}
       .load-rest{background:#1a1a1a;color:var(--muted)}
     }
 
@@ -229,7 +242,7 @@
 </div>
 
 <!-- TAB BAR -->
-<nav class="tabbar" style="position:relative">
+<nav class="tabbar">
   <div class="tab-line" id="tabLine" style="width:50%;left:0"></div>
   <div class="tab-btn active" id="tab-today" onclick="switchTab(0)">
     <div class="tab-icon">◎</div><div class="tab-lbl">Today</div>
@@ -324,11 +337,11 @@ function fmtShort(s){const d=new Date((s||'').replace(/\//g,'-'));if(isNaN(d))re
 function daysSince(s){const d=new Date((s||'').replace(/\//g,'-'));if(isNaN(d))return null;return Math.floor((Date.now()-d.getTime())/86400000);}
 function isoDate(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
-function trend(curr,prev,dec=0){
+function trend(curr,prev,dec=0,cls='t-cell-trend'){
   if(prev===null)return'';
   const d=curr-prev,e=Math.pow(10,-dec)*.5;
-  if(Math.abs(d)<e)return`<span class="t-row-trend flat">—</span>`;
-  return d>0?`<span class="t-row-trend up">↑</span>`:`<span class="t-row-trend dn">↓</span>`;
+  if(Math.abs(d)<e)return`<span class="${cls} flat">—</span>`;
+  return d>0?`<span class="${cls} up">↑</span>`:`<span class="${cls} dn">↓</span>`;
 }
 
 function deltaTag(curr,prev,dec=0,label='vs 昨日'){
@@ -496,64 +509,50 @@ function render(rows){
       </div>
     </div>
 
-    <!-- BODY STATE -->
+    <!-- BODY STATE 2-col -->
     <div class="t-section fade">
       <div class="t-sec-title">体能状态</div>
-      <div class="t-row">
-        <span class="t-row-lbl">CTL 体能</span>
-        <div class="t-row-right">
-          <span class="t-row-val" style="color:var(--ctl)">${R(ctl,1)}</span>
-          ${trend(ctl,pCtl,1)}
+      <div class="t-grid">
+        <div class="t-cell">
+          <span class="t-cell-lbl">CTL 体能</span>
+          <div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--ctl)">${R(ctl,1)}</span>${trend(ctl,pCtl,1)}</div>
         </div>
-      </div>
-      <div class="t-row">
-        <span class="t-row-lbl">ATL 疲劳</span>
-        <div class="t-row-right">
-          <span class="t-row-val" style="color:var(--atl)">${R(atl,1)}</span>
-          ${trend(atl,pAtl,1)}
+        <div class="t-cell">
+          <span class="t-cell-lbl">ATL 疲劳</span>
+          <div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--atl)">${R(atl,1)}</span>${trend(atl,pAtl,1)}</div>
         </div>
-      </div>
-      <div class="t-row">
-        <span class="t-row-lbl">TSB 恢复</span>
-        <div class="t-row-right">
-          <span class="t-row-val" style="color:${tsb>=0?'var(--teal)':'var(--red)'}">${R(tsb,1)}</span>
-          ${trend(tsb,pTsb,1)}
+        <div class="t-cell">
+          <span class="t-cell-lbl">TSB 恢复</span>
+          <div class="t-cell-val-row"><span class="t-cell-val" style="color:${tsb>=0?'var(--teal)':'var(--red)'}">${R(tsb,1)}</span>${trend(tsb,pTsb,1)}</div>
+        </div>
+        <div class="t-cell">
+          <span class="t-cell-lbl">ACWR 受伤风险</span>
+          <div class="t-cell-val-row"><span class="t-cell-val" style="color:${acwrColor(acwr)}">${acwr>0?R(acwr,2):'—'}</span></div>
         </div>
       </div>
     </div>
 
-    <!-- HRV -->
+    <!-- HRV 2-col -->
     <div class="t-section fade">
       <div class="t-sec-title">心率 · HRV</div>
-      <div class="t-row">
-        <span class="t-row-lbl">静息心率 RHR</span>
-        <div class="t-row-right">
-          <span class="t-row-val">${rhr>0?rhr.toFixed(0):'—'}</span>
-          <span class="t-row-unit">bpm</span>
-          ${rhr>0?trend(rhr,pRhr,0):''}
+      <div class="t-grid">
+        <div class="t-cell">
+          <span class="t-cell-lbl">静息心率 RHR</span>
+          <div class="t-cell-val-row"><span class="t-cell-val">${rhr>0?rhr.toFixed(0):'—'}</span><span class="t-cell-unit">bpm</span>${rhr>0?trend(rhr,pRhr,0):''}</div>
         </div>
+        <div class="t-cell">
+          <span class="t-cell-lbl">HRV</span>
+          <div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--teal)">${hrv>0?hrv.toFixed(0):'—'}</span><span class="t-cell-unit">ms</span>${hrv>0?trend(hrv,pHrv,0):''}</div>
+        </div>
+        ${hrv7>0?`<div class="t-cell">
+          <span class="t-cell-lbl">7天均 HRV</span>
+          <div class="t-cell-val-row"><span class="t-cell-val">${hrv7.toFixed(0)}</span><span class="t-cell-unit">ms</span></div>
+        </div>`:''}
+        ${hrvR>0?`<div class="t-cell">
+          <span class="t-cell-lbl">HRV Ratio</span>
+          <div class="t-cell-val-row"><span class="t-cell-val" style="color:${hrvR>=1?'var(--teal)':'var(--amber)'}">${R(hrvR,2)}</span></div>
+        </div>`:''}
       </div>
-      <div class="t-row">
-        <span class="t-row-lbl">HRV</span>
-        <div class="t-row-right">
-          <span class="t-row-val" style="color:var(--teal)">${hrv>0?hrv.toFixed(0):'—'}</span>
-          <span class="t-row-unit">ms</span>
-          ${hrv>0?trend(hrv,pHrv,0):''}
-        </div>
-      </div>
-      ${hrv7>0?`<div class="t-row">
-        <span class="t-row-lbl">7天平均 HRV</span>
-        <div class="t-row-right">
-          <span class="t-row-val">${hrv7.toFixed(0)}</span>
-          <span class="t-row-unit">ms</span>
-        </div>
-      </div>`:''}
-      ${hrvR>0?`<div class="t-row">
-        <span class="t-row-lbl">HRV Ratio</span>
-        <div class="t-row-right">
-          <span class="t-row-val" style="color:${hrvR>=1?'var(--teal)':'var(--amber)'}">${R(hrvR,2)}</span>
-        </div>
-      </div>`:''}
     </div>
 
     <!-- PMC -->
@@ -797,18 +796,22 @@ function openDayDetail(dateKey){
 
       <div class="t-section">
         <div class="t-sec-title">体能状态</div>
-        <div class="t-row"><span class="t-row-lbl">CTL 体能</span><div class="t-row-right"><span class="t-row-val" style="color:var(--ctl)">${R(ctl,1)}</span></div></div>
-        <div class="t-row"><span class="t-row-lbl">ATL 疲劳</span><div class="t-row-right"><span class="t-row-val" style="color:var(--atl)">${R(atl,1)}</span></div></div>
-        <div class="t-row"><span class="t-row-lbl">TSB 恢复</span><div class="t-row-right"><span class="t-row-val" style="color:${tsb>=0?'var(--teal)':'var(--red)'}">${R(tsb,1)}</span></div></div>
-        <div class="t-row"><span class="t-row-lbl">ACWR 受伤风险</span><div class="t-row-right"><span class="t-row-val" style="color:${acwrColor(acwr)}">${acwr>0?R(acwr,2):'—'}</span></div></div>
+        <div class="t-grid">
+          <div class="t-cell"><span class="t-cell-lbl">CTL 体能</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--ctl)">${R(ctl,1)}</span></div></div>
+          <div class="t-cell"><span class="t-cell-lbl">ATL 疲劳</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--atl)">${R(atl,1)}</span></div></div>
+          <div class="t-cell"><span class="t-cell-lbl">TSB 恢复</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:${tsb>=0?'var(--teal)':'var(--red)'}">${R(tsb,1)}</span></div></div>
+          <div class="t-cell"><span class="t-cell-lbl">ACWR 受伤风险</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:${acwrColor(acwr)}">${acwr>0?R(acwr,2):'—'}</span></div></div>
+        </div>
       </div>
 
       <div class="t-section">
         <div class="t-sec-title">心率 · HRV</div>
-        <div class="t-row"><span class="t-row-lbl">静息心率 RHR</span><div class="t-row-right"><span class="t-row-val">${rhr>0?rhr.toFixed(0):'—'}</span><span class="t-row-unit">bpm</span></div></div>
-        <div class="t-row"><span class="t-row-lbl">HRV</span><div class="t-row-right"><span class="t-row-val" style="color:var(--teal)">${hrv>0?hrv.toFixed(0):'—'}</span><span class="t-row-unit">ms</span></div></div>
-        ${hrv7>0?`<div class="t-row"><span class="t-row-lbl">7天平均 HRV</span><div class="t-row-right"><span class="t-row-val">${hrv7.toFixed(0)}</span><span class="t-row-unit">ms</span></div></div>`:''}
-        ${hrvR>0?`<div class="t-row"><span class="t-row-lbl">HRV Ratio</span><div class="t-row-right"><span class="t-row-val" style="color:${hrvR>=1?'var(--teal)':'var(--amber)'}">${R(hrvR,2)}</span></div></div>`:''}
+        <div class="t-grid">
+          <div class="t-cell"><span class="t-cell-lbl">静息心率 RHR</span><div class="t-cell-val-row"><span class="t-cell-val">${rhr>0?rhr.toFixed(0):'—'}</span><span class="t-cell-unit">bpm</span></div></div>
+          <div class="t-cell"><span class="t-cell-lbl">HRV</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--teal)">${hrv>0?hrv.toFixed(0):'—'}</span><span class="t-cell-unit">ms</span></div></div>
+          ${hrv7>0?`<div class="t-cell"><span class="t-cell-lbl">7天均 HRV</span><div class="t-cell-val-row"><span class="t-cell-val">${hrv7.toFixed(0)}</span><span class="t-cell-unit">ms</span></div></div>`:''}
+          ${hrvR>0?`<div class="t-cell"><span class="t-cell-lbl">HRV Ratio</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:${hrvR>=1?'var(--teal)':'var(--amber)'}">${R(hrvR,2)}</span></div></div>`:''}
+        </div>
       </div>
     `;
   }
