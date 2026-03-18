@@ -70,30 +70,30 @@
     .tab-line{position:absolute;top:0;height:2px;background:var(--text);transition:left .3s cubic-bezier(.4,0,.2,1),width .3s}
 
     /* ── TODAY: SECTION ROWS (Suunto style) ── */
-    .t-hero{padding:28px 20px 20px;border-bottom:1px solid var(--border)}
-    .t-hero-indicator{font-size:40px;line-height:1;margin-bottom:12px}
+    .t-hero{padding:18px 20px 16px;border-bottom:1px solid var(--border)}
+    .t-hero-indicator{font-size:36px;line-height:1;margin-bottom:8px}
     .t-hero-row{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
-    .t-hero-num{font-family:'DM Mono',monospace;font-size:68px;font-weight:300;line-height:1;letter-spacing:-.04em;color:var(--text)}
+    .t-hero-num{font-family:'DM Mono',monospace;font-size:68px;font-weight:500;line-height:1;letter-spacing:-.04em;color:var(--text)}
     .t-hero-unit{font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;align-self:flex-end;padding-bottom:10px}
-    .t-hero-sub{display:flex;gap:20px;margin-top:10px;flex-wrap:wrap}
+    .t-hero-sub{display:flex;gap:24px;margin-top:10px;flex-wrap:wrap}
     .t-hero-kv{display:flex;flex-direction:column;gap:1px}
-    .t-hero-kv-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:400;line-height:1;letter-spacing:-.02em}
-    .t-hero-kv-lbl{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
+    .t-hero-kv-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:600;line-height:1;letter-spacing:-.02em}
+    .t-hero-kv-lbl{font-size:10px;color:var(--sub);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:3px;font-weight:500}
     .t-hero-delta{font-size:11px;font-family:'DM Mono',monospace;margin-top:2px}
     .d-up{color:var(--teal)}.d-dn{color:var(--red)}.d-flat{color:var(--muted)}
 
     /* body state section — 2-col grid */
-    .t-section{padding:16px 20px 18px;border-bottom:1px solid var(--border)}
-    .t-sec-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px;font-weight:500}
+    .t-section{padding:12px 20px 14px;border-bottom:1px solid var(--border)}
+    .t-sec-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;font-weight:500}
     .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
-    .t-cell{display:flex;flex-direction:column;gap:4px;padding:12px 0;border-bottom:1px solid var(--border2)}
+    .t-cell{display:flex;flex-direction:column;gap:3px;padding:9px 0;border-bottom:1px solid var(--border2)}
     .t-cell:nth-child(odd){padding-right:16px;border-right:1px solid var(--border2)}
     .t-cell:nth-child(even){padding-left:16px}
     /* last row: remove bottom border from last 1 or 2 cells */
     .t-cell:nth-last-child(-n+2){border-bottom:none}
-    .t-cell-lbl{font-size:11px;color:var(--muted);font-weight:400;letter-spacing:.04em;text-transform:uppercase}
+    .t-cell-lbl{font-size:11px;color:var(--sub);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
     .t-cell-val-row{display:flex;align-items:baseline;gap:6px}
-    .t-cell-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:400;color:var(--text);line-height:1;letter-spacing:-.02em}
+    .t-cell-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:600;color:var(--text);line-height:1;letter-spacing:-.02em}
     .t-cell-unit{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em}
     .t-cell-trend{font-size:14px;line-height:1;font-weight:600}
     .t-cell-trend.up{color:var(--teal)}.t-cell-trend.dn{color:var(--red)}.t-cell-trend.flat{color:var(--muted)}
@@ -108,7 +108,7 @@
     .t-row-trend.up{color:var(--teal)}.t-row-trend.dn{color:var(--red)}.t-row-trend.flat{color:var(--muted)}
 
     /* PMC section */
-    .t-pmc{padding:20px 20px 14px;border-bottom:1px solid var(--border)}
+    .t-pmc{padding:14px 20px 12px;border-bottom:1px solid var(--border)}
     .t-pmc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
     .t-pmc-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
     .rpills{display:flex;gap:6px}
@@ -171,6 +171,12 @@
       .load-rest{background:#1a1a1a;color:var(--muted)}
     }
 
+    /* ── CALENDAR LEGEND ── */
+    .cal-legend{padding:14px 20px 20px;border-top:1px solid var(--border)}
+    .cal-legend-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;font-weight:500;margin-bottom:12px}
+    .cal-legend-row{display:flex;flex-direction:column;gap:9px}
+    .cal-legend-item{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--sub);line-height:1.3}
+
     /* ── WEEK SUMMARY ── */
     .week-summary{padding:16px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:0}
     .ws-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px}
@@ -178,7 +184,7 @@
     .ws-big-num{flex:1;display:flex;flex-direction:column;gap:3px;padding:0 0 14px}
     .ws-big-num+.ws-big-num{border-left:1px solid var(--border);padding-left:20px}
     .ws-num{font-family:'DM Mono',monospace;font-size:32px;font-weight:300;line-height:1;letter-spacing:-.02em}
-    .ws-lbl{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+    .ws-lbl{font-size:10px;color:var(--sub);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
     .ws-analysis-row{display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid var(--border2)}
     .ws-analysis-item{display:flex;align-items:flex-start;gap:10px}
     .ws-badge{font-size:16px;line-height:1;flex-shrink:0;margin-top:1px}
@@ -440,7 +446,7 @@ function drawChart(range){
   chartInst=new Chart(ctx,{
     plugins:[zeroLine,lastGlow],
     data:{labels,datasets:[
-      {type:'bar', label:'CTL',data:ctlD,backgroundColor:cCTL+'28',borderWidth:0,borderRadius:2,order:3,yAxisID:'y2'},
+      {type:'bar', label:'CTL',data:ctlD,backgroundColor:cCTL+'28',borderWidth:0,borderRadius:2,order:3,yAxisID:'y'},
       {type:'line',label:'ATL',data:atlD,borderColor:cATL,backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.35,order:1,yAxisID:'y'},
       {type:'line',label:'TSB',data:tsbD,borderColor:cTSB,backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.35,order:2,yAxisID:'y'},
     ]},
@@ -450,8 +456,7 @@ function drawChart(range){
       plugins:{legend:{display:false},tooltip:{backgroundColor:cBg,borderColor:cBorder,borderWidth:1,titleColor:cMuted,bodyColor:s.getPropertyValue('--text').trim(),padding:10,titleFont:{family:'DM Mono',size:10},bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}`}}},
       scales:{
         x:{ticks:{color:cMuted,font:{family:'DM Mono',size:9},maxRotation:0,maxTicksLimit:8},grid:{color:'transparent'},border:{color:cBorder}},
-        y:{ticks:{color:cMuted,font:{family:'DM Mono',size:9},maxTicksLimit:5},grid:{color:cBorder+'88'},border:{color:'transparent'},position:'left'},
-        y2:{ticks:{color:cCTL,font:{family:'DM Mono',size:9},maxTicksLimit:4},grid:{display:false},border:{color:'transparent'},position:'right'}
+        y:{ticks:{color:cMuted,font:{family:'DM Mono',size:9},maxTicksLimit:5},grid:{color:cBorder+'88'},border:{color:'transparent'}}
       }
     }
   });
@@ -505,14 +510,14 @@ function render(rows){
       ${ind?`<div class="t-hero-indicator">${ind}</div>`:''}
       <div class="t-hero-row">
         <span class="t-hero-num" style="color:${isRest?'var(--muted)':''}">${load.toFixed(0)}</span>
-        <span class="t-hero-unit">Load</span>
+        <span class="t-hero-unit">Load 体感负荷</span>
         ${isRest?`<span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;align-self:flex-end;padding-bottom:10px">休息日</span>`:''}
       </div>
       ${!isRest?deltaTag(load,wkLoad,0,'vs 本周均'):''}
       <div class="t-hero-sub" style="margin-top:14px">
         <div class="t-hero-kv">
           <span class="t-hero-kv-val" style="color:var(--pink)">${trimp.toFixed(0)}</span>
-          <span class="t-hero-kv-lbl">TRIMP</span>
+          <span class="t-hero-kv-lbl">TRIMP 心肺负荷</span>
           ${!isRest?deltaTag(trimp,wkTrimp,0,'vs 本周均'):''}
         </div>
         <div class="t-hero-kv">
@@ -658,7 +663,42 @@ function renderCalendar(){
     </div>
 
     ${ws}
+
+    <div class="cal-legend fade">
+      <div class="cal-legend-title">图例说明</div>
+      <div class="cal-legend-row">
+        <div class="cal-legend-item">
+          <div style="width:24px;height:24px;border-radius:50%;background:#fff3cd;flex-shrink:0"></div>
+          <span>低强度训练 (Load &lt;100)</span>
+        </div>
+        <div class="cal-legend-item">
+          <div style="width:24px;height:24px;border-radius:50%;background:#ffbb66;flex-shrink:0"></div>
+          <span>中等强度 (100–500)</span>
+        </div>
+        <div class="cal-legend-item">
+          <div style="width:24px;height:24px;border-radius:50%;background:#e03a1e;flex-shrink:0"></div>
+          <span>高强度训练 (Load &gt;700)</span>
+        </div>
+        <div class="cal-legend-item">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--bg2);flex-shrink:0;border:1px solid var(--border)"></div>
+          <span>休息日（无训练记录）</span>
+        </div>
+        <div class="cal-legend-item">
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <div style="width:24px;height:24px;border-radius:50%;background:#ffbb66;display:flex;align-items:center;justify-content:center">
+              <div style="width:5px;height:5px;border-radius:50%;background:var(--red)"></div>
+            </div>
+          </div>
+          <span>底部红点 = 当日指示器为 🔴（需注意）</span>
+        </div>
+        <div class="cal-legend-item">
+          <div style="width:24px;height:24px;border-radius:50%;border:1.5px solid var(--text);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;font-weight:700">今</div>
+          <span>外圈描边 = 今天</span>
+        </div>
+      </div>
+    </div>
   `;
+
 }
 
 function calNav(dir){
@@ -672,60 +712,88 @@ function calNav(dir){
 // WEEK SUMMARY (full month analysis)
 // ══════════════════════════════════════════════
 function calcWeekSummary(y,m){
-  // get all rows for this month
   const monthRows=allRows.filter(r=>{
     const d=new Date((r['Date']||'').replace(/\//g,'-'));
     return !isNaN(d)&&d.getFullYear()===y&&d.getMonth()===m;
   });
   if(!monthRows.length) return '';
 
+  // prev month
+  const pm=m===0?11:m-1, py=m===0?y-1:y;
+  const prevMonthRows=allRows.filter(r=>{
+    const d=new Date((r['Date']||'').replace(/\//g,'-'));
+    return !isNaN(d)&&d.getFullYear()===py&&d.getMonth()===pm;
+  });
+
+  // 3-month avg (prev 3 calendar months, not incl current)
+  const threeMonthRows=allRows.filter(r=>{
+    const d=new Date((r['Date']||'').replace(/\//g,'-'));
+    if(isNaN(d))return false;
+    // go back up to 3 months from current month
+    const cur=new Date(y,m,1);
+    const back3=new Date(y,m-3,1);
+    return d>=back3&&d<cur;
+  });
+
   const totalLoad=monthRows.reduce((a,r)=>a+f(r['Load(体感强度)']),0);
   const totalTrimp=monthRows.reduce((a,r)=>a+f(r['TRIMP(心肺强度)']),0);
   const trainingDays=monthRows.filter(r=>f(r['Load(体感强度)'])>0).length;
-  const restDays=monthRows.filter(r=>f(r['Load(体感强度)'])===0&&f(r['TRIMP(心肺强度)'])===0).length;
+  const daysInCalMonth=new Date(y,m+1,0).getDate();
+
+  const pmLoad=prevMonthRows.reduce((a,r)=>a+f(r['Load(体感强度)']),0);
+  const pmTrimp=prevMonthRows.reduce((a,r)=>a+f(r['TRIMP(心肺强度)']),0);
+  const pmTraining=prevMonthRows.filter(r=>f(r['Load(体感强度)'])>0).length;
+
+  const avg3Load=threeMonthRows.length?threeMonthRows.reduce((a,r)=>a+f(r['Load(体感强度)']),0)/3:null;
+  const avg3Trimp=threeMonthRows.length?threeMonthRows.reduce((a,r)=>a+f(r['TRIMP(心肺强度)']),0)/3:null;
 
   const hrvVals=monthRows.map(r=>f(r['HRV'])).filter(v=>v>0);
   const avgHrv=hrvVals.length?hrvVals.reduce((a,b)=>a+b,0)/hrvVals.length:null;
   const rhrVals=monthRows.map(r=>f(r['RHR'])).filter(v=>v>0);
-  const avgRhr=rhrVals.length?rhrVals.reduce((a,b)=>a+b,0)/rhrVals.length:null;
 
-  // ATL/CTL/TSB trend across month
   const lastRow=monthRows[monthRows.length-1];
   const firstRow=monthRows[0];
   const ctlGain=f(lastRow['CTL(体能)'])-f(firstRow['CTL(体能)']);
   const tsbEnd=f(lastRow['TSB(恢复)']);
-
-  // overload days (ACWR>1.5)
   const overloadDays=monthRows.filter(r=>f(r['ACWR(急慢性负荷比)'])>1.5).length;
   const lowHrvDays=monthRows.filter(r=>{const v=f(r['HRV Ratio']);return v>0&&v<0.85;}).length;
-
-  // avg daily load
   const avgLoad=trainingDays>0?(totalLoad/trainingDays):0;
+  const density=trainingDays/(daysInCalMonth||1);
 
-  // generate analysis bullets
+  // comparison helpers
+  function cmpTag(curr,prev,unit='',higherIsBetter=true){
+    if(!prev||prev===0)return'';
+    const d=curr-prev,pct=Math.abs(d/prev*100).toFixed(0);
+    const up=d>0,good=(higherIsBetter?up:!up);
+    const col=good?'var(--teal)':'var(--red)';
+    const arr=up?'↑':'↓';
+    return`<span style="font-size:11px;font-family:'DM Mono',monospace;color:${col};margin-left:6px">${arr}${pct}%</span>`;
+  }
+  function avg3Tag(curr,avg,higherIsBetter=true){
+    if(!avg)return'';
+    const d=curr-avg,pct=Math.abs(d/avg*100).toFixed(0);
+    const up=d>0,good=(higherIsBetter?up:!up);
+    const col=good?'var(--teal)':'var(--red)';
+    const arr=up?'↑':'↓';
+    return`<span style="font-size:10px;font-family:'DM Mono',monospace;color:${col};opacity:.7"> ${arr}${pct}% vs 3月均</span>`;
+  }
+
   const bullets=[];
-
-  // training density
-  const daysInCalMonth=new Date(y,m+1,0).getDate(); const density=trainingDays/(daysInCalMonth||1);
   if(density>=0.7) bullets.push({icon:'🔥',text:`本月已记录 <strong>${trainingDays} 训练日</strong>（共 ${daysInCalMonth} 天），密度较高，注意保留足够恢复时间`});
   else if(density>=0.5) bullets.push({icon:'✅',text:`本月已记录 <strong>${trainingDays} 训练日</strong>（共 ${daysInCalMonth} 天），训练与休息比例合理`});
   else bullets.push({icon:'📉',text:`本月已记录 <strong>${trainingDays} 训练日</strong>（共 ${daysInCalMonth} 天），训练频率偏低，可适当增加`});
 
-  // CTL trend
-  if(ctlGain>2) bullets.push({icon:'📈',text:`体能（CTL）本月增长 <strong>+${ctlGain.toFixed(1)}</strong>，适应性提升中`});
-  else if(ctlGain<-2) bullets.push({icon:'📉',text:`体能（CTL）本月下降 <strong>${ctlGain.toFixed(1)}</strong>，需要保持训练连续性`});
+  if(ctlGain>2) bullets.push({icon:'📈',text:`体能（CTL）本月增长 <strong>+${ctlGain.toFixed(1)}</strong>，适应性持续提升`});
+  else if(ctlGain<-2) bullets.push({icon:'📉',text:`体能（CTL）本月下降 <strong>${ctlGain.toFixed(1)}</strong>，需保持训练连续性`});
 
-  // TSB status end of month
-  if(tsbEnd>5) bullets.push({icon:'💤',text:`月末 TSB <strong>${tsbEnd.toFixed(1)}</strong>，当前处于超量恢复阶段，可安排大负荷训练`});
+  if(tsbEnd>5) bullets.push({icon:'💤',text:`月末 TSB <strong>${tsbEnd.toFixed(1)}</strong>，处于超量恢复阶段，可安排大负荷训练`});
   else if(tsbEnd<-10) bullets.push({icon:'⚠️',text:`月末 TSB <strong>${tsbEnd.toFixed(1)}</strong>，累积疲劳偏高，建议安排减量周`});
 
-  // overload risk
-  if(overloadDays>3) bullets.push({icon:'🚨',text:`本月有 <strong>${overloadDays} 天</strong> ACWR 超过 1.5，受伤风险较高，建议控制单次训练负荷`});
-  else if(overloadDays>0) bullets.push({icon:'⚡',text:`本月 <strong>${overloadDays} 天</strong> ACWR 偏高，整体在可控范围`});
+  if(overloadDays>3) bullets.push({icon:'🚨',text:`本月有 <strong>${overloadDays} 天</strong> ACWR 超 1.5，受伤风险较高，建议控制单次负荷`});
+  else if(overloadDays>0) bullets.push({icon:'⚡',text:`本月 <strong>${overloadDays} 天</strong> ACWR 偏高，整体仍在可控范围`});
 
-  // HRV quality
-  if(avgHrv!==null&&lowHrvDays>3) bullets.push({icon:'❤️',text:`本月有 <strong>${lowHrvDays} 天</strong> HRV Ratio 偏低（<0.85），自主神经系统压力较大`});
-  else if(avgHrv!==null) bullets.push({icon:'❤️',text:`本月平均 HRV <strong>${avgHrv.toFixed(0)} ms</strong>，心率恢复状态${avgHrv>=35?'良好':'一般'}`});
+  if(avgHrv!==null&&lowHrvDays>3) bullets.push({icon:'❤️',text:`本月有 <strong>${lowHrvDays} 天</strong> HRV Ratio 偏低，自主神经系统压力较大`});
+  else if(avgHrv!==null) bullets.push({icon:'❤️',text:`本月均 HRV <strong>${avgHrv.toFixed(0)} ms</strong>，恢复质量${avgHrv>=35?'良好':'一般'}`});
 
   const bulletsHTML=bullets.map(b=>`
     <div class="ws-analysis-item">
@@ -736,19 +804,30 @@ function calcWeekSummary(y,m){
   return`
     <div class="week-summary fade">
       <div class="ws-title">本月概览 — ${y}年${m+1}月</div>
+
       <div class="ws-big-row">
         <div class="ws-big-num">
-          <span class="ws-num">${totalLoad.toFixed(0)}</span>
-          <span class="ws-lbl">总 Load</span>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <span class="ws-num">${totalLoad.toFixed(0)}</span>
+            ${cmpTag(totalLoad,pmLoad)}
+          </div>
+          <span class="ws-lbl">总 Load ${avg3Load?avg3Tag(totalLoad,avg3Load):''}</span>
         </div>
         <div class="ws-big-num">
-          <span class="ws-num">${totalTrimp.toFixed(0)}</span>
-          <span class="ws-lbl">总 TRIMP</span>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <span class="ws-num">${totalTrimp.toFixed(0)}</span>
+            ${cmpTag(totalTrimp,pmTrimp)}
+          </div>
+          <span class="ws-lbl">总 TRIMP ${avg3Trimp?avg3Tag(totalTrimp,avg3Trimp):''}</span>
         </div>
       </div>
+
       <div class="ws-big-row" style="margin-top:12px">
         <div class="ws-big-num">
-          <span class="ws-num" style="font-size:24px">${trainingDays}<span style="font-size:14px;color:var(--muted)"> / ${new Date(y,m+1,0).getDate()}</span></span>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <span class="ws-num" style="font-size:24px">${trainingDays}<span style="font-size:14px;color:var(--muted)"> / ${daysInCalMonth}</span></span>
+            ${pmTraining?cmpTag(trainingDays,pmTraining):''}
+          </div>
           <span class="ws-lbl">训练天数</span>
         </div>
         <div class="ws-big-num">
@@ -756,6 +835,7 @@ function calcWeekSummary(y,m){
           <span class="ws-lbl">日均 Load</span>
         </div>
       </div>
+
       <div class="ws-analysis-row">${bulletsHTML}</div>
     </div>`;
 }
@@ -788,21 +868,21 @@ function openDayDetail(dateKey){
         ${ind?`<div class="t-hero-indicator">${ind}</div>`:''}
         <div class="t-hero-row">
           <span class="t-hero-num" style="color:${isRest?'var(--muted)':''}">${load.toFixed(0)}</span>
-          <span class="t-hero-unit">Load</span>
+          <span class="t-hero-unit">Load 体感负荷</span>
           ${isRest?`<span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;align-self:flex-end;padding-bottom:10px">休息日</span>`:''}
         </div>
         <div class="t-hero-sub" style="margin-top:14px">
           <div class="t-hero-kv">
             <span class="t-hero-kv-val" style="color:var(--pink)">${trimp.toFixed(0)}</span>
-            <span class="t-hero-kv-lbl">TRIMP</span>
+            <span class="t-hero-kv-lbl">TRIMP 心肺负荷</span>
           </div>
           ${srpe>0?`<div class="t-hero-kv">
             <span class="t-hero-kv-val">${srpe.toFixed(0)}</span>
-            <span class="t-hero-kv-lbl">sRPE</span>
+            <span class="t-hero-kv-lbl">sRPE 感知训练量</span>
           </div>`:''}
           <div class="t-hero-kv">
             <span class="t-hero-kv-val" style="color:${acwrColor(acwr)}">${acwr>0?R(acwr,1):'—'}</span>
-            <span class="t-hero-kv-lbl">ACWR</span>
+            <span class="t-hero-kv-lbl">ACWR 受伤风险</span>
           </div>
         </div>
       </div>
