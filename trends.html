@@ -71,8 +71,8 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
     </button>
   </header>
   <div class="filter-row">
-    <div class="fpill" data-r="7d" onclick="setRange('7d',this)">LAST 7 DAYS</div>
-    <div class="fpill active" data-r="30d" onclick="setRange('30d',this)">LAST 30 DAYS</div>
+    <div class="fpill active" data-r="7d" onclick="setRange('7d',this)">LAST 7 DAYS</div>
+    <div class="fpill" data-r="30d" onclick="setRange('30d',this)">LAST 30 DAYS</div>
     <div class="fpill" data-r="ytd" onclick="setRange('ytd',this)">YEAR TO DATE</div>
     <div class="fpill" data-r="all" onclick="setRange('all',this)">ALL TIME</div>
   </div>
@@ -288,7 +288,7 @@ const NAV_HTML = `<nav class="bottom-nav">
 
 document.getElementById('navwrap').innerHTML = NAV_HTML;
 setNav('trends');
-let _daily=[], _range='30d', _charts=[];
+let _daily=[], _range='7d', _charts=[];
 
 function setRange(r,el){
   _range=r;

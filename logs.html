@@ -49,8 +49,8 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
 .wo-entry-body{flex:1;min-width:0}
 .wo-entry-date{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600;margin-bottom:4px}
 .wo-entry-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.04em;line-height:1.2;margin-bottom:10px}
-.wo-entry-meta{display:flex;flex-wrap:wrap;gap:10px}
-.wm-item{display:flex;flex-direction:column;gap:3px}
+.wo-entry-meta{display:flex;flex-wrap:nowrap;gap:12px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.wm-item{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
 .wm-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--text)}
 .wm-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.12em;color:var(--sub);font-weight:600}
 .load-more{text-align:center;padding:18px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.14em;color:var(--muted);cursor:pointer;font-weight:600}

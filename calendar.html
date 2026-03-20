@@ -70,13 +70,17 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
 .dm-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600}
 .dm-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1}
 .dm-unit{font-size:13px;color:var(--muted);margin-left:3px;font-weight:400}
-.wo-section{padding:14px 18px;border-top:1px solid var(--border)}
-.wo-sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:700;margin-bottom:12px}
-.wo-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
-.wo-row:last-child{border-bottom:none}
-.wo-icon{width:40px;height:40px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.wo-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em}
-.wo-meta{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--sub);font-weight:500;margin-top:3px}
+.wo-section{padding:0}
+.wo-sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:700;padding:14px 18px 6px;border-top:1px solid var(--border)}
+.wo-card{margin:0 0 1px;padding:16px 18px;background:var(--bg3);border-top:1px solid var(--border);display:flex;gap:14px;align-items:flex-start}
+.wo-card:last-child{border-radius:0 0 14px 14px}
+.wo-card-icon{width:42px;height:42px;border-radius:9px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.wo-card-body{flex:1;min-width:0}
+.wo-card-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.04em;line-height:1.2;margin-bottom:10px}
+.wo-card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wo-stat{display:flex;flex-direction:column;gap:2px}
+.wo-stat-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;line-height:1}
+.wo-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--sub);font-weight:600}
 /* LEGEND */
 .legend-row{display:flex;align-items:center;justify-content:center;gap:14px;padding:14px 20px 4px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--sub);font-weight:600;flex-wrap:wrap}
 .legend-item{display:flex;align-items:center;gap:5px}
@@ -327,7 +331,7 @@ async function init(force=false){
     _dateIdx=buildDateIndex(_daily);
     _wkByDate={};
     _workouts.forEach(w=>{ const k=wkDate(w); if(!_wkByDate[k]) _wkByDate[k]=[]; _wkByDate[k].push(w); });
-    selDate=null; render();
+    selDate=isoDate(new Date()); render();
   }catch(e){ el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`; }
 }
 
@@ -395,17 +399,18 @@ function buildDetail(key){
     <div class="wo-section">
       <div class="wo-sec-lbl">WORKOUTS (${wos.length})</div>
       ${wos.map(w=>{
-        const parts=[];
-        if(wkDur(w)>0)   parts.push(fmtDuration(wkDur(w)));
-        if(wkRPE(w)>0)   parts.push(`RPE ${wkRPE(w).toFixed(1)}`);
-        if(wkTrimp(w)>0) parts.push(`${wkTrimp(w).toFixed(0)} TRIMP`);
-        if(wkAvgHR(w)>0) parts.push(`${wkAvgHR(w).toFixed(0)} AVG HR`);
-        if(wkMaxHR(w)>0) parts.push(`${wkMaxHR(w).toFixed(0)} MAX HR`);
-        return `<div class="wo-row">
-          <div class="wo-icon">${sportIcon(wkSport(w))}</div>
-          <div>
-            <div class="wo-name">${wkSport(w)||'Training'}</div>
-            <div class="wo-meta">${parts.join(' · ')}</div>
+        const stats=[];
+        if(wkRPE(w)>0)   stats.push({val:wkRPE(w).toFixed(1), lbl:'RPE',     col:'var(--orange)'});
+        if(wkDur(w)>0)   stats.push({val:fmtDuration(wkDur(w)),lbl:'DURATION',col:'var(--text)'});
+        if(wkLoad(w)>0)  stats.push({val:wkLoad(w).toFixed(0), lbl:'LOAD',    col:'var(--accent)'});
+        if(wkTrimp(w)>0) stats.push({val:wkTrimp(w).toFixed(0),lbl:'TRIMP',   col:'var(--blue)'});
+        if(wkAvgHR(w)>0) stats.push({val:wkAvgHR(w).toFixed(0),lbl:'AVG HR', col:'var(--text)'});
+        if(wkMaxHR(w)>0) stats.push({val:wkMaxHR(w).toFixed(0),lbl:'MAX HR', col:'var(--red)'});
+        return `<div class="wo-card">
+          <div class="wo-card-icon">${sportIcon(wkSport(w))}</div>
+          <div class="wo-card-body">
+            <div class="wo-card-name">${wkSport(w)||'Training'}</div>
+            <div class="wo-card-stats">${stats.map(s=>`<div class="wo-stat"><div class="wo-stat-val" style="color:${s.col}">${s.val}</div><div class="wo-stat-lbl">${s.lbl}</div></div>`).join('')}</div>
           </div>
         </div>`;
       }).join('')}
