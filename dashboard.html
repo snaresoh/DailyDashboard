@@ -29,30 +29,35 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
 .icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:background .15s}
 .icon-btn:active{background:var(--border)}.icon-btn svg{width:22px;height:22px}.icon-btn.spinning{animation:spin .7s linear infinite}
 
-.header{padding:calc(var(--safe-top)+10px) 20px 14px;display:flex;align-items:flex-end;justify-content:space-between}
-.header-date-block{display:flex;flex-direction:column;gap:1px}
+/* ── HEADER ── */
+.header{padding:calc(var(--safe-top) + 18px) 24px 20px;display:flex;align-items:flex-end;justify-content:space-between}
+.header-date-block{display:flex;flex-direction:column;gap:3px}
 .header-weekday{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:500}
-.header-date{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;letter-spacing:.04em;color:var(--text);line-height:1}
+.header-date{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;letter-spacing:.04em;color:var(--text);line-height:1}
 .page-wrap{padding-bottom:var(--nav-h)}
-.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--sub);font-weight:600;padding:0 20px;margin-bottom:10px}
-.perf-card{margin:0 16px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px}
-.perf-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-gap{height:8px}
+
+.sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--sub);font-weight:600;padding:0 24px;margin-bottom:12px}
+/* PERF CARD */
+.perf-card{margin:0 16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px}
+.perf-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .perf-form-lbl{font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.16em;color:var(--sub);font-weight:600}
 .perf-badge{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;display:flex;align-items:center;gap:5px}
 .badge-dot{width:7px;height:7px;border-radius:50%}
-.perf-main{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+.perf-main{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
 .perf-form-word{font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:900;letter-spacing:.02em;line-height:1}
 .perf-tsb-block{text-align:right}
 .perf-tsb-val{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:700;line-height:1;letter-spacing:-.02em}
-.perf-tsb-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:600;margin-top:3px}
+.perf-tsb-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:600;margin-top:4px}
 .perf-sub-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .perf-sub-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px}
 .perf-sub-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600;margin-bottom:8px}
 .perf-sub-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1}
 .perf-sub-bar{height:3px;border-radius:999px;background:var(--border);margin-top:8px}
 .perf-sub-fill{height:100%;border-radius:999px}
-.rings-row{margin:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ring-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 12px 14px;display:flex;flex-direction:column;align-items:center;gap:10px}
+/* RINGS */
+.rings-row{margin:0 16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ring-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:12px}
 .ring-card-lbl{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.16em;color:var(--sub);font-weight:600}
 .ring-wrap{position:relative;width:100px;height:100px}
 .ring-wrap svg{width:100px;height:100px;transform:rotate(-90deg)}
@@ -61,26 +66,28 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
 .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ring-val{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;line-height:1}
 .ring-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--sub);margin-top:2px;font-weight:600}
-.activity-card{margin:0 16px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 16px}
-.activity-chart-wrap{height:80px;display:flex;align-items:flex-end;gap:5px;margin-bottom:14px}
-.activity-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+/* 7-DAY BARS */
+.activity-card{margin:0 16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px 18px}
+.activity-chart-wrap{height:80px;display:flex;align-items:flex-end;gap:6px;margin-bottom:16px}
+.activity-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
 .activity-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
-.activity-bar{width:82%;border-radius:4px 4px 0 0;min-height:3px}
+.activity-bar{width:80%;border-radius:4px 4px 0 0;min-height:3px}
 .activity-bar-day{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;font-weight:600}
-.activity-stats{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--border);padding-top:14px}
-.act-stat{display:flex;flex-direction:column;gap:3px;padding:0 6px}
+.activity-stats{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--border);padding-top:16px}
+.act-stat{display:flex;flex-direction:column;gap:4px;padding:0 6px}
 .act-stat+.act-stat{border-left:1px solid var(--border)}
 .act-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;line-height:1}
 .act-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.12em;color:var(--sub);font-weight:600}
-.recent-header{padding:0 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+/* RECENT */
+.recent-header{padding:0 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .view-all-btn{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--accent);text-decoration:none}
-.workout-card{margin:0 16px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start}
+.workout-card{margin:0 16px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
 .workout-icon{width:46px;height:46px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .workout-info{flex:1;min-width:0}
-.workout-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:.04em;line-height:1.2;margin-bottom:3px}
+.workout-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:.04em;line-height:1.2;margin-bottom:4px}
 .workout-date{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.12em;color:var(--sub);font-weight:500}
 .workout-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-.wmeta-item{display:flex;flex-direction:column;gap:2px}
+.wmeta-item{display:flex;flex-direction:column;gap:3px}
 .wmeta-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--text)}
 .wmeta-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.12em;color:var(--sub);font-weight:600}
 </style>
@@ -228,15 +235,15 @@ function formLabel(tsb) {
   if(tsb > 5)   return { label:'OPTIMAL',      col:'#a8e063' };
   if(tsb > -10) return { label:'PRODUCTIVE',   col:'#f5d020' };
   if(tsb > -30) return { label:'OVER',         col:'#ff6b35' };
-  return              { label:'OVERREACHING',  col:'#ff3b30' };
+  return              { label:'OVER REACHING',  col:'#ff3b30' };
 }
 
 function acwrLabel(acwr) {
   if(!acwr)      return { label:'REST',          col:'#555' };
   if(acwr < 0.8) return { label:'LOW',           col:'#5b9cf6' };
   if(acwr <=1.3) return { label:'OPTIMAL',       col:'#a8e063' };
-  if(acwr <=1.5) return { label:'HIGHINTENSITY', col:'#f5d020' };
-  return              { label:'OVERREACHING',   col:'#ff3b30' };
+  if(acwr <=1.5) return { label:'HIGH INTENSITY', col:'#f5d020' };
+  return              { label:'OVER REACHING',   col:'#ff3b30' };
 }
 
 function loadBucket(load) {
@@ -309,13 +316,11 @@ const NAV_HTML = `<nav class="bottom-nav">
 
 document.getElementById('navwrap').innerHTML = NAV_HTML;
 setNav('dashboard');
-// Set header date
 (function(){
-  const now = new Date();
-  const wks = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
-  const mos = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  document.getElementById('hWeekday').textContent = wks[now.getDay()];
-  document.getElementById('hDate').textContent = `${mos[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+  const n=new Date(),wks=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'],
+    mos=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('hWeekday').textContent=wks[n.getDay()];
+  document.getElementById('hDate').textContent=`${mos[n.getMonth()]} ${n.getDate()}, ${n.getFullYear()}`;
 })();
 
 async function init(force=false){
@@ -323,145 +328,75 @@ async function init(force=false){
   if(btn) btn.classList.add('spinning');
   const el=document.getElementById('content');
   el.innerHTML='<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>';
-  try{
-    const {daily,workouts}=await loadData(force);
-    render(daily,workouts);
-  }catch(e){
-    el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`;
-  }finally{ if(btn) btn.classList.remove('spinning'); }
+  try{ const {daily,workouts}=await loadData(force); render(daily,workouts); }
+  catch(e){ el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`; }
+  finally{ if(btn) btn.classList.remove('spinning'); }
 }
 
 function render(daily,workouts){
   const el=document.getElementById('content');
   if(!daily.length){ el.innerHTML='<div class="state-box"><span>No data</span></div>'; return; }
-
   const today=daily[daily.length-1];
-  const ctl=getCTL(today),atl=getATL(today),tsb=getTSB(today);
-  const acwr=getACWR(today),hrv=getHRV(today),load=getLoad(today),trimp=getTrimp(today);
-  const form=formLabel(tsb), acwrL=acwrLabel(acwr);
-
-  // 7-day window Mon-Sun
-  const now=new Date();
+  const ctl=getCTL(today),atl=getATL(today),tsb=getTSB(today),acwr=getACWR(today),hrv=getHRV(today);
+  const form=formLabel(tsb),acwrL=acwrLabel(acwr);
+  const now=new Date(), todayKey=isoDate(now);
   const week7=[];
   for(let d=6;d>=0;d--){
     const dt=new Date(now); dt.setDate(now.getDate()-d);
     const key=isoDate(dt);
     const row=daily.find(r=>getDate(r)===key)||null;
-    const dows=['MON','TUE','WED','THU','FRI','SAT','SUN'];
-    week7.push({dt,key,row,dow:dows[(dt.getDay()+6)%7]});
+    week7.push({key,row,dow:['MON','TUE','WED','THU','FRI','SAT','SUN'][(dt.getDay()+6)%7]});
   }
   const weekLoad=week7.reduce((a,x)=>a+(x.row?getLoad(x.row):0),0);
   const weekTrimp=week7.reduce((a,x)=>a+(x.row?getTrimp(x.row):0),0);
   const maxLoad=Math.max(...week7.map(x=>x.row?getLoad(x.row):0),1);
   const sessions=week7.filter(x=>x.row&&getLoad(x.row)>0).length;
-
-  const barCol=ld=>{
-    const b=loadBucket(ld);
-    return {rest:'#2a2a2a',low:'#5b9cf6',medium:'#f5d020',high:'#ff6b35',peak:'#ff3b30'}[b];
-  };
-
-  const todayKey=isoDate(now);
+  const barCol=ld=>({rest:'#2a2a2a',low:'#5b9cf6',medium:'#f5d020',high:'#ff6b35',peak:'#ff3b30'})[loadBucket(ld)];
   const barsHTML=week7.map(x=>{
-    const v=x.row?getLoad(x.row):0;
-    const h=Math.max((v/maxLoad)*72,v>0?4:0);
-    const isToday=x.key===todayKey;
-    return `<div class="activity-bar-col">
-      <div class="activity-bar-wrap">
-        <div class="activity-bar" style="height:${h}px;background:${isToday?'var(--accent)':barCol(v)}"></div>
-      </div>
-      <div class="activity-bar-day" style="color:${isToday?'var(--accent)':'var(--sub)'}">${x.dow}</div>
-    </div>`;
+    const v=x.row?getLoad(x.row):0,h=Math.max((v/maxLoad)*72,v>0?4:0),isT=x.key===todayKey;
+    return `<div class="activity-bar-col"><div class="activity-bar-wrap"><div class="activity-bar" style="height:${h}px;background:${isT?'var(--accent)':barCol(v)}"></div></div><div class="activity-bar-day" style="color:${isT?'var(--accent)':'var(--sub)'}">${x.dow}</div></div>`;
   }).join('');
-
-  // Recent workouts – last 3 from Workouts sheet
   const recentW=[...workouts].reverse().slice(0,3);
-  const MONS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const MOS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const wHTML=recentW.map(w=>{
     const sport=wkSport(w);
     const d=new Date((wkDate(w)||'').replace(/\//g,'-'));
-    const dateStr=isNaN(d)?wkDate(w):`${MONS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-    const dur=wkDur(w),rpe=wkRPE(w),avgHR=wkAvgHR(w),maxHR=wkMaxHR(w),loadV=wkLoad(w),trimpV=wkTrimp(w);
+    const dateStr=isNaN(d)?wkDate(w):`${MOS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
     const metas=[];
-    if(rpe>0)   metas.push({val:rpe.toFixed(1),lbl:'RPE',col:'var(--orange)'});
-    if(dur>0)   metas.push({val:fmtDuration(dur),lbl:'TIME',col:'var(--text)'});
-    if(loadV>0) metas.push({val:loadV.toFixed(0),lbl:'LOAD',col:'var(--accent)'});
-    if(trimpV>0)metas.push({val:trimpV.toFixed(0),lbl:'TRIMP',col:'var(--blue)'});
-    if(avgHR>0) metas.push({val:avgHR.toFixed(0),lbl:'AVG HR',col:'var(--text)'});
-    if(maxHR>0) metas.push({val:maxHR.toFixed(0),lbl:'MAX HR',col:'var(--red)'});
-    return `<div class="workout-card fade">
-      <div class="workout-icon">${sportIcon(sport)}</div>
-      <div class="workout-info">
-        <div class="workout-name">${sport||'Training'}</div>
-        <div class="workout-date">${dateStr}</div>
-        <div class="workout-meta">${metas.map(m=>`<div class="wmeta-item"><div class="wmeta-val" style="color:${m.col}">${m.val}</div><div class="wmeta-lbl">${m.lbl}</div></div>`).join('')}</div>
-      </div>
-    </div>`;
+    if(wkRPE(w)>0)    metas.push({val:wkRPE(w).toFixed(1),lbl:'RPE',col:'var(--orange)'});
+    if(wkDur(w)>0)    metas.push({val:fmtDuration(wkDur(w)),lbl:'TIME',col:'var(--text)'});
+    if(wkLoad(w)>0)   metas.push({val:wkLoad(w).toFixed(0),lbl:'LOAD',col:'var(--accent)'});
+    if(wkTrimp(w)>0)  metas.push({val:wkTrimp(w).toFixed(0),lbl:'TRIMP',col:'var(--blue)'});
+    if(wkAvgHR(w)>0)  metas.push({val:wkAvgHR(w).toFixed(0),lbl:'AVG HR',col:'var(--text)'});
+    if(wkMaxHR(w)>0)  metas.push({val:wkMaxHR(w).toFixed(0),lbl:'MAX HR',col:'var(--red)'});
+    return `<div class="workout-card fade"><div class="workout-icon">${sportIcon(sport)}</div><div class="workout-info"><div class="workout-name">${sport||'Training'}</div><div class="workout-date">${dateStr}</div><div class="workout-meta">${metas.map(m=>`<div class="wmeta-item"><div class="wmeta-val" style="color:${m.col}">${m.val}</div><div class="wmeta-lbl">${m.lbl}</div></div>`).join('')}</div></div></div>`;
   }).join('');
-
-  const ctlC=2*Math.PI*40, atlC=2*Math.PI*40;
-  const ctlOff=ctlC*(1-Math.min(ctl/150,1));
-  const atlOff=atlC*(1-Math.min(atl/200,1));
-
+  const ctlC=2*Math.PI*40,atlC=2*Math.PI*40;
   el.innerHTML=`
-    <div class="sec-lbl fade">PERFORMANCE STATUS <span style="float:right;color:${acwrL.col};font-size:12px">${acwrL.label}</span></div>
+    <div class="sec-lbl fade" style="display:flex;justify-content:space-between;align-items:center">
+      <span>PERFORMANCE STATUS</span><span style="color:${acwrL.col};font-size:12px;font-weight:700;letter-spacing:.1em">${acwrL.label}</span>
+    </div>
     <div class="perf-card fade">
-      <div class="perf-top">
-        <span class="perf-form-lbl">CURRENT FORM</span>
-        <span class="perf-badge" style="color:${form.col}"><span class="badge-dot" style="background:${form.col}"></span>TSB ${tsb>=0?'+':''}${tsb.toFixed(1)}</span>
-      </div>
-      <div class="perf-main">
-        <div class="perf-form-word" style="color:${form.col}">${form.label}</div>
-        <div class="perf-tsb-block">
-          <div class="perf-tsb-val" style="color:${tsb<0?'var(--red)':'var(--green)'}">${tsb>=0?'+':''}${tsb.toFixed(1)}</div>
-          <div class="perf-tsb-lbl">TSB INDICATOR</div>
-        </div>
-      </div>
+      <div class="perf-top"><span class="perf-form-lbl">CURRENT FORM</span><span class="perf-badge" style="color:${form.col}"><span class="badge-dot" style="background:${form.col}"></span>TSB ${tsb>=0?'+':''}${tsb.toFixed(1)}</span></div>
+      <div class="perf-main"><div class="perf-form-word" style="color:${form.col}">${form.label}</div><div class="perf-tsb-block"><div class="perf-tsb-val" style="color:${tsb<0?'var(--red)':'var(--green)'}">${tsb>=0?'+':''}${tsb.toFixed(1)}</div><div class="perf-tsb-lbl">TSB INDICATOR</div></div></div>
       <div class="perf-sub-row">
-        <div class="perf-sub-card">
-          <div class="perf-sub-lbl">ACWR</div>
-          <div class="perf-sub-val" style="color:${acwrL.col}">${acwr>0?acwr.toFixed(1):'—'}</div>
-          <div class="perf-sub-bar"><div class="perf-sub-fill" style="width:${Math.min(acwr/2*100,100)}%;background:${acwrL.col}"></div></div>
-        </div>
-        <div class="perf-sub-card">
-          <div class="perf-sub-lbl">HRV</div>
-          <div class="perf-sub-val" style="color:var(--blue)">${hrv>0?hrv.toFixed(0)+' ms':'—'}</div>
-          <div class="perf-sub-bar"><div class="perf-sub-fill" style="width:${Math.min(hrv/80*100,100)}%;background:var(--blue)"></div></div>
-        </div>
+        <div class="perf-sub-card"><div class="perf-sub-lbl">ACWR</div><div class="perf-sub-val" style="color:${acwrL.col}">${acwr>0?acwr.toFixed(1):'—'}</div><div class="perf-sub-bar"><div class="perf-sub-fill" style="width:${Math.min(acwr/2*100,100)}%;background:${acwrL.col}"></div></div></div>
+        <div class="perf-sub-card"><div class="perf-sub-lbl">HRV</div><div class="perf-sub-val" style="color:var(--blue)">${hrv>0?hrv.toFixed(0)+' ms':'—'}</div><div class="perf-sub-bar"><div class="perf-sub-fill" style="width:${Math.min(hrv/80*100,100)}%;background:var(--blue)"></div></div></div>
       </div>
     </div>
     <div class="rings-row fade">
-      <div class="ring-card">
-        <div class="ring-wrap">
-          <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="40"/>
-            <circle class="ring-fg" cx="50" cy="50" r="40" stroke="#f5d020" stroke-dasharray="${ctlC.toFixed(1)}" stroke-dashoffset="${ctlOff.toFixed(1)}"/></svg>
-          <div class="ring-center"><div class="ring-val" style="color:#f5d020">${ctl.toFixed(0)}</div><div class="ring-sub">CTL</div></div>
-        </div>
-        <div class="ring-card-lbl">CHRONIC LOAD</div>
-      </div>
-      <div class="ring-card">
-        <div class="ring-wrap">
-          <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="40"/>
-            <circle class="ring-fg" cx="50" cy="50" r="40" stroke="var(--orange)" stroke-dasharray="${atlC.toFixed(1)}" stroke-dashoffset="${atlOff.toFixed(1)}"/></svg>
-          <div class="ring-center"><div class="ring-val" style="color:var(--orange)">${atl.toFixed(0)}</div><div class="ring-sub">ATL</div></div>
-        </div>
-        <div class="ring-card-lbl">ACUTE LOAD</div>
-      </div>
+      <div class="ring-card"><div class="ring-wrap"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="40"/><circle class="ring-fg" cx="50" cy="50" r="40" stroke="#f5d020" stroke-dasharray="${ctlC.toFixed(1)}" stroke-dashoffset="${(ctlC*(1-Math.min(ctl/150,1))).toFixed(1)}"/></svg><div class="ring-center"><div class="ring-val" style="color:#f5d020">${ctl.toFixed(0)}</div><div class="ring-sub">CTL</div></div></div><div class="ring-card-lbl">CHRONIC LOAD</div></div>
+      <div class="ring-card"><div class="ring-wrap"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="40"/><circle class="ring-fg" cx="50" cy="50" r="40" stroke="var(--orange)" stroke-dasharray="${atlC.toFixed(1)}" stroke-dashoffset="${(atlC*(1-Math.min(atl/200,1))).toFixed(1)}"/></svg><div class="ring-center"><div class="ring-val" style="color:var(--orange)">${atl.toFixed(0)}</div><div class="ring-sub">ATL</div></div></div><div class="ring-card-lbl">ACUTE LOAD</div></div>
     </div>
     <div class="sec-lbl fade">LAST 7 DAYS ACTIVITY</div>
-    <div class="activity-card fade">
-      <div class="activity-chart-wrap">${barsHTML}</div>
-      <div class="activity-stats">
-        <div class="act-stat"><div class="act-stat-val">${weekLoad.toFixed(0)}</div><div class="act-stat-lbl">TOTAL LOAD</div></div>
-        <div class="act-stat" style="padding-left:16px"><div class="act-stat-val">${weekTrimp.toFixed(0)}</div><div class="act-stat-lbl">TRIMP</div></div>
-        <div class="act-stat" style="padding-left:16px"><div class="act-stat-val">${sessions}</div><div class="act-stat-lbl">SESSIONS</div></div>
-      </div>
-    </div>
-    <div class="recent-header fade">
-      <span class="sec-lbl" style="padding:0;margin:0">RECENT ACTIVITY</span>
-      <a class="view-all-btn" href="logs.html">VIEW ALL</a>
-    </div>
+    <div class="activity-card fade"><div class="activity-chart-wrap">${barsHTML}</div><div class="activity-stats">
+      <div class="act-stat"><div class="act-stat-val">${weekLoad.toFixed(0)}</div><div class="act-stat-lbl">TOTAL LOAD</div></div>
+      <div class="act-stat" style="padding-left:16px"><div class="act-stat-val">${weekTrimp.toFixed(0)}</div><div class="act-stat-lbl">TRIMP</div></div>
+      <div class="act-stat" style="padding-left:16px"><div class="act-stat-val">${sessions}</div><div class="act-stat-lbl">SESSIONS</div></div>
+    </div></div>
+    <div class="recent-header fade"><span class="sec-lbl" style="padding:0;margin:0">RECENT ACTIVITY</span><a class="view-all-btn" href="logs.html">VIEW ALL</a></div>
     ${wHTML}
-    <div style="height:8px"></div>`;
+    <div style="height:12px"></div>`;
 }
 init();
 

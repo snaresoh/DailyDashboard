@@ -124,15 +124,15 @@ function formLabel(tsb) {
   if(tsb > 5)   return { label:'OPTIMAL',      col:'#a8e063' };
   if(tsb > -10) return { label:'PRODUCTIVE',   col:'#f5d020' };
   if(tsb > -30) return { label:'OVER',         col:'#ff6b35' };
-  return              { label:'OVERREACHING',  col:'#ff3b30' };
+  return              { label:'OVER REACHING',  col:'#ff3b30' };
 }
 
 function acwrLabel(acwr) {
   if(!acwr)      return { label:'REST',          col:'#555' };
   if(acwr < 0.8) return { label:'LOW',           col:'#5b9cf6' };
   if(acwr <=1.3) return { label:'OPTIMAL',       col:'#a8e063' };
-  if(acwr <=1.5) return { label:'HIGHINTENSITY', col:'#f5d020' };
-  return              { label:'OVERREACHING',   col:'#ff3b30' };
+  if(acwr <=1.5) return { label:'HIGH INTENSITY', col:'#f5d020' };
+  return              { label:'OVER REACHING',   col:'#ff3b30' };
 }
 
 function loadBucket(load) {

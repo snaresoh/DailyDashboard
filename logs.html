@@ -29,29 +29,31 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
 .icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:background .15s}
 .icon-btn:active{background:var(--border)}.icon-btn svg{width:22px;height:22px}.icon-btn.spinning{animation:spin .7s linear infinite}
 
-.header{padding:calc(var(--safe-top)+10px) 20px 8px;display:flex;align-items:flex-end;justify-content:space-between}
-.h-left{display:flex;flex-direction:column;gap:2px}
-.h-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.2em;color:var(--muted);font-weight:500}
-.h-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:.06em;line-height:1}
+/* ── HEADER ── */
+.header{padding:calc(var(--safe-top) + 18px) 24px 16px;display:flex;align-items:flex-end;justify-content:space-between}
+.h-left{display:flex;flex-direction:column;gap:4px}
+.h-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.22em;color:var(--muted);font-weight:500}
+.h-title{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;letter-spacing:.04em;line-height:1}
 .page-wrap{padding-bottom:var(--nav-h)}
-.filter-row{display:flex;gap:8px;padding:8px 16px 14px;overflow-x:auto}
+
+.filter-row{display:flex;gap:8px;padding:4px 20px 18px;overflow-x:auto}
 .fpill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;padding:7px 16px;border-radius:999px;border:1px solid var(--border);color:var(--sub);cursor:pointer;user-select:none;white-space:nowrap;transition:all .15s;background:transparent;flex-shrink:0}
 .fpill.active{background:var(--accent);border-color:var(--accent);color:#000}
-.month-divider{display:flex;align-items:center;gap:10px;padding:14px 20px 8px}
+.month-divider{display:flex;align-items:center;gap:10px;padding:16px 20px 10px}
 .month-divider span{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.18em;font-weight:700;color:var(--sub);white-space:nowrap}
 .month-divider::before,.month-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .log-list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
-.wo-entry{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start}
+.wo-entry{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
 .wo-entry-bar{width:4px;border-radius:2px;flex-shrink:0;align-self:stretch;min-height:50px}
-.wo-entry-icon{width:44px;height:44px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.wo-entry-icon{width:46px;height:46px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .wo-entry-body{flex:1;min-width:0}
-.wo-entry-date{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600;margin-bottom:3px}
-.wo-entry-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.04em;line-height:1.2;margin-bottom:8px}
+.wo-entry-date{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600;margin-bottom:4px}
+.wo-entry-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.04em;line-height:1.2;margin-bottom:10px}
 .wo-entry-meta{display:flex;flex-wrap:wrap;gap:10px}
-.wm-item{display:flex;flex-direction:column;gap:2px}
+.wm-item{display:flex;flex-direction:column;gap:3px}
 .wm-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--text)}
 .wm-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.12em;color:var(--sub);font-weight:600}
-.load-more{text-align:center;padding:16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.14em;color:var(--muted);cursor:pointer;font-weight:600}
+.load-more{text-align:center;padding:18px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.14em;color:var(--muted);cursor:pointer;font-weight:600}
 .load-more:active{color:var(--text)}
 </style>
 </head>
@@ -207,15 +209,15 @@ function formLabel(tsb) {
   if(tsb > 5)   return { label:'OPTIMAL',      col:'#a8e063' };
   if(tsb > -10) return { label:'PRODUCTIVE',   col:'#f5d020' };
   if(tsb > -30) return { label:'OVER',         col:'#ff6b35' };
-  return              { label:'OVERREACHING',  col:'#ff3b30' };
+  return              { label:'OVER REACHING',  col:'#ff3b30' };
 }
 
 function acwrLabel(acwr) {
   if(!acwr)      return { label:'REST',          col:'#555' };
   if(acwr < 0.8) return { label:'LOW',           col:'#5b9cf6' };
   if(acwr <=1.3) return { label:'OPTIMAL',       col:'#a8e063' };
-  if(acwr <=1.5) return { label:'HIGHINTENSITY', col:'#f5d020' };
-  return              { label:'OVERREACHING',   col:'#ff3b30' };
+  if(acwr <=1.5) return { label:'HIGH INTENSITY', col:'#f5d020' };
+  return              { label:'OVER REACHING',   col:'#ff3b30' };
 }
 
 function loadBucket(load) {
@@ -290,41 +292,24 @@ document.getElementById('navwrap').innerHTML = NAV_HTML;
 setNav('logs');
 let _workouts=[], _filter='all', _shown=25;
 const PAGE=25;
-
-const SPORT_CATS = {
+const CATS={
   tennis:    s=>s.includes('网球')||s.includes('tennis'),
   badminton: s=>s.includes('羽毛球')||s.includes('badminton'),
   strength:  s=>s.includes('力量')||s.includes('gym')||s.includes('weight'),
   run:       s=>s.includes('跑')||s.includes('run'),
   yoga:      s=>s.includes('瑜伽')||s.includes('yoga'),
 };
-
-function setFilter(f,el){
-  _filter=f; _shown=PAGE;
-  document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('active',p.dataset.f===f));
-  renderList();
-}
-
-function matchFilter(w){
-  if(_filter==='all') return true;
-  const s=(wkSport(w)||'').toLowerCase();
-  if(SPORT_CATS[_filter]) return SPORT_CATS[_filter](s);
-  // 'other' = none of the defined cats
-  return !Object.values(SPORT_CATS).some(fn=>fn(s));
-}
+function setFilter(f,el){ _filter=f; _shown=PAGE; document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('active',p.dataset.f===f)); renderList(); }
+function matchFilter(w){ if(_filter==='all') return true; const s=(wkSport(w)||'').toLowerCase(); if(CATS[_filter]) return CATS[_filter](s); return !Object.values(CATS).some(fn=>fn(s)); }
 
 async function init(force=false){
   const btn=document.getElementById('refreshBtn');
   if(btn) btn.classList.add('spinning');
   const el=document.getElementById('log-list');
   el.innerHTML='<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>';
-  try{
-    const {workouts}=await loadData(force);
-    _workouts=[...workouts].reverse(); // newest first
-    _shown=PAGE; renderList();
-  }catch(e){
-    el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`;
-  }finally{ if(btn) btn.classList.remove('spinning'); }
+  try{ const {workouts}=await loadData(force); _workouts=[...workouts].reverse(); _shown=PAGE; renderList(); }
+  catch(e){ el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`; }
+  finally{ if(btn) btn.classList.remove('spinning'); }
 }
 
 function renderList(){
@@ -332,31 +317,17 @@ function renderList(){
   const filtered=_workouts.filter(matchFilter);
   if(!filtered.length){ el.innerHTML='<div class="state-box"><span>NO WORKOUTS</span></div>'; return; }
   const slice=filtered.slice(0,_shown);
-
-  const MONS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const MOS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const WKS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
-  let lastMonthKey='';
-  let html='<div class="log-list">';
-
+  let lastMK='', html='<div class="log-list">';
   slice.forEach((w,i)=>{
     const d=new Date((wkDate(w)||'').replace(/\//g,'-'));
-    const monthKey=isNaN(d)?'':`${d.getFullYear()}-${d.getMonth()}`;
-    const dateStr=isNaN(d)?wkDate(w):`${WKS[d.getDay()]} ${MONS[d.getMonth()]} ${d.getDate()}`;
-    const monthLabel=isNaN(d)?'':`${MONS[d.getMonth()]} ${d.getFullYear()}`;
-
-    if(monthKey && monthKey!==lastMonthKey){
-      lastMonthKey=monthKey;
-      html+=`<div class="month-divider"><span>${monthLabel}</span></div>`;
-    }
-
-    const sport=wkSport(w);
-    const s=(sport||'').toLowerCase();
-    const rpe=wkRPE(w),dur=wkDur(w),loadV=wkLoad(w),trimpV=wkTrimp(w);
-    const avgHR=wkAvgHR(w),maxHR=wkMaxHR(w);
-
-    // bar color by RPE
+    const mk=isNaN(d)?'':`${d.getFullYear()}-${d.getMonth()}`;
+    const dateStr=isNaN(d)?wkDate(w):`${WKS[d.getDay()]} ${MOS[d.getMonth()]} ${d.getDate()}`;
+    const mLabel=isNaN(d)?'':`${MOS[d.getMonth()]} ${d.getFullYear()}`;
+    if(mk&&mk!==lastMK){ lastMK=mk; html+=`<div class="month-divider"><span>${mLabel}</span></div>`; }
+    const rpe=wkRPE(w),dur=wkDur(w),loadV=wkLoad(w),trimpV=wkTrimp(w),avgHR=wkAvgHR(w),maxHR=wkMaxHR(w);
     const barCol=rpe>=8?'var(--red)':rpe>=6?'var(--orange)':rpe>=4?'var(--yellow)':'var(--blue)';
-
     const metas=[];
     if(rpe>0)    metas.push({val:rpe.toFixed(1),lbl:'RPE',col:'var(--orange)'});
     if(dur>0)    metas.push({val:fmtDuration(dur),lbl:'DURATION',col:'var(--text)'});
@@ -364,26 +335,21 @@ function renderList(){
     if(trimpV>0) metas.push({val:trimpV.toFixed(0),lbl:'TRIMP',col:'var(--blue)'});
     if(avgHR>0)  metas.push({val:avgHR.toFixed(0),lbl:'AVG HR',col:'var(--text)'});
     if(maxHR>0)  metas.push({val:maxHR.toFixed(0),lbl:'MAX HR',col:'var(--red)'});
-
-    html+=`<div class="wo-entry fade" style="animation-delay:${Math.min(i*.025,.25)}s">
+    html+=`<div class="wo-entry fade" style="animation-delay:${Math.min(i*.02,.3)}s">
       <div class="wo-entry-bar" style="background:${barCol}"></div>
-      <div class="wo-entry-icon">${sportIcon(sport)}</div>
+      <div class="wo-entry-icon">${sportIcon(wkSport(w))}</div>
       <div class="wo-entry-body">
         <div class="wo-entry-date">${dateStr}</div>
-        <div class="wo-entry-name">${sport||'Training'}</div>
+        <div class="wo-entry-name">${wkSport(w)||'Training'}</div>
         <div class="wo-entry-meta">${metas.map(m=>`<div class="wm-item"><div class="wm-val" style="color:${m.col}">${m.val}</div><div class="wm-lbl">${m.lbl}</div></div>`).join('')}</div>
       </div>
     </div>`;
   });
   html+='</div>';
-
-  const remaining=filtered.length-_shown;
-  if(remaining>0) html+=`<div class="load-more" onclick="loadMore()">LOAD ${Math.min(PAGE,remaining)} MORE ↓ &nbsp;(${remaining} remaining)</div>`;
-  else html+=`<div class="load-more" style="pointer-events:none;color:var(--muted)">— END OF LOG — ${filtered.length} workouts</div>`;
-
+  const rem=filtered.length-_shown;
+  html+=rem>0?`<div class="load-more" onclick="loadMore()">LOAD ${Math.min(PAGE,rem)} MORE &darr; &nbsp;(${rem} remaining)</div>`:`<div class="load-more" style="pointer-events:none;color:var(--muted)">&#8212; END OF LOG &#8212; ${filtered.length} workouts</div>`;
   el.innerHTML=html;
 }
-
 function loadMore(){ _shown+=PAGE; renderList(); }
 init();
 

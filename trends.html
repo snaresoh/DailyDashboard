@@ -29,34 +29,33 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
 .icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:background .15s}
 .icon-btn:active{background:var(--border)}.icon-btn svg{width:22px;height:22px}.icon-btn.spinning{animation:spin .7s linear infinite}
 
-.header{padding:calc(var(--safe-top)+10px) 20px 12px;display:flex;align-items:flex-end;justify-content:space-between}
-.h-left{display:flex;flex-direction:column;gap:2px}
-.h-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.2em;color:var(--muted);font-weight:500}
-.h-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:.06em;line-height:1}
+/* ── HEADER ── */
+.header{padding:calc(var(--safe-top) + 18px) 24px 16px;display:flex;align-items:flex-end;justify-content:space-between}
+.h-left{display:flex;flex-direction:column;gap:4px}
+.h-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.22em;color:var(--muted);font-weight:500}
+.h-title{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;letter-spacing:.04em;line-height:1}
 .page-wrap{padding-bottom:var(--nav-h)}
-.filter-row{display:flex;gap:8px;padding:4px 16px 14px;overflow-x:auto}
+
+.filter-row{display:flex;gap:8px;padding:4px 20px 18px;overflow-x:auto}
 .fpill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;padding:7px 16px;border-radius:999px;border:1px solid var(--border);color:var(--sub);cursor:pointer;user-select:none;white-space:nowrap;transition:all .15s;background:transparent;flex-shrink:0}
 .fpill.active{background:var(--accent);border-color:var(--accent);color:#000}
-.chart-block{margin:0 16px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 16px 14px;overflow:hidden}
-.chart-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.chart-block{margin:0 16px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px 18px 16px;overflow:hidden}
+.chart-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
 .chart-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.14em;color:var(--sub)}
 .chart-legend{display:flex;gap:10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--sub);font-weight:600}
 .leg-item{display:flex;align-items:center;gap:4px}
 .leg-line{width:16px;height:2.5px;border-radius:1px}
 .chart-big{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:800;line-height:1;margin-bottom:14px}
-.chart-big-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:600}
-.chart-wrap{height:140px;position:relative}
-.chart-footer{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline}
+.chart-wrap{height:145px;position:relative}
+.chart-footer{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline}
 .hrv-stats{display:flex;gap:20px;align-items:baseline;flex-wrap:wrap}
-.hrv-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;line-height:1}
-.hrv-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.12em;color:var(--sub);font-weight:600}
 .hrv-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 10px;border-radius:4px}
-.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 16px}
-.mini-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px}
-.mini-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:600;margin-bottom:8px}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 18px}
+.mini-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px}
+.mini-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:600;margin-bottom:10px}
 .mini-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;line-height:1}
 .mini-unit{font-size:14px;font-weight:400;color:var(--muted);margin-left:2px}
-.mini-tag{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;margin-top:6px}
+.mini-tag{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;margin-top:8px}
 </style>
 </head>
 <body>
@@ -208,15 +207,15 @@ function formLabel(tsb) {
   if(tsb > 5)   return { label:'OPTIMAL',      col:'#a8e063' };
   if(tsb > -10) return { label:'PRODUCTIVE',   col:'#f5d020' };
   if(tsb > -30) return { label:'OVER',         col:'#ff6b35' };
-  return              { label:'OVERREACHING',  col:'#ff3b30' };
+  return              { label:'OVER REACHING',  col:'#ff3b30' };
 }
 
 function acwrLabel(acwr) {
   if(!acwr)      return { label:'REST',          col:'#555' };
   if(acwr < 0.8) return { label:'LOW',           col:'#5b9cf6' };
   if(acwr <=1.3) return { label:'OPTIMAL',       col:'#a8e063' };
-  if(acwr <=1.5) return { label:'HIGHINTENSITY', col:'#f5d020' };
-  return              { label:'OVERREACHING',   col:'#ff3b30' };
+  if(acwr <=1.5) return { label:'HIGH INTENSITY', col:'#f5d020' };
+  return              { label:'OVER REACHING',   col:'#ff3b30' };
 }
 
 function loadBucket(load) {
@@ -302,72 +301,58 @@ async function init(force=false){
   if(btn) btn.classList.add('spinning');
   const el=document.getElementById('content');
   el.innerHTML='<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>';
-  try{
-    const {daily}=await loadData(force);
-    _daily=daily; renderCharts(daily);
-  }catch(e){
-    el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`;
-  }finally{ if(btn) btn.classList.remove('spinning'); }
+  try{ const {daily}=await loadData(force); _daily=daily; renderCharts(daily); }
+  catch(e){ el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`; }
+  finally{ if(btn) btn.classList.remove('spinning'); }
 }
 
 function getSlice(daily){
   if(_range==='7d') return daily.slice(-7);
   if(_range==='30d') return daily.slice(-30);
-  if(_range==='ytd'){
-    const yr=new Date().getFullYear();
-    return daily.filter(r=>{ const d=new Date(getDate(r).replace(/\//g,'-')); return !isNaN(d)&&d.getFullYear()===yr; });
-  }
+  if(_range==='ytd'){ const yr=new Date().getFullYear(); return daily.filter(r=>{ const d=new Date(getDate(r).replace(/\//g,'-')); return !isNaN(d)&&d.getFullYear()===yr; }); }
   return daily;
 }
 
 function mkDateLabels(slice){
-  const MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return slice.map(r=>{ const d=new Date(getDate(r).replace(/\//g,'-')); return isNaN(d)?getDate(r):`${MONS[d.getMonth()]} ${d.getDate()}`; });
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return slice.map(r=>{ const d=new Date(getDate(r).replace(/\//g,'-')); return isNaN(d)?getDate(r):`${M[d.getMonth()]} ${d.getDate()}`; });
+}
+
+function mkFullDateLabel(r){
+  const d=new Date(getDate(r).replace(/\//g,'-'));
+  if(isNaN(d)) return getDate(r);
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const W=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return `${W[d.getDay()]} ${M[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
 function mkChart(id,datasets,labels,yMin){
   const ctx=document.getElementById(id); if(!ctx) return;
+  const slice=getSlice(_daily);
   const c=new Chart(ctx,{
-    type:'line',
-    data:{labels,datasets},
+    type:'line',data:{labels,datasets},
     options:{
-      responsive:true,maintainAspectRatio:false,animation:{duration:500},
+      responsive:true,maintainAspectRatio:false,animation:{duration:400},
       interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'#1c1c1e',borderColor:'#333',borderWidth:1,
+          backgroundColor:'#1c1c1e',borderColor:'#3a3a3a',borderWidth:1,
           titleColor:'#c0c0c0',bodyColor:'#f0f0f0',padding:10,
-          titleFont:{family:'Barlow Condensed',size:12,weight:'600'},
+          titleFont:{family:'Barlow Condensed',size:13,weight:'700'},
           bodyFont:{family:'DM Mono',size:12},
           callbacks:{
-            title: items => {
-              const idx=items[0].dataIndex;
-              const r=getSlice(_daily)[idx];
-              if(!r) return items[0].label;
-              const d=new Date(getDate(r).replace(/\//g,'-'));
-              if(isNaN(d)) return items[0].label;
-              const MOS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-              const WKS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-              return `${WKS[d.getDay()]} ${MOS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-            }
+            title:items=>{ const r=slice[items[0].dataIndex]; return r?mkFullDateLabel(r):items[0].label; }
           }
         }
       },
       scales:{
-        x:{
-          ticks:{color:'#888',font:{family:'Barlow Condensed',size:10,weight:'600'},maxRotation:0,maxTicksLimit:6},
-          grid:{color:'rgba(255,255,255,.04)'},border:{color:'#2a2a2a'}
-        },
-        y:{
-          ticks:{color:'#888',font:{family:'Barlow Condensed',size:10},maxTicksLimit:5},
-          grid:{color:'rgba(255,255,255,.04)'},border:{color:'transparent'},
-          ...(yMin!==undefined?{min:yMin}:{})
-        }
+        x:{ticks:{color:'#888',font:{family:'Barlow Condensed',size:11,weight:'600'},maxRotation:0,maxTicksLimit:7},grid:{color:'rgba(255,255,255,.03)'},border:{color:'#2a2a2a'}},
+        y:{ticks:{color:'#888',font:{family:'Barlow Condensed',size:10},maxTicksLimit:5},grid:{color:'rgba(255,255,255,.03)'},border:{color:'transparent'},...(yMin!==undefined?{min:yMin}:{})}
       }
     }
   });
-  _charts.push(c); return c;
+  _charts.push(c);
 }
 
 function renderCharts(daily){
@@ -375,50 +360,37 @@ function renderCharts(daily){
   _charts.forEach(c=>c.destroy()); _charts=[];
   if(!daily.length){ el.innerHTML='<div class="state-box"><span>No data</span></div>'; return; }
   const last=daily[daily.length-1];
-  const ctl=getCTL(last),atl=getATL(last),tsb=getTSB(last);
-  const hrv=getHRV(last),hrv7=getHRV7(last),hrvR=getHRVR(last),rhr=getRHR(last);
-  const acwr=getACWR(last), acwrL=acwrLabel(acwr), tsbF=formLabel(tsb);
-  const slice=getSlice(daily);
-  const labels=mkDateLabels(slice);
-  const ctlD=slice.map(r=>getCTL(r)), atlD=slice.map(r=>getATL(r));
-  const tsbD=slice.map(r=>getTSB(r));
+  const ctl=getCTL(last),atl=getATL(last),tsb=getTSB(last),hrv=getHRV(last);
+  const hrv7=getHRV7(last),hrvR=getHRVR(last),rhr=getRHR(last),acwr=getACWR(last);
+  const acwrL=acwrLabel(acwr),tsbF=formLabel(tsb);
+  const slice=getSlice(daily),labels=mkDateLabels(slice);
+  const ctlD=slice.map(getCTL),atlD=slice.map(getATL),tsbD=slice.map(getTSB);
   const hrvD=slice.map(r=>getHRV(r)>0?getHRV(r):null);
   const hrv7D=slice.map(r=>getHRV7(r)>0?getHRV7(r):null);
 
   el.innerHTML=`
     <div class="chart-block fade">
-      <div class="chart-top">
-        <div class="chart-title">TRAINING LOAD</div>
-        <div class="chart-legend">
-          <div class="leg-item"><div class="leg-line" style="background:var(--yellow)"></div>CTL</div>
-          <div class="leg-item"><div class="leg-line" style="background:var(--blue)"></div>ATL</div>
-        </div>
-      </div>
-      <div class="chart-big" style="color:var(--yellow)">${ctl.toFixed(1)} <span class="chart-big-lbl">CURRENT CTL</span></div>
+      <div class="chart-top"><div class="chart-title">TRAINING LOAD</div><div class="chart-legend"><div class="leg-item"><div class="leg-line" style="background:var(--yellow)"></div>CTL</div><div class="leg-item"><div class="leg-line" style="background:var(--blue)"></div>ATL</div></div></div>
+      <div class="chart-big" style="color:var(--yellow)">${ctl.toFixed(1)} <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:var(--sub);letter-spacing:.14em">CURRENT CTL</span></div>
       <div class="chart-wrap"><canvas id="ctlC"></canvas></div>
     </div>
     <div class="chart-block fade">
-      <div class="chart-top">
-        <div class="chart-title">HRV & BASELINE</div>
-        <div class="chart-legend"><div class="leg-item"><div class="leg-line" style="background:var(--blue)"></div>HRV</div><div class="leg-item"><div class="leg-line" style="background:rgba(91,156,246,.4);border-top:1px dashed"></div>7D AVG</div></div>
-      </div>
+      <div class="chart-top"><div class="chart-title">HRV & BASELINE</div><div class="chart-legend"><div class="leg-item"><div class="leg-line" style="background:var(--blue)"></div>HRV</div><div class="leg-item"><div class="leg-line" style="background:rgba(91,156,246,.45);border-top:1px dashed"></div>7D AVG</div></div></div>
       <div class="chart-wrap"><canvas id="hrvC"></canvas></div>
       <div class="chart-footer">
         <div class="hrv-stats">
-          <div><div class="hrv-stat-val" style="color:var(--blue)">${hrv7>0?hrv7.toFixed(0):hrv.toFixed(0)}<span style="font-size:13px;color:var(--muted)"> ms</span></div><div class="hrv-stat-lbl">7D AVERAGE</div></div>
+          <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:var(--blue)">${hrv7>0?hrv7.toFixed(0):hrv.toFixed(0)}<span style="font-size:13px;color:var(--muted)"> ms</span></div><div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.12em;color:var(--sub);font-weight:600">7D AVERAGE</div></div>
           <div><span class="hrv-badge" style="background:${hrvR>=1?'#1a3a1a':'#3a1a1a'};color:${hrvR>=1?'var(--green)':'var(--orange)'}">${hrvR>=1?'OPTIMAL':'BELOW BASE'}</span></div>
         </div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--sub)">RATIO: ${hrvR>0?hrvR.toFixed(2):'—'}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--sub)">RATIO: ${hrvR>0?hrvR.toFixed(2):'—'}</div>
       </div>
     </div>
     <div class="chart-block fade">
       <div class="chart-top"><div class="chart-title">RECOVERY BALANCE (TSB)</div><span style="color:${tsbF.col};font-size:14px">●</span></div>
       <div class="chart-wrap"><canvas id="tsbC"></canvas></div>
       <div class="chart-footer">
-        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600;margin-bottom:4px">TRAINING STRESS BALANCE</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:${tsbF.col}">${tsb>=0?'+':''}${tsb.toFixed(1)} <span style="font-size:13px;font-weight:500;color:var(--sub)">${tsbF.label}</span></div>
-        </div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--sub);text-align:right">LOAD: ${acwrL.label}</div>
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600;margin-bottom:5px">TRAINING STRESS BALANCE</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:${tsbF.col}">${tsb>=0?'+':''}${tsb.toFixed(1)} <span style="font-size:13px;font-weight:500;color:var(--sub)">${tsbF.label}</span></div></div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--sub)">LOAD: ${acwrL.label}</div>
       </div>
     </div>
     <div class="mini-grid fade">
@@ -427,7 +399,7 @@ function renderCharts(daily){
       <div class="mini-card"><div class="mini-lbl">CTL FITNESS</div><div class="mini-val" style="color:var(--yellow)">${ctl.toFixed(1)}</div></div>
       <div class="mini-card"><div class="mini-lbl">HRV RATIO</div><div class="mini-val" style="color:${hrvR>=1?'var(--green)':'var(--orange)'}">${hrvR>0?hrvR.toFixed(2):'—'}</div><div class="mini-tag" style="color:${hrvR>=1?'var(--green)':'var(--orange)'}">● ${hrvR>=1?'OPTIMAL':'CAUTION'}</div></div>
     </div>
-    <div style="height:8px"></div>`;
+    <div style="height:12px"></div>`;
 
   requestAnimationFrame(()=>{
     mkChart('ctlC',[
@@ -438,10 +410,9 @@ function renderCharts(daily){
       {label:'HRV',data:hrvD,borderColor:'#5b9cf6',backgroundColor:'rgba(91,156,246,.09)',borderWidth:2,pointRadius:0,tension:.4,fill:true,spanGaps:true},
       {label:'7D',data:hrv7D,borderColor:'rgba(91,156,246,.45)',backgroundColor:'transparent',borderWidth:1,pointRadius:0,tension:.4,borderDash:[4,4],spanGaps:true},
     ],labels);
-    const tsbMin=Math.min(...tsbD.filter(v=>v!=null))*1.1;
     mkChart('tsbC',[
       {label:'TSB',data:tsbD,borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true},
-    ],labels,tsbMin);
+    ],labels,Math.min(...tsbD.filter(v=>v!=null))*1.1);
   });
 }
 init();

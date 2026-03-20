@@ -29,19 +29,22 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
 .icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:background .15s}
 .icon-btn:active{background:var(--border)}.icon-btn svg{width:22px;height:22px}.icon-btn.spinning{animation:spin .7s linear infinite}
 
-.header{padding:calc(var(--safe-top)+10px) 20px 12px;display:flex;align-items:flex-end;justify-content:space-between}
-.header-date-block{display:flex;flex-direction:column;gap:1px}
+/* ── HEADER ── */
+.header{padding:calc(var(--safe-top) + 18px) 24px 20px;display:flex;align-items:flex-end;justify-content:space-between}
+.header-date-block{display:flex;flex-direction:column;gap:3px}
 .header-weekday{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:500}
-.header-date{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;letter-spacing:.04em;color:var(--text);line-height:1}
+.header-date{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;letter-spacing:.04em;color:var(--text);line-height:1}
 .page-wrap{padding-bottom:var(--nav-h)}
-.month-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px}
+.section-gap{height:8px}
+
+.month-nav{display:flex;align-items:center;justify-content:space-between;padding:4px 24px 16px}
 .nav-arrow{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);cursor:pointer;font-size:20px;color:var(--sub);user-select:none;transition:background .15s}
 .nav-arrow:active{background:var(--bg3)}
 .month-lbl{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;letter-spacing:.06em}
-.cal-wrap{padding:0 16px}
-.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.cal-wrap{padding:0 20px}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:8px}
 .dow-cell{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--sub);padding:4px 0;font-weight:600}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;position:relative;overflow:hidden;transition:transform .15s}
 .cal-day:active{transform:scale(.88)}
 .cal-day.empty{pointer-events:none}
@@ -57,28 +60,28 @@ html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--
 .i-medium{background:#2a2500;color:#f5d020}
 .i-high{background:#2d1800;color:#ff6b35}
 .i-peak{background:#280a0a;color:#ff3b30}
-
 /* DETAIL */
-.detail-panel{margin:14px 16px 0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.detail-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.detail-date-lbl{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.1em}
-.detail-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.1em;padding:4px 10px;border-radius:4px;color:#000}
+.detail-panel{margin:16px 16px 0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.detail-header{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.detail-date-lbl{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.12em}
+.detail-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.12em;padding:4px 12px;border-radius:4px;color:#000}
 .detail-metrics{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
-.detail-metric{background:var(--bg3);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.detail-metric{background:var(--bg3);padding:16px 18px;display:flex;flex-direction:column;gap:5px}
 .dm-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600}
-.dm-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;line-height:1}
-.dm-unit{font-size:12px;color:var(--muted);margin-left:2px}
-.wo-section{padding:12px 16px;border-top:1px solid var(--border)}
-.wo-sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.16em;color:var(--sub);font-weight:600;margin-bottom:10px}
-.wo-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.dm-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1}
+.dm-unit{font-size:13px;color:var(--muted);margin-left:3px;font-weight:400}
+.wo-section{padding:14px 18px;border-top:1px solid var(--border)}
+.wo-sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:700;margin-bottom:12px}
+.wo-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
 .wo-row:last-child{border-bottom:none}
-.wo-icon{width:38px;height:38px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.wo-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em}
-.wo-meta{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--sub);font-weight:500;margin-top:2px}
-.legend-row{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px 20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--sub);font-weight:600}
+.wo-icon{width:40px;height:40px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.wo-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em}
+.wo-meta{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--sub);font-weight:500;margin-top:3px}
+/* LEGEND */
+.legend-row{display:flex;align-items:center;justify-content:center;gap:14px;padding:14px 20px 4px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--sub);font-weight:600;flex-wrap:wrap}
 .legend-item{display:flex;align-items:center;gap:5px}
 .legend-dot{width:11px;height:11px;border-radius:50%}
-.no-data{text-align:center;padding:20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.12em;color:var(--muted)}
+.no-data{text-align:center;padding:24px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.12em;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -224,15 +227,15 @@ function formLabel(tsb) {
   if(tsb > 5)   return { label:'OPTIMAL',      col:'#a8e063' };
   if(tsb > -10) return { label:'PRODUCTIVE',   col:'#f5d020' };
   if(tsb > -30) return { label:'OVER',         col:'#ff6b35' };
-  return              { label:'OVERREACHING',  col:'#ff3b30' };
+  return              { label:'OVER REACHING',  col:'#ff3b30' };
 }
 
 function acwrLabel(acwr) {
   if(!acwr)      return { label:'REST',          col:'#555' };
   if(acwr < 0.8) return { label:'LOW',           col:'#5b9cf6' };
   if(acwr <=1.3) return { label:'OPTIMAL',       col:'#a8e063' };
-  if(acwr <=1.5) return { label:'HIGHINTENSITY', col:'#f5d020' };
-  return              { label:'OVERREACHING',   col:'#ff3b30' };
+  if(acwr <=1.5) return { label:'HIGH INTENSITY', col:'#f5d020' };
+  return              { label:'OVER REACHING',   col:'#ff3b30' };
 }
 
 function loadBucket(load) {
@@ -306,11 +309,10 @@ const NAV_HTML = `<nav class="bottom-nav">
 document.getElementById('navwrap').innerHTML = NAV_HTML;
 setNav('calendar');
 (function(){
-  const now=new Date();
-  const wks=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
-  const mos=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  document.getElementById('hWeekday').textContent=wks[now.getDay()];
-  document.getElementById('hDate').textContent=`${mos[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+  const n=new Date(),wks=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'],
+    mos=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('hWeekday').textContent=wks[n.getDay()];
+  document.getElementById('hDate').textContent=`${mos[n.getMonth()]} ${n.getDate()}, ${n.getFullYear()}`;
 })();
 
 let _daily=[],_workouts=[],_dateIdx={},_wkByDate={};
@@ -348,12 +350,12 @@ function render(){
     const dotCol=ind.includes('🔴')?'var(--red)':ind.includes('🟡')?'var(--yellow)':'transparent';
     cells+=`<div class="${cls}" onclick="selectDate('${key}')"><div class="day-num">${d}</div><div class="day-dot" style="background:${dotCol}"></div></div>`;
   }
-  const MOS=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const MOS_LONG=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
   const detailHTML=selDate?buildDetail(selDate):'';
   el.innerHTML=`
     <div class="month-nav fade">
       <div class="nav-arrow" onclick="navCal(-1)">‹</div>
-      <div class="month-lbl">${MOS[m]} ${y}</div>
+      <div class="month-lbl">${MOS_LONG[m]} ${y}</div>
       <div class="nav-arrow" onclick="navCal(1)">›</div>
     </div>
     <div class="cal-wrap fade">
@@ -363,45 +365,69 @@ function render(){
     ${detailHTML}
     <div class="legend-row fade">
       <div class="legend-item"><div class="legend-dot" style="background:#1a2a3a;border:1px solid #5b9cf6"></div><span>LOW</span></div>
-      <div class="legend-item"><div class="legend-dot" style="background:#2a2500;border:1px solid #f5d020"></div><span>MED</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2a2500;border:1px solid #f5d020"></div><span>MEDIUM</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:#2d1800;border:1px solid #ff6b35"></div><span>HIGH</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:#280a0a;border:1px solid #ff3b30"></div><span>PEAK</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--bg2);border:1px solid var(--border)"></div><span>REST</span></div>
     </div>
-    <div style="height:8px"></div>`;
+    <div style="height:10px"></div>`;
 }
 
 function buildDetail(key){
   const row=_dateIdx[key];
   const wos=_wkByDate[key]||[];
-  const d=new Date(key);
+  const d=new Date(key.replace(/\//g,'-'));
   const MOS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const WKS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
-  const dateStr=`${WKS[d.getDay()]} ${MOS[d.getMonth()]} ${d.getDate()}`;
-  if(!row&&!wos.length) return `<div class="detail-panel fade"><div class="no-data">NO DATA FOR ${dateStr}</div></div>`;
+  const dateStr=isNaN(d)?key:`${WKS[d.getDay()]} ${MOS[d.getMonth()]} ${d.getDate()}`;
+
+  if(!row&&!wos.length){
+    return `<div class="detail-panel fade"><div class="no-data">NO DATA FOR ${dateStr.toUpperCase()}</div></div>`;
+  }
+
   const ld=row?getLoad(row):0, acwr=row?getACWR(row):0;
   const trimp=row?getTrimp(row):0, hrv=row?getHRV(row):0;
   const tsb=row?getTSB(row):0, ctl=row?getCTL(row):0, atl=row?getATL(row):0;
   const acwrL=acwrLabel(acwr);
-  const wosHTML=wos.map(w=>`<div class="wo-row">
-    <div class="wo-icon">${sportIcon(wkSport(w))}</div>
-    <div><div class="wo-name">${wkSport(w)||'Training'}</div>
-    <div class="wo-meta">${fmtDuration(wkDur(w))} · RPE ${wkRPE(w).toFixed(1)} · ${wkTrimp(w).toFixed(0)} TRIMP${wkAvgHR(w)>0?' · '+wkAvgHR(w).toFixed(0)+' avg HR':''}</div></div>
-  </div>`).join('');
-  return `<div class="detail-panel fade">
-    <div class="detail-header">
-      <span class="detail-date-lbl">${dateStr}</span>
-      ${acwr>0?`<span class="detail-badge" style="background:${acwrL.col}">${acwrL.label}</span>`:''}
-    </div>
-    ${row?`<div class="detail-metrics">
+
+  // workouts HTML
+  const wosHTML=wos.length ? `
+    <div class="wo-section">
+      <div class="wo-sec-lbl">WORKOUTS (${wos.length})</div>
+      ${wos.map(w=>{
+        const parts=[];
+        if(wkDur(w)>0)   parts.push(fmtDuration(wkDur(w)));
+        if(wkRPE(w)>0)   parts.push(`RPE ${wkRPE(w).toFixed(1)}`);
+        if(wkTrimp(w)>0) parts.push(`${wkTrimp(w).toFixed(0)} TRIMP`);
+        if(wkAvgHR(w)>0) parts.push(`${wkAvgHR(w).toFixed(0)} AVG HR`);
+        if(wkMaxHR(w)>0) parts.push(`${wkMaxHR(w).toFixed(0)} MAX HR`);
+        return `<div class="wo-row">
+          <div class="wo-icon">${sportIcon(wkSport(w))}</div>
+          <div>
+            <div class="wo-name">${wkSport(w)||'Training'}</div>
+            <div class="wo-meta">${parts.join(' · ')}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  const metricsHTML=row ? `
+    <div class="detail-metrics">
       <div class="detail-metric"><div class="dm-lbl">LOAD</div><div class="dm-val" style="color:${acwrL.col}">${ld.toFixed(0)}</div></div>
       <div class="detail-metric"><div class="dm-lbl">ACWR</div><div class="dm-val" style="color:${acwrL.col}">${acwr>0?acwr.toFixed(1):'—'}</div></div>
       <div class="detail-metric"><div class="dm-lbl">TRIMP</div><div class="dm-val" style="color:var(--orange)">${trimp.toFixed(0)}</div></div>
       <div class="detail-metric"><div class="dm-lbl">HRV</div><div class="dm-val" style="color:var(--blue)">${hrv>0?hrv.toFixed(0):'—'}<span class="dm-unit">${hrv>0?'ms':''}</span></div></div>
       <div class="detail-metric"><div class="dm-lbl">TSB</div><div class="dm-val" style="color:${tsb>=0?'var(--green)':'var(--red)'}">${tsb>=0?'+':''}${tsb.toFixed(1)}</div></div>
-      <div class="detail-metric"><div class="dm-lbl">CTL / ATL</div><div class="dm-val" style="font-size:20px">${ctl.toFixed(0)}<span class="dm-unit">/ ${atl.toFixed(0)}</span></div></div>
-    </div>`:''}
-    ${wos.length?`<div class="wo-section"><div class="wo-sec-lbl">WORKOUTS (${wos.length})</div>${wosHTML}</div>`:''}
+      <div class="detail-metric"><div class="dm-lbl">CTL / ATL</div><div class="dm-val" style="font-size:22px">${ctl.toFixed(0)}<span class="dm-unit">/ ${atl.toFixed(0)}</span></div></div>
+    </div>` : '';
+
+  return `<div class="detail-panel fade">
+    <div class="detail-header">
+      <span class="detail-date-lbl">${dateStr.toUpperCase()}</span>
+      ${acwr>0?`<span class="detail-badge" style="background:${acwrL.col}">${acwrL.label}</span>`:''}
+    </div>
+    ${metricsHTML}
+    ${wosHTML}
   </div>`;
 }
 
