@@ -1,16 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="theme-color" content="#0e0e0e"/>
-  <title>PRECISION — Calendar</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <script>
-/* === PRECISION SHARED CODE === */
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0e0e0e"/>
+<title>PRECISION — Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<style>
+:root{--bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--border:#2a2a2a;--border2:#333;--text:#f0f0f0;--sub:#c0c0c0;--muted:#888;--accent:#c8f000;--red:#ff3b30;--orange:#ff6b35;--yellow:#f5d020;--green:#a8e063;--blue:#5b9cf6;--safe-top:env(safe-area-inset-top,44px);--safe-bot:env(safe-area-inset-bottom,0px);--nav-h:calc(58px + var(--safe-bot))}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100dvh;overscroll-behavior:none}
+::-webkit-scrollbar{display:none}*{scrollbar-width:none}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);padding-bottom:var(--safe-bot);background:rgba(14,14,14,.97);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding-top:10px;text-decoration:none;color:var(--muted);transition:color .2s}
+.nav-item svg{width:22px;height:22px}
+.nav-item span{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;font-weight:600}
+.nav-item.active{color:var(--accent)}.nav-item.active svg{filter:drop-shadow(0 0 5px var(--accent))}
+.spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.12em}
+.state-box button{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 28px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;cursor:pointer}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fade{animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:background .15s}
+.icon-btn:active{background:var(--border)}.icon-btn svg{width:22px;height:22px}.icon-btn.spinning{animation:spin .7s linear infinite}
+
+.header{padding:calc(var(--safe-top)+10px) 20px 12px;display:flex;align-items:flex-end;justify-content:space-between}
+.header-date-block{display:flex;flex-direction:column;gap:1px}
+.header-weekday{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.header-date{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;letter-spacing:.04em;color:var(--text);line-height:1}
+.page-wrap{padding-bottom:var(--nav-h)}
+.month-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px}
+.nav-arrow{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);cursor:pointer;font-size:20px;color:var(--sub);user-select:none;transition:background .15s}
+.nav-arrow:active{background:var(--bg3)}
+.month-lbl{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;letter-spacing:.06em}
+.cal-wrap{padding:0 16px}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.dow-cell{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--sub);padding:4px 0;font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;position:relative;overflow:hidden;transition:transform .15s}
+.cal-day:active{transform:scale(.88)}
+.cal-day.empty{pointer-events:none}
+.cal-day::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.4) 0%,transparent 65%);opacity:0;transform:scale(0);transition:transform .3s,opacity .3s;pointer-events:none}
+.cal-day:active::before{opacity:1;transform:scale(1)}
+.day-num{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;line-height:1;position:relative;z-index:1}
+.day-dot{width:5px;height:5px;border-radius:50%;margin-top:2px;position:relative;z-index:1}
+.cal-day.today::after{content:'';position:absolute;inset:2px;border-radius:50%;border:1.5px solid currentColor;pointer-events:none;z-index:2;opacity:.7}
+.cal-day.selected{outline:2px solid var(--text);outline-offset:1px}
+.i-rest{background:var(--bg2);color:var(--muted)}
+.i-none{background:transparent;color:var(--muted)}
+.i-low{background:#1a2a3a;color:#5b9cf6}
+.i-medium{background:#2a2500;color:#f5d020}
+.i-high{background:#2d1800;color:#ff6b35}
+.i-peak{background:#280a0a;color:#ff3b30}
+
+/* DETAIL */
+.detail-panel{margin:14px 16px 0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.detail-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.detail-date-lbl{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.1em}
+.detail-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.1em;padding:4px 10px;border-radius:4px;color:#000}
+.detail-metrics{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.detail-metric{background:var(--bg3);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.dm-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600}
+.dm-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;line-height:1}
+.dm-unit{font-size:12px;color:var(--muted);margin-left:2px}
+.wo-section{padding:12px 16px;border-top:1px solid var(--border)}
+.wo-sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.16em;color:var(--sub);font-weight:600;margin-bottom:10px}
+.wo-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.wo-row:last-child{border-bottom:none}
+.wo-icon{width:38px;height:38px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.wo-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em}
+.wo-meta{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--sub);font-weight:500;margin-top:2px}
+.legend-row{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px 20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--sub);font-weight:600}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:11px;height:11px;border-radius:50%}
+.no-data{text-align:center;padding:20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.12em;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <header class="header">
+    <div class="header-date-block">
+      <div class="header-weekday" id="hWeekday"></div>
+      <div class="header-date" id="hDate"></div>
+    </div>
+    <button class="icon-btn" onclick="init(true)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115.4-4.4M20 15a9 9 0 01-15.4 4.4"/></svg>
+    </button>
+  </header>
+  <div id="cal-content"><div class="state-box"><div class="spinner"></div><span>LOADING</span></div></div>
+</div>
+<div id="navwrap"></div>
+
+<script>
 /* ═══════════════════════════════════════════════════════
    PRECISION — Shared Data Layer & Utilities
    ═══════════════════════════════════════════════════════ */
@@ -215,167 +302,58 @@ const NAV_HTML = `<nav class="bottom-nav">
   </a>
 </nav>`;
 
-</script>
-  <style>
-    :root{
-      --bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--border:#282828;--border2:#333;
-      --text:#f0f0f0;--sub:#aaa;--muted:#555;
-      --accent:#c8f000;--red:#ff3b30;--orange:#ff6b35;--yellow:#f5d020;--green:#a8e063;--blue:#5b9cf6;
-      --safe-top:env(safe-area-inset-top,44px);--safe-bot:env(safe-area-inset-bottom,0px);
-      --nav-h:calc(58px + var(--safe-bot));
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100dvh;overscroll-behavior:none}
-    ::-webkit-scrollbar{display:none}*{scrollbar-width:none}
-    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);padding-bottom:var(--safe-bot);background:rgba(14,14,14,.97);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around}
-    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding-top:10px;text-decoration:none;color:var(--muted);transition:color .2s}
-    .nav-item svg{width:20px;height:20px}
-    .nav-item span{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.1em}
-    .nav-item.active{color:var(--accent)}
-    .nav-item.active svg{filter:drop-shadow(0 0 5px var(--accent))}
-    .spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-    .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:12px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.12em}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .fade{animation:fadeUp .35s ease both}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-    /* HEADER */
-    .header{padding:calc(var(--safe-top) + 10px) 20px 10px;display:flex;align-items:center;justify-content:space-between}
-    .logo{display:flex;align-items:center;gap:10px}
-    .logo-icon{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;color:#000}
-    .logo-name{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
-    .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent}
-    .icon-btn svg{width:20px;height:20px}
-
-    .page-wrap{padding-bottom:calc(var(--nav-h) + 12px)}
-
-    /* MONTH NAV */
-    .month-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px}
-    .nav-arrow{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);cursor:pointer;font-size:18px;color:var(--sub);user-select:none;transition:background .15s}
-    .nav-arrow:active{background:var(--bg3)}
-    .month-lbl{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;letter-spacing:.06em;text-align:center}
-
-    /* CALENDAR GRID */
-    .cal-wrap{padding:0 16px}
-    .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
-    .dow-cell{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--muted);padding:4px 0}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-    .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;position:relative;overflow:hidden;transition:transform .15s}
-    .cal-day:active{transform:scale(.88)}
-    .cal-day.empty{pointer-events:none}
-    /* ripple */
-    .cal-day::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.4) 0%,transparent 65%);opacity:0;transform:scale(0);transition:transform .3s,opacity .3s;pointer-events:none}
-    .cal-day:active::before{opacity:1;transform:scale(1)}
-    .day-num{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;line-height:1;position:relative;z-index:1}
-    .day-dot{width:5px;height:5px;border-radius:50%;margin-top:2px;position:relative;z-index:1}
-    .cal-day.today::after{content:'';position:absolute;inset:2px;border-radius:50%;border:1.5px solid currentColor;pointer-events:none;z-index:2;opacity:.7}
-    .cal-day.selected{outline:2px solid var(--text);outline-offset:1px}
-    /* intensity buckets */
-    .i-rest{background:var(--bg2);color:var(--muted)}
-    .i-none{background:transparent;color:var(--muted)}
-    .i-low{background:#1a2a3a;color:#5b9cf6}
-    .i-medium{background:#2a2500;color:#f5d020}
-    .i-high{background:#2d1800;color:#ff6b35}
-    .i-peak{background:#280a0a;color:#ff3b30}
-
-    /* DETAIL PANEL */
-    .detail-panel{margin:14px 16px 0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-    .detail-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-    .detail-date{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.1em}
-    .detail-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;padding:4px 10px;border-radius:4px;color:#000}
-    .detail-main{padding:16px;background:var(--bg3);border-bottom:1px solid var(--border)}
-    .detail-load-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.18em;color:var(--muted);margin-bottom:6px}
-    .detail-load-row{display:flex;align-items:flex-end;justify-content:space-between}
-    .detail-load-val{font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:900;line-height:1;letter-spacing:-.02em}
-    .detail-acwr-block{text-align:right}
-    .detail-acwr-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.16em;color:var(--muted)}
-    .detail-acwr-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1}
-    .detail-sub-row{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
-    .detail-sub-cell{background:var(--bg3);padding:14px 16px}
-    .detail-sub-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.16em;color:var(--muted);margin-bottom:6px}
-    .detail-sub-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;line-height:1}
-    .detail-sub-unit{font-size:12px;font-weight:400;color:var(--muted);margin-left:2px}
-    /* workouts in detail */
-    .detail-workouts{padding:10px 16px}
-    .detail-wo{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
-    .detail-wo:last-child{border-bottom:none}
-    .detail-wo-icon{width:40px;height:40px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-    .detail-wo-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.04em}
-    .detail-wo-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.1em;color:var(--muted);margin-top:2px}
-    .detail-wo-arrow{color:var(--muted);margin-left:auto;font-size:16px}
-
-    /* LEGEND */
-    .legend-row{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 20px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.1em;color:var(--sub)}
-    .legend-item{display:flex;align-items:center;gap:5px}
-    .legend-dot{width:10px;height:10px;border-radius:50%}
-    .no-data-msg{text-align:center;padding:20px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.12em;color:var(--muted)}
-  </style>
-</head>
-<body>
-<div class="page-wrap">
-  <header class="header">
-    <div class="logo"><div class="logo-icon">P</div><div class="logo-name">PRECISION</div></div>
-    <button class="icon-btn" onclick="init(true)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115.4-4.4M20 15a9 9 0 01-15.4 4.4"/></svg>
-    </button>
-  </header>
-
-  <div id="cal-content"><div class="state-box"><div class="spinner"></div><span>LOADING</span></div></div>
-</div>
-<div id="nav-placeholder"></div>
-
-<script>
-document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+document.getElementById('navwrap').innerHTML = NAV_HTML;
 setNav('calendar');
+(function(){
+  const now=new Date();
+  const wks=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  const mos=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('hWeekday').textContent=wks[now.getDay()];
+  document.getElementById('hDate').textContent=`${mos[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+})();
 
-let daily=[], workouts=[], dateIdx={};
-let calY=new Date().getFullYear(), calM=new Date().getMonth();
-let selDate=null;
+let _daily=[],_workouts=[],_dateIdx={},_wkByDate={};
+let calY=new Date().getFullYear(),calM=new Date().getMonth(),selDate=null;
 
 async function init(force=false){
-  showLoading(document.getElementById('cal-content'));
+  const el=document.getElementById('cal-content');
+  el.innerHTML='<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>';
   try{
     const d=await loadData(force);
-    daily=d.daily; workouts=d.workouts; dateIdx=buildDateIndex(daily);
-    selDate=null;
-    renderPage();
-  }catch(e){ showError(document.getElementById('cal-content'),e.message); }
+    _daily=d.daily; _workouts=d.workouts;
+    _dateIdx=buildDateIndex(_daily);
+    _wkByDate={};
+    _workouts.forEach(w=>{ const k=wkDate(w); if(!_wkByDate[k]) _wkByDate[k]=[]; _wkByDate[k].push(w); });
+    selDate=null; render();
+  }catch(e){ el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`; }
 }
-function showLoading(el){ if(el) el.innerHTML=`<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>`; }
-function showError(el,msg){ if(el) el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${msg}</span><button onclick="init()">RETRY</button></div>`; }
 
-function renderPage(){
+function render(){
   const el=document.getElementById('cal-content');
-  const y=calY, m=calM;
-  const first=new Date(y,m,1), last=new Date(y,m+1,0);
-  const startDow=(first.getDay()+6)%7;
-  const daysInMonth=last.getDate();
+  const y=calY,m=calM;
+  const startDow=(new Date(y,m,1).getDay()+6)%7;
+  const daysInMonth=new Date(y,m+1,0).getDate();
   const todayKey=isoDate(new Date());
-
   let cells='';
-  for(let i=0;i<startDow;i++) cells+=`<div class="cal-day empty"></div>`;
+  for(let i=0;i<startDow;i++) cells+='<div class="cal-day empty"></div>';
   for(let d=1;d<=daysInMonth;d++){
     const key=isoDate(new Date(y,m,d));
-    const row=dateIdx[key]||null;
+    const row=_dateIdx[key]||null;
     const ld=row?getLoad(row):null;
-    const rest=row&&ld===0&&getTrimp(row)===0;
-    const bkt=ld!==null?(rest?'rest':loadBucket(ld)):'none';
+    const isRest=row&&ld===0&&getTrimp(row)===0;
+    const bkt=ld!==null?(isRest?'rest':loadBucket(ld)):'none';
     const cls=['cal-day',`i-${bkt}`,key===todayKey?'today':'',key===selDate?'selected':''].filter(Boolean).join(' ');
-    // dot color: indicator
     const ind=row?getInd(row):'';
     const dotCol=ind.includes('🔴')?'var(--red)':ind.includes('🟡')?'var(--yellow)':'transparent';
-    cells+=`<div class="${cls}" onclick="selectDate('${key}')">
-      <div class="day-num">${d}</div>
-      <div class="day-dot" style="background:${dotCol}"></div>
-    </div>`;
+    cells+=`<div class="${cls}" onclick="selectDate('${key}')"><div class="day-num">${d}</div><div class="day-dot" style="background:${dotCol}"></div></div>`;
   }
-
+  const MOS=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
   const detailHTML=selDate?buildDetail(selDate):'';
-
   el.innerHTML=`
     <div class="month-nav fade">
       <div class="nav-arrow" onclick="navCal(-1)">‹</div>
-      <div class="month-lbl">${fmtMonthYear(y,m)}</div>
+      <div class="month-lbl">${MOS[m]} ${y}</div>
       <div class="nav-arrow" onclick="navCal(1)">›</div>
     </div>
     <div class="cal-wrap fade">
@@ -383,84 +361,54 @@ function renderPage(){
       <div class="cal-grid">${cells}</div>
     </div>
     ${detailHTML}
-    <div class="legend-row fade" style="margin-top:12px">
+    <div class="legend-row fade">
       <div class="legend-item"><div class="legend-dot" style="background:#1a2a3a;border:1px solid #5b9cf6"></div><span>LOW</span></div>
-      <div class="legend-item"><div class="legend-dot" style="background:#2a2500;border:1px solid #f5d020"></div><span>MEDIUM</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2a2500;border:1px solid #f5d020"></div><span>MED</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:#2d1800;border:1px solid #ff6b35"></div><span>HIGH</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:#280a0a;border:1px solid #ff3b30"></div><span>PEAK</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--bg2);border:1px solid var(--border)"></div><span>REST</span></div>
     </div>
-    <div style="height:8px"></div>
-  `;
+    <div style="height:8px"></div>`;
 }
 
-function buildDetail(dateKey){
-  const row=dateIdx[dateKey];
-  const wos=workouts.filter(w=>wkDate(w)===dateKey);
-  const d=new Date(dateKey);
-  const mos=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  const dateStr=`${mos[d.getMonth()]} ${d.getDate()} DETAIL`;
-  if(!row&&!wos.length) return `<div class="detail-panel fade"><div class="no-data-msg">NO DATA FOR ${dateStr}</div></div>`;
-
-  const ld=row?getLoad(row):0;
-  const acwr=row?getACWR(row):0;
-  const trimp=row?getTrimp(row):0;
-  const hrv=row?getHRV(row):0;
-  const tsb=row?getTSB(row):0;
+function buildDetail(key){
+  const row=_dateIdx[key];
+  const wos=_wkByDate[key]||[];
+  const d=new Date(key);
+  const MOS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const WKS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const dateStr=`${WKS[d.getDay()]} ${MOS[d.getMonth()]} ${d.getDate()}`;
+  if(!row&&!wos.length) return `<div class="detail-panel fade"><div class="no-data">NO DATA FOR ${dateStr}</div></div>`;
+  const ld=row?getLoad(row):0, acwr=row?getACWR(row):0;
+  const trimp=row?getTrimp(row):0, hrv=row?getHRV(row):0;
+  const tsb=row?getTSB(row):0, ctl=row?getCTL(row):0, atl=row?getATL(row):0;
   const acwrL=acwrLabel(acwr);
-  const col=acwrL.col;
-
-  const wosHTML=wos.map(w=>`
-    <div class="detail-wo">
-      <div class="detail-wo-icon">${sportIcon(wkSport(w))}</div>
-      <div>
-        <div class="detail-wo-name">${wkSport(w)||'Training'}</div>
-        <div class="detail-wo-meta">${fmtDuration(wkDur(w))} · RPE ${wkRPE(w).toFixed(1)} · TRIMP ${wkTrimp(w).toFixed(0)}</div>
-      </div>
-      <div class="detail-wo-arrow">›</div>
-    </div>`).join('');
-
-  return `<div class="detail-panel fade" style="margin-top:14px">
+  const wosHTML=wos.map(w=>`<div class="wo-row">
+    <div class="wo-icon">${sportIcon(wkSport(w))}</div>
+    <div><div class="wo-name">${wkSport(w)||'Training'}</div>
+    <div class="wo-meta">${fmtDuration(wkDur(w))} · RPE ${wkRPE(w).toFixed(1)} · ${wkTrimp(w).toFixed(0)} TRIMP${wkAvgHR(w)>0?' · '+wkAvgHR(w).toFixed(0)+' avg HR':''}</div></div>
+  </div>`).join('');
+  return `<div class="detail-panel fade">
     <div class="detail-header">
-      <span class="detail-date">${dateStr}</span>
-      ${acwr>0?`<span class="detail-badge" style="background:${col}">${acwrL.label}</span>`:''}
+      <span class="detail-date-lbl">${dateStr}</span>
+      ${acwr>0?`<span class="detail-badge" style="background:${acwrL.col}">${acwrL.label}</span>`:''}
     </div>
-    ${row?`<div class="detail-main">
-      <div class="detail-load-lbl">TRAINING LOAD</div>
-      <div class="detail-load-row">
-        <div class="detail-load-val" style="color:${col}">${ld.toFixed(0)}</div>
-        <div class="detail-acwr-block">
-          <div class="detail-acwr-lbl">ACWR</div>
-          <div class="detail-acwr-val" style="color:${col}">${acwr>0?acwr.toFixed(1):'—'}</div>
-        </div>
-      </div>
-    </div>
-    <div class="detail-sub-row">
-      <div class="detail-sub-cell">
-        <div class="detail-sub-lbl">TRIMP</div>
-        <div class="detail-sub-val" style="color:var(--orange)">${trimp.toFixed(0)}<span class="detail-sub-unit">pts</span></div>
-      </div>
-      <div class="detail-sub-cell">
-        <div class="detail-sub-lbl">HRV</div>
-        <div class="detail-sub-val" style="color:var(--blue)">${hrv>0?hrv.toFixed(0):'—'}<span class="detail-sub-unit">${hrv>0?'ms':''}</span></div>
-      </div>
+    ${row?`<div class="detail-metrics">
+      <div class="detail-metric"><div class="dm-lbl">LOAD</div><div class="dm-val" style="color:${acwrL.col}">${ld.toFixed(0)}</div></div>
+      <div class="detail-metric"><div class="dm-lbl">ACWR</div><div class="dm-val" style="color:${acwrL.col}">${acwr>0?acwr.toFixed(1):'—'}</div></div>
+      <div class="detail-metric"><div class="dm-lbl">TRIMP</div><div class="dm-val" style="color:var(--orange)">${trimp.toFixed(0)}</div></div>
+      <div class="detail-metric"><div class="dm-lbl">HRV</div><div class="dm-val" style="color:var(--blue)">${hrv>0?hrv.toFixed(0):'—'}<span class="dm-unit">${hrv>0?'ms':''}</span></div></div>
+      <div class="detail-metric"><div class="dm-lbl">TSB</div><div class="dm-val" style="color:${tsb>=0?'var(--green)':'var(--red)'}">${tsb>=0?'+':''}${tsb.toFixed(1)}</div></div>
+      <div class="detail-metric"><div class="dm-lbl">CTL / ATL</div><div class="dm-val" style="font-size:20px">${ctl.toFixed(0)}<span class="dm-unit">/ ${atl.toFixed(0)}</span></div></div>
     </div>`:''}
-    ${wos.length?`<div class="detail-workouts">${wosHTML}</div>`:''}
+    ${wos.length?`<div class="wo-section"><div class="wo-sec-lbl">WORKOUTS (${wos.length})</div>${wosHTML}</div>`:''}
   </div>`;
 }
 
-function selectDate(key){
-  selDate=selDate===key?null:key;
-  renderPage();
-}
-function navCal(dir){
-  calM+=dir;
-  if(calM>11){calM=0;calY++;}
-  if(calM<0){calM=11;calY--;}
-  selDate=null;
-  renderPage();
-}
+function selectDate(k){ selDate=selDate===k?null:k; render(); }
+function navCal(dir){ calM+=dir; if(calM>11){calM=0;calY++;} if(calM<0){calM=11;calY--;} selDate=null; render(); }
 init();
+
 </script>
 </body>
 </html>

@@ -1,17 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="theme-color" content="#0e0e0e"/>
-  <title>PRECISION — Trends</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script>
-/* === PRECISION SHARED CODE === */
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0e0e0e"/>
+<title>PRECISION — Trends</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--border:#2a2a2a;--border2:#333;--text:#f0f0f0;--sub:#c0c0c0;--muted:#888;--accent:#c8f000;--red:#ff3b30;--orange:#ff6b35;--yellow:#f5d020;--green:#a8e063;--blue:#5b9cf6;--safe-top:env(safe-area-inset-top,44px);--safe-bot:env(safe-area-inset-bottom,0px);--nav-h:calc(58px + var(--safe-bot))}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100dvh;overscroll-behavior:none}
+::-webkit-scrollbar{display:none}*{scrollbar-width:none}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);padding-bottom:var(--safe-bot);background:rgba(14,14,14,.97);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding-top:10px;text-decoration:none;color:var(--muted);transition:color .2s}
+.nav-item svg{width:22px;height:22px}
+.nav-item span{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;font-weight:600}
+.nav-item.active{color:var(--accent)}.nav-item.active svg{filter:drop-shadow(0 0 5px var(--accent))}
+.spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.12em}
+.state-box button{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 28px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;cursor:pointer}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fade{animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:background .15s}
+.icon-btn:active{background:var(--border)}.icon-btn svg{width:22px;height:22px}.icon-btn.spinning{animation:spin .7s linear infinite}
+
+.header{padding:calc(var(--safe-top)+10px) 20px 12px;display:flex;align-items:flex-end;justify-content:space-between}
+.h-left{display:flex;flex-direction:column;gap:2px}
+.h-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.2em;color:var(--muted);font-weight:500}
+.h-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:.06em;line-height:1}
+.page-wrap{padding-bottom:var(--nav-h)}
+.filter-row{display:flex;gap:8px;padding:4px 16px 14px;overflow-x:auto}
+.fpill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;padding:7px 16px;border-radius:999px;border:1px solid var(--border);color:var(--sub);cursor:pointer;user-select:none;white-space:nowrap;transition:all .15s;background:transparent;flex-shrink:0}
+.fpill.active{background:var(--accent);border-color:var(--accent);color:#000}
+.chart-block{margin:0 16px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 16px 14px;overflow:hidden}
+.chart-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.chart-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.14em;color:var(--sub)}
+.chart-legend{display:flex;gap:10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--sub);font-weight:600}
+.leg-item{display:flex;align-items:center;gap:4px}
+.leg-line{width:16px;height:2.5px;border-radius:1px}
+.chart-big{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:800;line-height:1;margin-bottom:14px}
+.chart-big-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:600}
+.chart-wrap{height:140px;position:relative}
+.chart-footer{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline}
+.hrv-stats{display:flex;gap:20px;align-items:baseline;flex-wrap:wrap}
+.hrv-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;line-height:1}
+.hrv-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.12em;color:var(--sub);font-weight:600}
+.hrv-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 10px;border-radius:4px}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 16px}
+.mini-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px}
+.mini-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;color:var(--sub);font-weight:600;margin-bottom:8px}
+.mini-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;line-height:1}
+.mini-unit{font-size:14px;font-weight:400;color:var(--muted);margin-left:2px}
+.mini-tag{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <header class="header">
+    <div class="h-left">
+      <span class="h-eyebrow">METRIC ANALYSIS</span>
+      <span class="h-title">TRENDS</span>
+    </div>
+    <button class="icon-btn" id="refreshBtn" onclick="init(true)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115.4-4.4M20 15a9 9 0 01-15.4 4.4"/></svg>
+    </button>
+  </header>
+  <div class="filter-row">
+    <div class="fpill" data-r="7d" onclick="setRange('7d',this)">LAST 7 DAYS</div>
+    <div class="fpill active" data-r="30d" onclick="setRange('30d',this)">LAST 30 DAYS</div>
+    <div class="fpill" data-r="ytd" onclick="setRange('ytd',this)">YEAR TO DATE</div>
+    <div class="fpill" data-r="all" onclick="setRange('all',this)">ALL TIME</div>
+  </div>
+  <div id="content"><div class="state-box"><div class="spinner"></div><span>LOADING</span></div></div>
+</div>
+<div id="navwrap"></div>
+
+<script>
 /* ═══════════════════════════════════════════════════════
    PRECISION — Shared Data Layer & Utilities
    ═══════════════════════════════════════════════════════ */
@@ -216,245 +286,166 @@ const NAV_HTML = `<nav class="bottom-nav">
   </a>
 </nav>`;
 
-</script>
-  <style>
-    :root{--bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--border:#282828;--border2:#333;--text:#f0f0f0;--sub:#aaa;--muted:#555;--accent:#c8f000;--red:#ff3b30;--orange:#ff6b35;--yellow:#f5d020;--green:#a8e063;--blue:#5b9cf6;--safe-top:env(safe-area-inset-top,44px);--safe-bot:env(safe-area-inset-bottom,0px);--nav-h:calc(58px + var(--safe-bot))}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100dvh;overscroll-behavior:none}
-    ::-webkit-scrollbar{display:none}*{scrollbar-width:none}
-    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);padding-bottom:var(--safe-bot);background:rgba(14,14,14,.97);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around}
-    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding-top:10px;text-decoration:none;color:var(--muted);transition:color .2s}
-    .nav-item svg{width:20px;height:20px}.nav-item span{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.1em}
-    .nav-item.active{color:var(--accent)}.nav-item.active svg{filter:drop-shadow(0 0 5px var(--accent))}
-    .spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-    .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:12px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.12em}
-    .state-box button{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 24px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;cursor:pointer}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .fade{animation:fadeUp .35s ease both}.fade-1{animation-delay:.06s}.fade-2{animation-delay:.12s}.fade-3{animation-delay:.18s}.fade-4{animation-delay:.24s}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .page-wrap{padding-bottom:calc(var(--nav-h)+12px)}
 
-    /* HEADER */
-    .header{padding:calc(var(--safe-top)+10px) 20px 12px;display:flex;align-items:flex-end;justify-content:space-between}
-    .header-left{display:flex;flex-direction:column;gap:2px}
-    .h-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;color:var(--muted)}
-    .h-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:.06em;line-height:1}
-    .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent}
-    .icon-btn svg{width:20px;height:20px}
-    .icon-btn.spinning{animation:spin .7s linear infinite}
-
-    /* CHART CARDS */
-    .chart-block{margin:0 16px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 16px 14px;overflow:hidden}
-    .chart-block-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
-    .chart-block-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;color:var(--sub)}
-    .chart-block-badge{font-family:'DM Mono',sans-serif;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px}
-    .chart-block-badge span{display:inline-flex;align-items:center;gap:3px}
-    .legend-line{width:16px;height:2px;border-radius:1px;display:inline-block}
-    .chart-big-val{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:800;line-height:1;margin-bottom:14px}
-    .chart-big-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.18em;color:var(--muted)}
-    .chart-wrap{height:130px;position:relative}
-    .chart-x-labels{display:flex;justify-content:space-between;margin-top:6px;padding:0 2px;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.1em;color:var(--muted)}
-
-    /* HRV sub section */
-    .hrv-stats{display:flex;align-items:baseline;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-    .hrv-stat{display:flex;flex-direction:column;gap:2px}
-    .hrv-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;line-height:1}
-    .hrv-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.14em;color:var(--muted)}
-    .hrv-status{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;margin-left:6px}
-
-    /* 2x2 MINI CARDS */
-    .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 16px}
-    .mini-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px}
-    .mini-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.18em;color:var(--muted);margin-bottom:8px}
-    .mini-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;line-height:1;letter-spacing:-.01em}
-    .mini-unit{font-size:14px;font-weight:400;color:var(--muted);margin-left:2px}
-    .mini-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;margin-top:6px;display:flex;align-items:center;gap:4px}
-    .mini-delta{font-family:'DM Mono',sans-serif;font-size:10px;color:var(--muted);margin-top:4px}
-  </style>
-</head>
-<body>
-<div class="page-wrap">
-  <header class="header">
-    <div class="header-left">
-      <span class="h-eyebrow">METRIC ANALYSIS</span>
-      <span class="h-title">TRENDS</span>
-    </div>
-    <button class="icon-btn" id="refreshBtn" onclick="init(true)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115.4-4.4M20 15a9 9 0 01-15.4 4.4"/></svg>
-    </button>
-  </header>
-  <div id="content"><div class="state-box"><div class="spinner"></div><span>LOADING</span></div></div>
-</div>
-<div id="nav-placeholder"></div>
-
-<script>
-document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+document.getElementById('navwrap').innerHTML = NAV_HTML;
 setNav('trends');
-let charts=[];
+let _daily=[], _range='30d', _charts=[];
+
+function setRange(r,el){
+  _range=r;
+  document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('active',p.dataset.r===r));
+  if(_daily.length) renderCharts(_daily);
+}
 
 async function init(force=false){
   const btn=document.getElementById('refreshBtn');
   if(btn) btn.classList.add('spinning');
   const el=document.getElementById('content');
-  el.innerHTML=`<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>`;
+  el.innerHTML='<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>';
   try{
     const {daily}=await loadData(force);
-    charts.forEach(c=>c.destroy()); charts=[];
-    renderTrends(daily);
+    _daily=daily; renderCharts(daily);
   }catch(e){
     el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`;
   }finally{ if(btn) btn.classList.remove('spinning'); }
 }
 
-function mkChart(id,type,labels,datasets,opts={}){
-  const ctx=document.getElementById(id);
-  if(!ctx) return null;
-  const c=new Chart(ctx,{
-    type,
-    data:{labels,datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      animation:{duration:600},
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{
-        backgroundColor:'#1a1a1a',borderColor:'#333',borderWidth:1,
-        titleColor:'#666',bodyColor:'#eee',padding:8,
-        titleFont:{family:'Barlow Condensed',size:10},
-        bodyFont:{family:'DM Mono',size:11}
-      }},
-      scales:{
-        x:{display:false,grid:{display:false}},
-        y:{display:false,grid:{display:false},...(opts.y||{})}
-      },
-      ...opts.chart
-    }
-  });
-  charts.push(c);
-  return c;
+function getSlice(daily){
+  if(_range==='7d') return daily.slice(-7);
+  if(_range==='30d') return daily.slice(-30);
+  if(_range==='ytd'){
+    const yr=new Date().getFullYear();
+    return daily.filter(r=>{ const d=new Date(getDate(r).replace(/\//g,'-')); return !isNaN(d)&&d.getFullYear()===yr; });
+  }
+  return daily;
 }
 
-function renderTrends(daily){
-  if(!daily.length){ document.getElementById('content').innerHTML=`<div class="state-box"><span>No data</span></div>`; return; }
+function mkDateLabels(slice){
+  const MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return slice.map(r=>{ const d=new Date(getDate(r).replace(/\//g,'-')); return isNaN(d)?getDate(r):`${MONS[d.getMonth()]} ${d.getDate()}`; });
+}
+
+function mkChart(id,datasets,labels,yMin){
+  const ctx=document.getElementById(id); if(!ctx) return;
+  const c=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:500},
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#1c1c1e',borderColor:'#333',borderWidth:1,
+          titleColor:'#c0c0c0',bodyColor:'#f0f0f0',padding:10,
+          titleFont:{family:'Barlow Condensed',size:12,weight:'600'},
+          bodyFont:{family:'DM Mono',size:12},
+          callbacks:{
+            title: items => {
+              const idx=items[0].dataIndex;
+              const r=getSlice(_daily)[idx];
+              if(!r) return items[0].label;
+              const d=new Date(getDate(r).replace(/\//g,'-'));
+              if(isNaN(d)) return items[0].label;
+              const MOS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+              const WKS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+              return `${WKS[d.getDay()]} ${MOS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{
+          ticks:{color:'#888',font:{family:'Barlow Condensed',size:10,weight:'600'},maxRotation:0,maxTicksLimit:6},
+          grid:{color:'rgba(255,255,255,.04)'},border:{color:'#2a2a2a'}
+        },
+        y:{
+          ticks:{color:'#888',font:{family:'Barlow Condensed',size:10},maxTicksLimit:5},
+          grid:{color:'rgba(255,255,255,.04)'},border:{color:'transparent'},
+          ...(yMin!==undefined?{min:yMin}:{})
+        }
+      }
+    }
+  });
+  _charts.push(c); return c;
+}
+
+function renderCharts(daily){
+  const el=document.getElementById('content');
+  _charts.forEach(c=>c.destroy()); _charts=[];
+  if(!daily.length){ el.innerHTML='<div class="state-box"><span>No data</span></div>'; return; }
   const last=daily[daily.length-1];
   const ctl=getCTL(last),atl=getATL(last),tsb=getTSB(last);
   const hrv=getHRV(last),hrv7=getHRV7(last),hrvR=getHRVR(last),rhr=getRHR(last);
+  const acwr=getACWR(last), acwrL=acwrLabel(acwr), tsbF=formLabel(tsb);
+  const slice=getSlice(daily);
+  const labels=mkDateLabels(slice);
+  const ctlD=slice.map(r=>getCTL(r)), atlD=slice.map(r=>getATL(r));
+  const tsbD=slice.map(r=>getTSB(r));
+  const hrvD=slice.map(r=>getHRV(r)>0?getHRV(r):null);
+  const hrv7D=slice.map(r=>getHRV7(r)>0?getHRV7(r):null);
 
-  // slices
-  const sl90=daily.slice(-90), sl30=daily.slice(-30);
-  const lbl90=sl90.map((_,i)=>i);
-  const lbl30=sl30.map((_,i)=>i);
-
-  const ctlD=sl90.map(r=>getCTL(r)),atlD=sl90.map(r=>getATL(r)),tsbD=sl90.map(r=>getTSB(r));
-  const hrvD=sl30.map(r=>getHRV(r)>0?getHRV(r):null);
-  const hrv7D=sl30.map(r=>getHRV7(r)>0?getHRV7(r):null);
-
-  const tsbForm=formLabel(tsb);
-  const acwr=getACWR(last);
-  const acwrL=acwrLabel(acwr);
-
-  document.getElementById('content').innerHTML=`
-
-    <!-- TRAINING LOAD -->
+  el.innerHTML=`
     <div class="chart-block fade">
-      <div class="chart-block-header">
-        <div class="chart-block-title">TRAINING LOAD</div>
-        <div class="chart-block-badge">
-          <span><span class="legend-line" style="background:var(--yellow)"></span>CTL (FITNESS)</span>
-          <span><span class="legend-line" style="background:var(--blue)"></span>ATL (FATIGUE)</span>
+      <div class="chart-top">
+        <div class="chart-title">TRAINING LOAD</div>
+        <div class="chart-legend">
+          <div class="leg-item"><div class="leg-line" style="background:var(--yellow)"></div>CTL</div>
+          <div class="leg-item"><div class="leg-line" style="background:var(--blue)"></div>ATL</div>
         </div>
       </div>
-      <div class="chart-big-val" style="color:var(--yellow)">${ctl.toFixed(1)}</div>
-      <div class="chart-big-lbl">CURRENT CTL</div>
-      <div class="chart-wrap"><canvas id="ctlChart"></canvas></div>
-      <div class="chart-x-labels"><span>90 DAYS AGO</span><span>30 DAYS AGO</span><span>TODAY</span></div>
+      <div class="chart-big" style="color:var(--yellow)">${ctl.toFixed(1)} <span class="chart-big-lbl">CURRENT CTL</span></div>
+      <div class="chart-wrap"><canvas id="ctlC"></canvas></div>
     </div>
-
-    <!-- HRV -->
-    <div class="chart-block fade fade-1">
-      <div class="chart-block-header">
-        <div class="chart-block-title">HRV & BASELINE</div>
-        <div class="chart-block-badge">
-          <span style="color:var(--blue)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l5-5 4 4 9-9"/></svg>
-          </span>
-        </div>
+    <div class="chart-block fade">
+      <div class="chart-top">
+        <div class="chart-title">HRV & BASELINE</div>
+        <div class="chart-legend"><div class="leg-item"><div class="leg-line" style="background:var(--blue)"></div>HRV</div><div class="leg-item"><div class="leg-line" style="background:rgba(91,156,246,.4);border-top:1px dashed"></div>7D AVG</div></div>
       </div>
-      <div class="chart-wrap"><canvas id="hrvChart"></canvas></div>
-      <div class="hrv-stats">
-        <div class="hrv-stat">
-          <div class="hrv-stat-val" style="color:var(--blue)">${hrv7>0?hrv7.toFixed(0):hrv.toFixed(0)}<span style="font-size:12px;color:var(--muted)">ms</span></div>
-          <div class="hrv-stat-lbl">7D AVERAGE</div>
+      <div class="chart-wrap"><canvas id="hrvC"></canvas></div>
+      <div class="chart-footer">
+        <div class="hrv-stats">
+          <div><div class="hrv-stat-val" style="color:var(--blue)">${hrv7>0?hrv7.toFixed(0):hrv.toFixed(0)}<span style="font-size:13px;color:var(--muted)"> ms</span></div><div class="hrv-stat-lbl">7D AVERAGE</div></div>
+          <div><span class="hrv-badge" style="background:${hrvR>=1?'#1a3a1a':'#3a1a1a'};color:${hrvR>=1?'var(--green)':'var(--orange)'}">${hrvR>=1?'OPTIMAL':'BELOW BASE'}</span></div>
         </div>
-        <div style="display:flex;align-items:baseline">
-          <span class="hrv-status" style="background:${hrvR>=1?'#1a3a1a':'#3a1a1a'};color:${hrvR>=1?'var(--green)':'var(--orange)'}">
-            ${hrvR>=1?'OPTIMAL':'BELOW BASE'}
-          </span>
-        </div>
-        <div class="hrv-stat" style="margin-left:auto">
-          <div class="hrv-stat-val">${hrvR>0?'RATIO: '+hrvR.toFixed(2):''}</div>
-          <div class="hrv-stat-lbl">${rhr>0?'RHR: '+rhr.toFixed(0)+' BPM':''}</div>
-        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--sub)">RATIO: ${hrvR>0?hrvR.toFixed(2):'—'}</div>
       </div>
     </div>
-
-    <!-- TSB (Recovery Balance) -->
-    <div class="chart-block fade fade-2">
-      <div class="chart-block-header">
-        <div class="chart-block-title">RECOVERY BALANCE (TSB)</div>
-        <div class="chart-block-badge" style="color:${tsbForm.col}">●</div>
-      </div>
-      <div class="chart-wrap"><canvas id="tsbChart"></canvas></div>
-      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline">
-        <div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.16em;color:var(--muted);margin-bottom:4px">TRAINING STRESS BALANCE</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:${tsbForm.col}">${tsb>=0?'+':''}${tsb.toFixed(1)} <span style="font-size:12px;font-weight:400">${tsbForm.label}</span></div>
+    <div class="chart-block fade">
+      <div class="chart-top"><div class="chart-title">RECOVERY BALANCE (TSB)</div><span style="color:${tsbF.col};font-size:14px">●</span></div>
+      <div class="chart-wrap"><canvas id="tsbC"></canvas></div>
+      <div class="chart-footer">
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600;margin-bottom:4px">TRAINING STRESS BALANCE</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:${tsbF.col}">${tsb>=0?'+':''}${tsb.toFixed(1)} <span style="font-size:13px;font-weight:500;color:var(--sub)">${tsbF.label}</span></div>
         </div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--muted);text-align:right">LOAD: ${acwrL.label}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--sub);text-align:right">LOAD: ${acwrL.label}</div>
       </div>
     </div>
-
-    <!-- MINI CARDS -->
-    <div class="mini-grid fade fade-3">
-      <div class="mini-card">
-        <div class="mini-lbl">LOAD RATIO</div>
-        <div class="mini-val" style="color:${acwrL.col}">${acwr>0?acwr.toFixed(2):'—'}</div>
-        <div class="mini-tag" style="color:${acwrL.col}">▲ ${acwrL.label}</div>
-      </div>
-      <div class="mini-card">
-        <div class="mini-lbl">REST HR</div>
-        <div class="mini-val">${rhr>0?rhr.toFixed(0):'—'}<span class="mini-unit">${rhr>0?'BPM':''}</span></div>
-        <div class="mini-tag" style="color:var(--blue)">● STABLE</div>
-      </div>
-      <div class="mini-card">
-        <div class="mini-lbl">CTL FITNESS</div>
-        <div class="mini-val" style="color:var(--yellow)">${ctl.toFixed(1)}</div>
-        ${daily.length>7?`<div class="mini-delta">+${(ctl-getCTL(daily[daily.length-8])).toFixed(1)} 7d</div>`:''}
-      </div>
-      <div class="mini-card">
-        <div class="mini-lbl">HRV RATIO</div>
-        <div class="mini-val" style="color:${hrvR>=1?'var(--green)':'var(--orange)'}">${hrvR>0?hrvR.toFixed(2):'—'}</div>
-        <div class="mini-tag" style="color:${hrvR>=1?'var(--green)':'var(--orange)'}">● ${hrvR>=1?'OPTIMAL':'CAUTION'}</div>
-      </div>
+    <div class="mini-grid fade">
+      <div class="mini-card"><div class="mini-lbl">LOAD RATIO</div><div class="mini-val" style="color:${acwrL.col}">${acwr>0?acwr.toFixed(2):'—'}</div><div class="mini-tag" style="color:${acwrL.col}">▲ ${acwrL.label}</div></div>
+      <div class="mini-card"><div class="mini-lbl">REST HR</div><div class="mini-val">${rhr>0?rhr.toFixed(0):'—'}<span class="mini-unit">${rhr>0?'BPM':''}</span></div><div class="mini-tag" style="color:var(--blue)">● STABLE</div></div>
+      <div class="mini-card"><div class="mini-lbl">CTL FITNESS</div><div class="mini-val" style="color:var(--yellow)">${ctl.toFixed(1)}</div></div>
+      <div class="mini-card"><div class="mini-lbl">HRV RATIO</div><div class="mini-val" style="color:${hrvR>=1?'var(--green)':'var(--orange)'}">${hrvR>0?hrvR.toFixed(2):'—'}</div><div class="mini-tag" style="color:${hrvR>=1?'var(--green)':'var(--orange)'}">● ${hrvR>=1?'OPTIMAL':'CAUTION'}</div></div>
     </div>
-    <div style="height:8px"></div>
-  `;
+    <div style="height:8px"></div>`;
 
-  // draw charts
   requestAnimationFrame(()=>{
-    mkChart('ctlChart','line',lbl90,[
-      {label:'CTL',data:ctlD,borderColor:'#f5d020',backgroundColor:'rgba(245,208,32,.06)',borderWidth:2,pointRadius:0,tension:.4,fill:true},
+    mkChart('ctlC',[
+      {label:'CTL',data:ctlD,borderColor:'#f5d020',backgroundColor:'rgba(245,208,32,.07)',borderWidth:2,pointRadius:0,tension:.4,fill:true},
       {label:'ATL',data:atlD,borderColor:'#5b9cf6',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.4},
-    ]);
-    mkChart('hrvChart','line',lbl30,[
-      {label:'HRV',data:hrvD,borderColor:'#5b9cf6',backgroundColor:'rgba(91,156,246,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true,spanGaps:true},
-      {label:'7D',data:hrv7D,borderColor:'rgba(91,156,246,.4)',backgroundColor:'transparent',borderWidth:1,pointRadius:0,tension:.4,borderDash:[4,4],spanGaps:true},
-    ]);
-    mkChart('tsbChart','line',lbl90,[
+    ],labels);
+    mkChart('hrvC',[
+      {label:'HRV',data:hrvD,borderColor:'#5b9cf6',backgroundColor:'rgba(91,156,246,.09)',borderWidth:2,pointRadius:0,tension:.4,fill:true,spanGaps:true},
+      {label:'7D',data:hrv7D,borderColor:'rgba(91,156,246,.45)',backgroundColor:'transparent',borderWidth:1,pointRadius:0,tension:.4,borderDash:[4,4],spanGaps:true},
+    ],labels);
+    const tsbMin=Math.min(...tsbD.filter(v=>v!=null))*1.1;
+    mkChart('tsbC',[
       {label:'TSB',data:tsbD,borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true},
-    ],{y:{min:Math.min(...tsbD)*1.1}});
+    ],labels,tsbMin);
   });
 }
 init();
+
 </script>
 </body>
 </html>

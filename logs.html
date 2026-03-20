@@ -1,16 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="theme-color" content="#0e0e0e"/>
-  <title>PRECISION — Logs</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <script>
-/* === PRECISION SHARED CODE === */
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0e0e0e"/>
+<title>PRECISION — Logs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<style>
+:root{--bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--border:#2a2a2a;--border2:#333;--text:#f0f0f0;--sub:#c0c0c0;--muted:#888;--accent:#c8f000;--red:#ff3b30;--orange:#ff6b35;--yellow:#f5d020;--green:#a8e063;--blue:#5b9cf6;--safe-top:env(safe-area-inset-top,44px);--safe-bot:env(safe-area-inset-bottom,0px);--nav-h:calc(58px + var(--safe-bot))}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100dvh;overscroll-behavior:none}
+::-webkit-scrollbar{display:none}*{scrollbar-width:none}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);padding-bottom:var(--safe-bot);background:rgba(14,14,14,.97);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding-top:10px;text-decoration:none;color:var(--muted);transition:color .2s}
+.nav-item svg{width:22px;height:22px}
+.nav-item span{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;font-weight:600}
+.nav-item.active{color:var(--accent)}.nav-item.active svg{filter:drop-shadow(0 0 5px var(--accent))}
+.spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.12em}
+.state-box button{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 28px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;cursor:pointer}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fade{animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:background .15s}
+.icon-btn:active{background:var(--border)}.icon-btn svg{width:22px;height:22px}.icon-btn.spinning{animation:spin .7s linear infinite}
+
+.header{padding:calc(var(--safe-top)+10px) 20px 8px;display:flex;align-items:flex-end;justify-content:space-between}
+.h-left{display:flex;flex-direction:column;gap:2px}
+.h-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.2em;color:var(--muted);font-weight:500}
+.h-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:.06em;line-height:1}
+.page-wrap{padding-bottom:var(--nav-h)}
+.filter-row{display:flex;gap:8px;padding:8px 16px 14px;overflow-x:auto}
+.fpill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;padding:7px 16px;border-radius:999px;border:1px solid var(--border);color:var(--sub);cursor:pointer;user-select:none;white-space:nowrap;transition:all .15s;background:transparent;flex-shrink:0}
+.fpill.active{background:var(--accent);border-color:var(--accent);color:#000}
+.month-divider{display:flex;align-items:center;gap:10px;padding:14px 20px 8px}
+.month-divider span{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.18em;font-weight:700;color:var(--sub);white-space:nowrap}
+.month-divider::before,.month-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.log-list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.wo-entry{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start}
+.wo-entry-bar{width:4px;border-radius:2px;flex-shrink:0;align-self:stretch;min-height:50px}
+.wo-entry-icon{width:44px;height:44px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.wo-entry-body{flex:1;min-width:0}
+.wo-entry-date{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--sub);font-weight:600;margin-bottom:3px}
+.wo-entry-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.04em;line-height:1.2;margin-bottom:8px}
+.wo-entry-meta{display:flex;flex-wrap:wrap;gap:10px}
+.wm-item{display:flex;flex-direction:column;gap:2px}
+.wm-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--text)}
+.wm-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.12em;color:var(--sub);font-weight:600}
+.load-more{text-align:center;padding:16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.14em;color:var(--muted);cursor:pointer;font-weight:600}
+.load-more:active{color:var(--text)}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <header class="header">
+    <div class="h-left">
+      <span class="h-eyebrow">WORKOUT LOG</span>
+      <span class="h-title">ACTIVITY</span>
+    </div>
+    <button class="icon-btn" id="refreshBtn" onclick="init(true)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115.4-4.4M20 15a9 9 0 01-15.4 4.4"/></svg>
+    </button>
+  </header>
+  <div class="filter-row">
+    <div class="fpill active" data-f="all" onclick="setFilter('all',this)">ALL</div>
+    <div class="fpill" data-f="tennis" onclick="setFilter('tennis',this)">🎾 TENNIS</div>
+    <div class="fpill" data-f="badminton" onclick="setFilter('badminton',this)">🏸 BADMINTON</div>
+    <div class="fpill" data-f="strength" onclick="setFilter('strength',this)">🏋️ STRENGTH</div>
+    <div class="fpill" data-f="run" onclick="setFilter('run',this)">🏃 RUN</div>
+    <div class="fpill" data-f="yoga" onclick="setFilter('yoga',this)">🧘 YOGA</div>
+    <div class="fpill" data-f="other" onclick="setFilter('other',this)">OTHER</div>
+  </div>
+  <div id="log-list"><div class="state-box"><div class="spinner"></div><span>LOADING</span></div></div>
+</div>
+<div id="navwrap"></div>
+
+<script>
 /* ═══════════════════════════════════════════════════════
    PRECISION — Shared Data Layer & Utilities
    ═══════════════════════════════════════════════════════ */
@@ -215,183 +285,108 @@ const NAV_HTML = `<nav class="bottom-nav">
   </a>
 </nav>`;
 
-</script>
-  <style>
-    :root{--bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--border:#282828;--text:#f0f0f0;--sub:#aaa;--muted:#555;--accent:#c8f000;--red:#ff3b30;--orange:#ff6b35;--yellow:#f5d020;--green:#a8e063;--blue:#5b9cf6;--safe-top:env(safe-area-inset-top,44px);--safe-bot:env(safe-area-inset-bottom,0px);--nav-h:calc(58px + var(--safe-bot))}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100dvh;overscroll-behavior:none}
-    ::-webkit-scrollbar{display:none}*{scrollbar-width:none}
-    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);padding-bottom:var(--safe-bot);background:rgba(14,14,14,.97);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around}
-    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding-top:10px;text-decoration:none;color:var(--muted);transition:color .2s}
-    .nav-item svg{width:20px;height:20px}.nav-item span{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.1em}
-    .nav-item.active{color:var(--accent)}.nav-item.active svg{filter:drop-shadow(0 0 5px var(--accent))}
-    .spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-    .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:12px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.12em}
-    .state-box button{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 24px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;cursor:pointer}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .fade{animation:fadeUp .35s ease both}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .page-wrap{padding-bottom:calc(var(--nav-h)+12px)}
 
-    /* HEADER */
-    .header{padding:calc(var(--safe-top)+10px) 20px 8px;display:flex;align-items:flex-end;justify-content:space-between}
-    .header-left{display:flex;flex-direction:column;gap:2px}
-    .h-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;color:var(--muted)}
-    .h-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:.06em;line-height:1}
-    .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent}
-    .icon-btn svg{width:20px;height:20px}
-    .icon-btn.spinning{animation:spin .7s linear infinite}
-
-    /* FILTER PILLS */
-    .filter-row{display:flex;gap:8px;padding:10px 16px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-    .fpill{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;padding:6px 16px;border-radius:999px;border:1px solid var(--border);color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;transition:all .15s;background:transparent;flex-shrink:0}
-    .fpill.active{background:var(--accent);border-color:var(--accent);color:#000}
-    .fpill:not(.active):active{background:var(--bg2)}
-
-    /* LOG ENTRIES */
-    .log-list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
-    .log-entry{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;gap:0;overflow:hidden;position:relative}
-    .log-entry-bar{width:4px;border-radius:2px;flex-shrink:0;margin-right:14px;align-self:stretch;min-height:60px}
-    .log-entry-body{flex:1;min-width:0}
-    .log-entry-date{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.16em;color:var(--muted);margin-bottom:4px}
-    .log-entry-load{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:900;line-height:1;letter-spacing:-.02em}
-    .log-entry-form{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;margin-top:2px}
-    .log-entry-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px;flex-shrink:0}
-    .log-ind{font-size:20px;line-height:1}
-    .log-meta-col{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-    .log-meta-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.14em;color:var(--muted)}
-    .log-meta-val{font-family:'DM Mono',sans-serif;font-size:15px;font-weight:500}
-    .log-wo-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-    .log-wo-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.1em;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;color:var(--sub)}
-
-    /* load more */
-    .load-more{text-align:center;padding:16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--muted);cursor:pointer}
-    .load-more:active{color:var(--text)}
-  </style>
-</head>
-<body>
-<div class="page-wrap">
-  <header class="header">
-    <div class="header-left">
-      <span class="h-eyebrow">SYSTEM LOGS</span>
-      <span class="h-title">PERFORMANCE</span>
-    </div>
-    <button class="icon-btn" id="refreshBtn" onclick="init(true)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115.4-4.4M20 15a9 9 0 01-15.4 4.4"/></svg>
-    </button>
-  </header>
-
-  <div class="filter-row">
-    <div class="fpill active" data-f="all" onclick="setFilter('all',this)">ALL DATES</div>
-    <div class="fpill" data-f="high" onclick="setFilter('high',this)">HIGH INTENSITY</div>
-    <div class="fpill" data-f="recovery" onclick="setFilter('recovery',this)">RECOVERY</div>
-    <div class="fpill" data-f="rest" onclick="setFilter('rest',this)">REST</div>
-  </div>
-
-  <div id="log-list"><div class="state-box"><div class="spinner"></div><span>LOADING</span></div></div>
-</div>
-<div id="nav-placeholder"></div>
-
-<script>
-document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+document.getElementById('navwrap').innerHTML = NAV_HTML;
 setNav('logs');
+let _workouts=[], _filter='all', _shown=25;
+const PAGE=25;
 
-let daily=[], workouts=[], dateIdx={}, wkByDate={};
-let activeFilter='all', pageSize=20, shownCount=20;
+const SPORT_CATS = {
+  tennis:    s=>s.includes('网球')||s.includes('tennis'),
+  badminton: s=>s.includes('羽毛球')||s.includes('badminton'),
+  strength:  s=>s.includes('力量')||s.includes('gym')||s.includes('weight'),
+  run:       s=>s.includes('跑')||s.includes('run'),
+  yoga:      s=>s.includes('瑜伽')||s.includes('yoga'),
+};
+
+function setFilter(f,el){
+  _filter=f; _shown=PAGE;
+  document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('active',p.dataset.f===f));
+  renderList();
+}
+
+function matchFilter(w){
+  if(_filter==='all') return true;
+  const s=(wkSport(w)||'').toLowerCase();
+  if(SPORT_CATS[_filter]) return SPORT_CATS[_filter](s);
+  // 'other' = none of the defined cats
+  return !Object.values(SPORT_CATS).some(fn=>fn(s));
+}
 
 async function init(force=false){
   const btn=document.getElementById('refreshBtn');
   if(btn) btn.classList.add('spinning');
   const el=document.getElementById('log-list');
-  el.innerHTML=`<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>`;
+  el.innerHTML='<div class="state-box"><div class="spinner"></div><span>LOADING</span></div>';
   try{
-    const d=await loadData(force);
-    daily=d.daily; workouts=d.workouts;
-    dateIdx=buildDateIndex(daily);
-    wkByDate={};
-    workouts.forEach(w=>{ const k=wkDate(w); if(!wkByDate[k]) wkByDate[k]=[]; wkByDate[k].push(w); });
-    shownCount=pageSize;
-    renderList();
+    const {workouts}=await loadData(force);
+    _workouts=[...workouts].reverse(); // newest first
+    _shown=PAGE; renderList();
   }catch(e){
     el.innerHTML=`<div class="state-box"><span style="font-size:24px">⚠</span><span>${e.message}</span><button onclick="init()">RETRY</button></div>`;
   }finally{ if(btn) btn.classList.remove('spinning'); }
 }
 
-function setFilter(f, el){
-  activeFilter=f;
-  document.querySelectorAll('.fpill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  shownCount=pageSize;
-  renderList();
-}
-
-function loadMore(){ shownCount+=pageSize; renderList(); }
-
 function renderList(){
   const el=document.getElementById('log-list');
-  const rev=[...daily].reverse();
+  const filtered=_workouts.filter(matchFilter);
+  if(!filtered.length){ el.innerHTML='<div class="state-box"><span>NO WORKOUTS</span></div>'; return; }
+  const slice=filtered.slice(0,_shown);
 
-  const filtered=rev.filter(r=>{
-    const ld=getLoad(r), acwr=getACWR(r), tsb=getTSB(r);
-    const isRest=ld===0&&getTrimp(r)===0;
-    if(activeFilter==='all') return true;
-    if(activeFilter==='high') return acwr>1.3||ld>500;
-    if(activeFilter==='recovery') return tsb>5;
-    if(activeFilter==='rest') return isRest;
-    return true;
-  });
+  const MONS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const WKS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  let lastMonthKey='';
+  let html='<div class="log-list">';
 
-  if(!filtered.length){
-    el.innerHTML=`<div class="state-box"><span>NO ENTRIES</span></div>`;
-    return;
-  }
+  slice.forEach((w,i)=>{
+    const d=new Date((wkDate(w)||'').replace(/\//g,'-'));
+    const monthKey=isNaN(d)?'':`${d.getFullYear()}-${d.getMonth()}`;
+    const dateStr=isNaN(d)?wkDate(w):`${WKS[d.getDay()]} ${MONS[d.getMonth()]} ${d.getDate()}`;
+    const monthLabel=isNaN(d)?'':`${MONS[d.getMonth()]} ${d.getFullYear()}`;
 
-  const slice=filtered.slice(0,shownCount);
-  const entries=slice.map((r,i)=>{
-    const ld=getLoad(r), trimp=getTrimp(r), tsb=getTSB(r), acwr=getACWR(r);
-    const isRest=ld===0&&trimp===0;
-    const form=formLabel(tsb);
-    const acwrL=acwrLabel(acwr);
-    const ind=getInd(r);
-    const dateKey=getDate(r);
-    const d=new Date(dateKey.replace(/\//g,'-'));
-    const mos=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    const dateStr=isNaN(d)?dateKey:`${mos[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-    const barCol=isRest?'#333':acwrL.col;
+    if(monthKey && monthKey!==lastMonthKey){
+      lastMonthKey=monthKey;
+      html+=`<div class="month-divider"><span>${monthLabel}</span></div>`;
+    }
 
-    // workouts for this day
-    const dayWos=wkByDate[dateKey]||[];
-    const woTagsHTML=dayWos.map(w=>`<div class="log-wo-tag">${sportIcon(wkSport(w))} ${wkSport(w)||'Training'} · ${fmtDuration(wkDur(w))}</div>`).join('');
+    const sport=wkSport(w);
+    const s=(sport||'').toLowerCase();
+    const rpe=wkRPE(w),dur=wkDur(w),loadV=wkLoad(w),trimpV=wkTrimp(w);
+    const avgHR=wkAvgHR(w),maxHR=wkMaxHR(w);
 
-    return `<div class="log-entry fade" style="animation-delay:${Math.min(i*.03,.2)}s">
-      <div class="log-entry-bar" style="background:${barCol}"></div>
-      <div class="log-entry-body">
-        <div class="log-entry-date">${dateStr}</div>
-        <div class="log-entry-load" style="color:${isRest?'var(--muted)':acwrL.col}">${isRest?'REST':ld.toFixed(0)}</div>
-        <div class="log-entry-form" style="color:${form.col}">${isRest?'RECOVERY DAY':form.label}</div>
-        ${woTagsHTML?`<div class="log-wo-row">${woTagsHTML}</div>`:''}
-      </div>
-      <div class="log-entry-right">
-        ${ind?`<div class="log-ind">${ind}</div>`:''}
-        <div class="log-meta-col">
-          <div class="log-meta-lbl">TSB</div>
-          <div class="log-meta-val" style="color:${tsb>=0?'var(--green)':'var(--red)'}">${tsb>=0?'+':''}${tsb.toFixed(1)}</div>
-        </div>
-        ${acwr>0?`<div class="log-meta-col">
-          <div class="log-meta-lbl">ACWR</div>
-          <div class="log-meta-val" style="color:${acwrL.col}">${acwr.toFixed(1)}</div>
-        </div>`:''}
+    // bar color by RPE
+    const barCol=rpe>=8?'var(--red)':rpe>=6?'var(--orange)':rpe>=4?'var(--yellow)':'var(--blue)';
+
+    const metas=[];
+    if(rpe>0)    metas.push({val:rpe.toFixed(1),lbl:'RPE',col:'var(--orange)'});
+    if(dur>0)    metas.push({val:fmtDuration(dur),lbl:'DURATION',col:'var(--text)'});
+    if(loadV>0)  metas.push({val:loadV.toFixed(0),lbl:'LOAD',col:'var(--accent)'});
+    if(trimpV>0) metas.push({val:trimpV.toFixed(0),lbl:'TRIMP',col:'var(--blue)'});
+    if(avgHR>0)  metas.push({val:avgHR.toFixed(0),lbl:'AVG HR',col:'var(--text)'});
+    if(maxHR>0)  metas.push({val:maxHR.toFixed(0),lbl:'MAX HR',col:'var(--red)'});
+
+    html+=`<div class="wo-entry fade" style="animation-delay:${Math.min(i*.025,.25)}s">
+      <div class="wo-entry-bar" style="background:${barCol}"></div>
+      <div class="wo-entry-icon">${sportIcon(sport)}</div>
+      <div class="wo-entry-body">
+        <div class="wo-entry-date">${dateStr}</div>
+        <div class="wo-entry-name">${sport||'Training'}</div>
+        <div class="wo-entry-meta">${metas.map(m=>`<div class="wm-item"><div class="wm-val" style="color:${m.col}">${m.val}</div><div class="wm-lbl">${m.lbl}</div></div>`).join('')}</div>
       </div>
     </div>`;
-  }).join('');
+  });
+  html+='</div>';
 
-  const moreBtn=filtered.length>shownCount
-    ?`<div class="load-more" onclick="loadMore()">LOAD MORE ↓ (${filtered.length-shownCount} remaining)</div>`
-    :`<div class="load-more" style="color:var(--muted)">— END OF LOG —</div>`;
+  const remaining=filtered.length-_shown;
+  if(remaining>0) html+=`<div class="load-more" onclick="loadMore()">LOAD ${Math.min(PAGE,remaining)} MORE ↓ &nbsp;(${remaining} remaining)</div>`;
+  else html+=`<div class="load-more" style="pointer-events:none;color:var(--muted)">— END OF LOG — ${filtered.length} workouts</div>`;
 
-  el.innerHTML=`<div class="log-list">${entries}</div>${moreBtn}`;
+  el.innerHTML=html;
 }
+
+function loadMore(){ _shown+=PAGE; renderList(); }
 init();
+
 </script>
 </body>
 </html>
