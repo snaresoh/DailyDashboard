@@ -1,960 +1,375 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-  <meta name="apple-mobile-web-app-title" content="训练日志"/>
-  <meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme:light)"/>
-  <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme:dark)"/>
-  <title>训练日志</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <style>
-    /* ── TOKENS ── */
-    :root{
-      --bg:#f5f5f5; --bg2:#ebebeb; --card:#ffffff; --border:#e0e0e0; --border2:#f0f0f0;
-      --text:#111111; --sub:#444444; --muted:#999999; --muted2:#cccccc;
-      --accent:#111111;
-      --teal:#00a878; --red:#e53935; --amber:#e07b00; --blue:#1a6ef5; --pink:#d81b7a;
-      --ctl:#1a6ef5; --atl:#d81b7a; --tsb:#e53935;
-      --tab-h:calc(env(safe-area-inset-bottom,0px) + 58px);
-      --safe-top:env(safe-area-inset-top,44px);
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PRECISION | Kinetic Performance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-error": "#450900",
+                "error-container": "#b92902",
+                "background": "#0e0e0e",
+                "secondary-container": "#c0000a",
+                "secondary": "#ff7162",
+                "on-secondary": "#4a0001",
+                "surface-container-high": "#20201f",
+                "secondary-dim": "#e2241f",
+                "inverse-surface": "#fcf9f8",
+                "tertiary-container": "#007aff",
+                "tertiary-dim": "#0070eb",
+                "on-tertiary": "#001f4a",
+                "on-surface-variant": "#adaaaa",
+                "on-error-container": "#ffd2c8",
+                "secondary-fixed": "#ffc3bb",
+                "primary": "#f9ffb5",
+                "surface-dim": "#0e0e0e",
+                "tertiary-fixed": "#89b0ff",
+                "tertiary-fixed-dim": "#71a2ff",
+                "on-primary-fixed": "#424800",
+                "on-tertiary-container": "#000000",
+                "inverse-on-surface": "#565555",
+                "surface-bright": "#2c2c2c",
+                "primary-dim": "#dbee00",
+                "outline": "#767575",
+                "surface-container-low": "#131313",
+                "on-primary": "#5c6400",
+                "surface-tint": "#f9ffb5",
+                "surface-container-highest": "#262626",
+                "primary-fixed": "#e4f700",
+                "on-tertiary-fixed": "#00173a",
+                "primary-container": "#e4f700",
+                "error": "#ff7351",
+                "surface-container": "#1a1a1a",
+                "error-dim": "#d53d18",
+                "outline-variant": "#484847",
+                "on-surface": "#ffffff",
+                "tertiary": "#679cff",
+                "surface-container-lowest": "#000000",
+                "on-secondary-container": "#fff6f4",
+                "on-primary-fixed-variant": "#5e6600",
+                "on-primary-container": "#545c00",
+                "primary-fixed-dim": "#d6e800",
+                "secondary-fixed-dim": "#ffb0a5",
+                "on-background": "#ffffff",
+                "on-secondary-fixed": "#700003",
+                "inverse-primary": "#5c6400",
+                "on-tertiary-fixed-variant": "#00377a",
+                "surface-variant": "#262626",
+                "on-secondary-fixed-variant": "#a60007",
+                "surface": "#0e0e0e"
+              },
+              fontFamily: {
+                "headline": ["Space Grotesk"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-tab-indicator::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            width: 4px;
+            height: 4px;
+            background-color: #f9ffb5;
+            border-radius: 50%;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0e0e0e; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 10px; }
+        
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .bento-item-large { grid-column: span 2; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
     }
-    @media(prefers-color-scheme:dark){:root{
-      --bg:#0a0a0a; --bg2:#141414; --card:#1a1a1a; --border:#2a2a2a; --border2:#1e1e1e;
-      --text:#f0f0f0; --sub:#bbbbbb; --muted:#666666; --muted2:#333333;
-      --accent:#f0f0f0;
-      --teal:#2ed9a8; --red:#ff4c4c; --amber:#ffaa44; --blue:#5b9cf6; --pink:#ff3cac;
-      --ctl:#5b9cf6; --atl:#ff3cac; --tsb:#ff4c4c;
-    }}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{overflow-x:hidden;touch-action:pan-y;overscroll-behavior:none}
-    body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;min-height:100dvh}
-
-    /* ── PAGES ── */
-    .pages-wrap{display:flex;width:200%;transition:transform .32s cubic-bezier(.25,0.1,.25,1);will-change:transform}
-    .pages-wrap.no-anim{transition:none}
-    .page{width:50%;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-
-    /* ── HEADER ── */
-    .header{
-      position:sticky;top:0;z-index:60;
-      padding:calc(var(--safe-top) + 8px) 20px 12px;
-      display:flex;align-items:flex-end;justify-content:space-between;flex-shrink:0;
-      background:var(--bg);border-bottom:1px solid var(--border);
-    }
-    .header-left{display:flex;flex-direction:column;gap:2px}
-    .h-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
-    .h-title{font-size:22px;font-weight:300;color:var(--text);letter-spacing:-.01em;line-height:1}
-    .h-stale{font-size:10px;color:var(--amber);font-family:'DM Mono',monospace;margin-top:1px}
-    .h-nav{display:flex;align-items:center;gap:8px}
-    .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);cursor:pointer;transition:background .15s;user-select:none;border:none;background:transparent}
-    .icon-btn:active{background:var(--border)}
-    .icon-btn.spinning{animation:spin .7s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* ── SCROLL ── */
-    .scroll{padding:0 0 calc(var(--tab-h) + 12px);max-width:430px;margin:0 auto;width:100%;display:flex;flex-direction:column;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
-    .scroll::-webkit-scrollbar{display:none}
-    .scroll{scrollbar-width:none;-ms-overflow-style:none}
-
-    /* ── TAB BAR ── */
-    .tabbar{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--tab-h);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg);border-top:1px solid var(--border);display:flex;align-items:flex-start}
-    .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding-top:8px;cursor:pointer;user-select:none}
-    .tab-icon{font-size:20px;line-height:1}
-    .tab-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;transition:color .15s}
-    .tab-btn.active .tab-lbl{color:var(--text)}
-    .tab-line{position:absolute;top:0;height:2px;background:var(--text);transition:left .3s cubic-bezier(.4,0,.2,1),width .3s}
-
-    /* ── TODAY: SECTION ROWS (Suunto style) ── */
-    .t-hero{padding:18px 20px 16px;border-bottom:1px solid var(--border)}
-    .t-hero-indicator{font-size:36px;line-height:1;margin-bottom:8px}
-    .t-hero-row{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
-    .t-hero-num{font-family:'DM Mono',monospace;font-size:68px;font-weight:500;line-height:1;letter-spacing:-.04em;color:var(--text)}
-    .t-hero-unit{font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;align-self:flex-end;padding-bottom:10px}
-    .t-hero-sub{display:flex;gap:24px;margin-top:10px;flex-wrap:wrap}
-    .t-hero-kv{display:flex;flex-direction:column;gap:1px}
-    .t-hero-kv-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:600;line-height:1;letter-spacing:-.02em}
-    .t-hero-kv-lbl{font-size:10px;color:var(--sub);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:3px;font-weight:500}
-    .t-hero-delta{font-size:11px;font-family:'DM Mono',monospace;margin-top:2px}
-    .d-up{color:var(--teal)}.d-dn{color:var(--red)}.d-flat{color:var(--muted)}
-
-    /* body state section — 2-col grid */
-    .t-section{padding:12px 20px 14px;border-bottom:1px solid var(--border)}
-    .t-sec-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;font-weight:500}
-    .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
-    .t-cell{display:flex;flex-direction:column;gap:3px;padding:9px 0;border-bottom:1px solid var(--border2)}
-    .t-cell:nth-child(odd){padding-right:16px;border-right:1px solid var(--border2)}
-    .t-cell:nth-child(even){padding-left:16px}
-    /* last row: remove bottom border from last 1 or 2 cells */
-    .t-cell:nth-last-child(-n+2){border-bottom:none}
-    .t-cell-lbl{font-size:11px;color:var(--sub);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
-    .t-cell-val-row{display:flex;align-items:baseline;gap:6px}
-    .t-cell-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:600;color:var(--text);line-height:1;letter-spacing:-.02em}
-    .t-cell-unit{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em}
-    .t-cell-trend{font-size:14px;line-height:1;font-weight:600}
-    .t-cell-trend.up{color:var(--teal)}.t-cell-trend.dn{color:var(--red)}.t-cell-trend.flat{color:var(--muted)}
-    /* keep single-row for hero sub items */
-    .t-row{display:flex;align-items:baseline;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border2)}
-    .t-row:last-child{border-bottom:none}
-    .t-row-lbl{font-size:13px;color:var(--sub);font-weight:400;letter-spacing:.01em}
-    .t-row-right{display:flex;align-items:baseline;gap:8px}
-    .t-row-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:400;color:var(--text);line-height:1}
-    .t-row-unit{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em}
-    .t-row-trend{font-size:12px;line-height:1}
-    .t-row-trend.up{color:var(--teal)}.t-row-trend.dn{color:var(--red)}.t-row-trend.flat{color:var(--muted)}
-
-    /* PMC section */
-    .t-pmc{padding:14px 20px 12px;border-bottom:1px solid var(--border)}
-    .t-pmc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-    .t-pmc-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
-    .rpills{display:flex;gap:6px}
-    .rpill{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.04em;padding:4px 11px;border-radius:999px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;background:transparent}
-    .rpill.active{background:var(--text);border-color:var(--text);color:var(--bg)}
-    .t-chart-wrap{height:180px;position:relative}
-    .t-pmc-legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
-    .t-leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
-    .t-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .t-leg-bar{width:16px;height:8px;border-radius:2px;flex-shrink:0;opacity:.6}
-
-    /* ── CALENDAR PAGE ── */
-    .cal-header{padding:16px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center}
-    .cal-month-nav{display:flex;align-items:center;gap:16px;justify-content:center;width:100%}
-    .cal-month-lbl{font-size:17px;font-weight:400;letter-spacing:-.01em;min-width:120px;text-align:center}
-    .cal-nav-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);cursor:pointer;user-select:none;transition:background .15s}
-    .cal-nav-btn:active{background:var(--border)}
-
-    .cal-grid-wrap{padding:8px 12px 0}
-    .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
-    .cal-dow-cell{text-align:center;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;padding:4px 0}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-    .cal-day{
-      aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;cursor:pointer;
-      position:relative;font-family:'DM Mono',monospace;overflow:hidden;
-      transition:transform .15s cubic-bezier(.34,1.4,.64,1);
-    }
-    /* ripple */
-    .cal-day::before{
-      content:'';position:absolute;inset:0;border-radius:50%;
-      background:radial-gradient(circle,rgba(255,255,255,0.45) 0%,transparent 70%);
-      opacity:0;transform:scale(0);
-      transition:transform .35s ease,opacity .35s ease;pointer-events:none;
-    }
-    .cal-day:active{transform:scale(.88)}
-    .cal-day:active::before{opacity:1;transform:scale(1)}
-    .cal-day.empty{cursor:default;pointer-events:none;background:transparent!important}
-    .cal-day-num{font-size:13px;font-weight:400;line-height:1;position:relative;z-index:1}
-    .cal-day-dot{width:4px;height:4px;border-radius:50%;margin-top:3px;opacity:.9;position:relative;z-index:1}
-    .cal-day.today .cal-day-num{font-weight:700}
-    .cal-day.today::after{content:'';position:absolute;inset:1.5px;border-radius:50%;border:1.5px solid currentColor;opacity:.7;pointer-events:none;z-index:2}
-    .cal-day.selected{outline:2px solid var(--text);outline-offset:1px}
-
-    /* load heat colors - light mode */
-    .load-0{background:transparent;color:var(--muted)}
-    .load-1{background:#fff3cd;color:#7a4f00}
-    .load-2{background:#ffe0a0;color:#6b3800}
-    .load-3{background:#ffbb66;color:#5a2800}
-    .load-4{background:#ff8833;color:#fff}
-    .load-5{background:#e03a1e;color:#fff}
-    .load-rest{background:var(--bg2);color:var(--muted)}
-    @media(prefers-color-scheme:dark){
-      .load-0{background:transparent;color:var(--muted)}
-      .load-1{background:#2a2000;color:#ffcc44}
-      .load-2{background:#3a2800;color:#ffaa33}
-      .load-3{background:#4a2a00;color:#ff8833}
-      .load-4{background:#5a2200;color:#ffaa66}
-      .load-5{background:#6a1800;color:#ff9999}
-      .load-rest{background:#1a1a1a;color:var(--muted)}
-    }
-
-    /* ── CALENDAR LEGEND ── */
-    .cal-legend{padding:14px 20px 20px;border-top:1px solid var(--border)}
-    .cal-legend-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;font-weight:500;margin-bottom:12px}
-    .cal-legend-row{display:flex;flex-direction:column;gap:9px}
-    .cal-legend-item{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--sub);line-height:1.3}
-
-    /* ── WEEK SUMMARY ── */
-    .week-summary{padding:16px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:0}
-    .ws-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px}
-    .ws-big-row{display:flex;gap:0;margin-bottom:2px}
-    .ws-big-num{flex:1;display:flex;flex-direction:column;gap:3px;padding:0 0 14px}
-    .ws-big-num+.ws-big-num{border-left:1px solid var(--border);padding-left:20px}
-    .ws-num{font-family:'DM Mono',monospace;font-size:32px;font-weight:300;line-height:1;letter-spacing:-.02em}
-    .ws-lbl{font-size:10px;color:var(--sub);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
-    .ws-analysis-row{display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid var(--border2)}
-    .ws-analysis-item{display:flex;align-items:flex-start;gap:10px}
-    .ws-badge{font-size:16px;line-height:1;flex-shrink:0;margin-top:1px}
-    .ws-analysis-text{font-size:13px;color:var(--sub);line-height:1.5;letter-spacing:.01em}
-    .ws-analysis-text strong{color:var(--text);font-weight:500}
-
-    /* ── DAY DETAIL PANEL ── */
-    .day-detail{
-      position:fixed;inset:0;z-index:200;
-      background:var(--bg);
-      display:flex;flex-direction:column;
-      transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
-    }
-    .day-detail.open{transform:translateY(0)}
-    .dd-header{
-      padding:calc(var(--safe-top) + 8px) 20px 14px;
-      border-bottom:1px solid var(--border);
-      display:flex;align-items:flex-end;justify-content:space-between;flex-shrink:0;
-      background:var(--bg);
-    }
-    .dd-title{display:flex;flex-direction:column;gap:2px}
-    .dd-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
-    .dd-date{font-size:22px;font-weight:300;color:var(--text);letter-spacing:-.01em}
-    .dd-close{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);cursor:pointer;transition:background .15s}
-    .dd-close:active{background:var(--border)}
-    .dd-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:40px;scroll-behavior:smooth}
-    .dd-scroll::-webkit-scrollbar{display:none}
-    .dd-scroll{scrollbar-width:none;-ms-overflow-style:none}
-
-    /* ── STATES ── */
-    .state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;color:var(--muted);font-size:13px;text-align:center}
-    .spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:spin .75s linear infinite}
-    .err{color:var(--red);max-width:280px;line-height:1.7;font-size:13px}
-
-    .fade{animation:fadeUp .3s ease both}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   </style>
-</head>
-<body>
-
-<div class="pages-wrap" id="pagesWrap">
-
-  <!-- TODAY -->
-  <div class="page" id="page-today">
-    <header class="header">
-      <div class="header-left">
-        <span class="h-eyebrow">训练日志</span>
-        <span class="h-title" id="hDate">—</span>
-        <span class="h-stale" id="hStale" style="display:none"></span>
-      </div>
-      <div class="h-nav">
-        <div class="icon-btn" id="refreshBtn" onclick="loadData()">↻</div>
-      </div>
-    </header>
-    <main class="scroll" id="main">
-      <div class="state"><div class="spinner"></div><span>加载数据中…</span></div>
-    </main>
-  </div>
-
-  <!-- CALENDAR -->
-  <div class="page" id="page-cal">
-    <header class="header">
-      <div class="header-left">
-        <span class="h-eyebrow">训练日志</span>
-        <span class="h-title">日历</span>
-      </div>
-    </header>
-    <main class="scroll" id="cal-main">
-      <div class="state"><span style="color:var(--muted);font-size:13px">请先在 TODAY 加载数据</span></div>
-    </main>
-  </div>
-
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0e0e0e] border-none">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-md mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="Athlete Profile" class="w-full h-full object-cover" data-alt="Close up professional athlete profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiQlSV_DWgmLghmE9iV9BmdOOvFkF2RLUUAvOEqap2nkMZqkIRqNb8eDebjOBKOqbWj4_Fb6azXv54K92_xlSEtF71QnV6PJNz5SNIkNmQWskBagWQFLmyv9bNsU7yX56ej0hgZzG9op3qL4u4Qqw9lzsi2nta5bDfOzlEslPscUjQMd9cmHW5JsFN1u46MLJ-SGgsD3YitjfSPewOrsraWsF7OGHFbd0LghqmMC6RWbDicMANsJkMxuffwXT1UKqeAARNYIwTgt3V"/>
 </div>
-
-<!-- TAB BAR -->
-<nav class="tabbar">
-  <div class="tab-line" id="tabLine" style="width:50%;left:0"></div>
-  <div class="tab-btn active" id="tab-today" onclick="switchTab(0)">
-    <div class="tab-icon">◎</div><div class="tab-lbl">Today</div>
-  </div>
-  <div class="tab-btn" id="tab-cal" onclick="switchTab(1)">
-    <div class="tab-icon">▦</div><div class="tab-lbl">Calendar</div>
-  </div>
+<span class="text-xl font-black tracking-tighter text-[#f9ffb5] font-headline uppercase">PRECISION</span>
+</div>
+<button class="text-[#f9ffb5] hover:bg-[#1a1a1a] transition-colors p-2 rounded-full active:scale-95 duration-100">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-20 px-6 max-w-md mx-auto space-y-8">
+<!-- Dashboard View (Active by default) -->
+<section class="space-y-6" id="view-dashboard">
+<header class="space-y-1">
+<p class="text-[10px] font-bold tracking-[0.2em] text-primary/60 uppercase font-headline">SYSTEM STATUS</p>
+<h1 class="text-4xl font-bold font-headline tracking-tighter text-on-surface">OPTIMAL</h1>
+</header>
+<!-- Metrics Bento -->
+<div class="bento-grid">
+<!-- Large Status Card -->
+<div class="bento-item-large bg-surface-container-low p-6 rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">RECOVERY HRV</span>
+<div class="text-4xl font-bold font-headline mt-1">74 <span class="text-sm font-normal text-primary">MS</span></div>
+</div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">speed</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[82%]"></div>
+</div>
+<p class="text-[10px] mt-2 text-on-surface-variant italic">+12% vs 7-day baseline</p>
+</div>
+<!-- CTL / ATL Small Cards -->
+<div class="bg-surface-container p-4 rounded-xl">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">LOAD (CTL)</span>
+<div class="text-2xl font-bold font-headline text-on-surface">104</div>
+</div>
+<div class="bg-surface-container p-4 rounded-xl">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">STRAIN (ATL)</span>
+<div class="text-2xl font-bold font-headline text-on-surface">128</div>
+</div>
+<!-- Recent Activity -->
+<div class="bento-item-large bg-surface-container-high p-5 rounded-xl">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xs font-bold tracking-widest font-headline uppercase">RECENT WORKOUT</h3>
+<span class="text-[10px] text-on-surface-variant">2H AGO</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 p-3 rounded-lg">
+<span class="material-symbols-outlined text-primary">directions_run</span>
+</div>
+<div class="flex-1">
+<div class="font-bold text-on-surface">VO2 Max Intervals</div>
+<div class="text-xs text-on-surface-variant">Threshold • 45:12</div>
+</div>
+<div class="text-right">
+<div class="font-bold text-secondary">168 <span class="text-[10px]">BPM</span></div>
+<div class="text-[10px] text-on-surface-variant">AVG HR</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Calendar View (Hidden) -->
+<section class="hidden space-y-6" id="view-calendar">
+<header class="flex justify-between items-end">
+<div>
+<p class="text-[10px] font-bold tracking-[0.2em] text-primary/60 uppercase font-headline">PLANNING</p>
+<h1 class="text-4xl font-bold font-headline tracking-tighter text-on-surface">OCTOBER</h1>
+</div>
+<div class="text-right">
+<span class="text-xs font-bold font-headline text-on-surface-variant">2023</span>
+</div>
+</header>
+<div class="bg-surface-container-low rounded-xl p-4">
+<div class="grid grid-cols-7 gap-1 text-center mb-4">
+<div class="text-[10px] font-bold text-on-surface-variant">M</div>
+<div class="text-[10px] font-bold text-on-surface-variant">T</div>
+<div class="text-[10px] font-bold text-on-surface-variant">W</div>
+<div class="text-[10px] font-bold text-on-surface-variant">T</div>
+<div class="text-[10px] font-bold text-on-surface-variant">F</div>
+<div class="text-[10px] font-bold text-on-surface-variant">S</div>
+<div class="text-[10px] font-bold text-on-surface-variant">S</div>
+</div>
+<div class="grid grid-cols-7 gap-y-4 text-center">
+<!-- Calendar Days -->
+<div class="text-sm py-2 text-white/20">28</div>
+<div class="text-sm py-2 text-white/20">29</div>
+<div class="text-sm py-2 text-white/20">30</div>
+<div class="relative py-2 text-sm font-bold">1<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></div></div>
+<div class="relative py-2 text-sm font-bold">2<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-secondary"></div></div>
+<div class="relative py-2 text-sm font-bold">3<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-tertiary"></div></div>
+<div class="relative py-2 text-sm font-bold">4</div>
+<div class="relative py-2 text-sm font-bold bg-primary/10 rounded-lg text-primary">5<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></div></div>
+<div class="relative py-2 text-sm font-bold">6<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></div></div>
+<div class="relative py-2 text-sm font-bold">7</div>
+<!-- Simplified dots for the rest -->
+<div class="py-2 text-sm">8</div><div class="py-2 text-sm">9</div><div class="py-2 text-sm">10</div><div class="py-2 text-sm">11</div>
+<div class="py-2 text-sm">12</div><div class="py-2 text-sm">13</div><div class="py-2 text-sm">14</div><div class="py-2 text-sm">15</div>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="text-xs font-bold tracking-widest font-headline uppercase text-on-surface-variant">DAILY DETAILS • OCT 5</h3>
+<div class="bg-surface-container-high p-4 rounded-xl border-l-2 border-primary">
+<div class="flex justify-between items-center">
+<span class="font-bold font-headline">S&amp;C Session</span>
+<span class="text-xs text-primary font-bold">PLANNED</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1">Lower Body Power Development • 60m</p>
+</div>
+</div>
+</section>
+<!-- Trends View (Hidden) -->
+<section class="hidden space-y-6" id="view-trends">
+<header>
+<p class="text-[10px] font-bold tracking-[0.2em] text-primary/60 uppercase font-headline">TELEMETRY</p>
+<h1 class="text-4xl font-bold font-headline tracking-tighter text-on-surface">TRENDS</h1>
+</header>
+<!-- TSB Area Chart (Stylized Placeholder) -->
+<div class="bg-surface-container-low p-6 rounded-xl space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">TSB (TRAINING STRESS BALANCE)</span>
+<span class="text-sm font-bold font-headline text-primary">+8.4</span>
+</div>
+<div class="h-32 w-full flex items-end gap-1 px-2">
+<div class="bg-primary/20 hover:bg-primary/40 transition-colors w-full h-[40%] rounded-t-sm"></div>
+<div class="bg-primary/20 hover:bg-primary/40 transition-colors w-full h-[55%] rounded-t-sm"></div>
+<div class="bg-primary/20 hover:bg-primary/40 transition-colors w-full h-[70%] rounded-t-sm"></div>
+<div class="bg-primary/60 hover:bg-primary/80 transition-colors w-full h-[85%] rounded-t-sm"></div>
+<div class="bg-primary/20 hover:bg-primary/40 transition-colors w-full h-[60%] rounded-t-sm"></div>
+<div class="bg-secondary/40 hover:bg-secondary/60 transition-colors w-full h-[30%] rounded-t-sm"></div>
+<div class="bg-primary/20 hover:bg-primary/40 transition-colors w-full h-[45%] rounded-t-sm"></div>
+</div>
+<div class="flex justify-between text-[8px] font-bold text-on-surface-variant uppercase tracking-widest">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- HRV Trend -->
+<div class="bg-surface-container-low p-6 rounded-xl space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">HRV BASELINE (7D)</span>
+<span class="text-sm font-bold font-headline text-tertiary">STABLE</span>
+</div>
+<div class="flex items-baseline gap-2">
+<div class="text-3xl font-bold font-headline">72</div>
+<div class="text-xs text-on-surface-variant">ms average</div>
+</div>
+<!-- Mini-sparkline concept using div flex -->
+<div class="flex items-center justify-between h-8">
+<div class="w-1 h-3 bg-tertiary rounded-full"></div>
+<div class="w-1 h-5 bg-tertiary rounded-full"></div>
+<div class="w-1 h-4 bg-tertiary rounded-full"></div>
+<div class="w-1 h-6 bg-tertiary rounded-full"></div>
+<div class="w-1 h-4 bg-tertiary rounded-full"></div>
+<div class="w-1 h-2 bg-tertiary/40 rounded-full"></div>
+<div class="w-1 h-5 bg-tertiary rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Logs View (Hidden) -->
+<section class="hidden space-y-6" id="view-logs">
+<header>
+<p class="text-[10px] font-bold tracking-[0.2em] text-primary/60 uppercase font-headline">HISTORY</p>
+<h1 class="text-4xl font-bold font-headline tracking-tighter text-on-surface">LOGS</h1>
+</header>
+<div class="space-y-3">
+<!-- Log Item 1 -->
+<div class="bg-surface-container p-4 rounded-xl flex items-center gap-4">
+<div class="text-center min-w-[3rem]">
+<p class="text-[10px] font-bold text-on-surface-variant">OCT</p>
+<p class="text-xl font-bold font-headline">04</p>
+</div>
+<div class="flex-1 border-l border-outline-variant pl-4">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">STEADY STATE RUN</p>
+<div class="flex gap-3 mt-1">
+<span class="text-xs font-bold font-headline">8.2 <span class="font-normal opacity-60">KM</span></span>
+<span class="text-xs font-bold font-headline text-secondary">152 <span class="font-normal opacity-60">BPM</span></span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary/40">chevron_right</span>
+</div>
+<!-- Log Item 2 -->
+<div class="bg-surface-container p-4 rounded-xl flex items-center gap-4">
+<div class="text-center min-w-[3rem]">
+<p class="text-[10px] font-bold text-on-surface-variant">OCT</p>
+<p class="text-xl font-bold font-headline">03</p>
+</div>
+<div class="flex-1 border-l border-outline-variant pl-4">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">MOBILITY FLOW</p>
+<div class="flex gap-3 mt-1">
+<span class="text-xs font-bold font-headline">25 <span class="font-normal opacity-60">MIN</span></span>
+<span class="text-xs font-bold font-headline text-tertiary">84 <span class="font-normal opacity-60">BPM</span></span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary/40">chevron_right</span>
+</div>
+<!-- Log Item 3 -->
+<div class="bg-surface-container-high p-4 rounded-xl flex items-center gap-4 border border-secondary/20">
+<div class="text-center min-w-[3rem]">
+<p class="text-[10px] font-bold text-on-secondary-fixed-variant">OCT</p>
+<p class="text-xl font-bold font-headline text-secondary">02</p>
+</div>
+<div class="flex-1 border-l border-outline-variant pl-4">
+<p class="text-xs font-bold uppercase tracking-widest text-secondary">INTERVAL SESSION</p>
+<div class="flex gap-3 mt-1">
+<span class="text-xs font-bold font-headline">12.4 <span class="font-normal opacity-60">KM</span></span>
+<span class="text-xs font-bold font-headline text-secondary">174 <span class="font-normal opacity-60">BPM</span></span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary/40">error_outline</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full bg-[#0e0e0e]/80 backdrop-blur-xl z-50 border-t border-[#f9ffb5]/10 shadow-[0_-8px_24px_rgba(0,0,0,0.5)]">
+<div class="max-w-md mx-auto flex justify-around items-center px-4 pb-6 pt-3">
+<button class="nav-btn flex flex-col items-center justify-center text-[#f9ffb5] relative active-tab-indicator transition-all active:translate-y-0.5" id="btn-dashboard" onclick="switchView('dashboard')">
+<span class="material-symbols-outlined mb-1">speed</span>
+<span class="font-headline text-[10px] font-bold tracking-widest uppercase">DASHBOARD</span>
+</button>
+<button class="nav-btn flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:translate-y-0.5" id="btn-calendar" onclick="switchView('calendar')">
+<span class="material-symbols-outlined mb-1">calendar_month</span>
+<span class="font-headline text-[10px] font-bold tracking-widest uppercase">CALENDAR</span>
+</button>
+<button class="nav-btn flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:translate-y-0.5" id="btn-trends" onclick="switchView('trends')">
+<span class="material-symbols-outlined mb-1">show_chart</span>
+<span class="font-headline text-[10px] font-bold tracking-widest uppercase">TRENDS</span>
+</button>
+<button class="nav-btn flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:translate-y-0.5" id="btn-logs" onclick="switchView('logs')">
+<span class="material-symbols-outlined mb-1">format_list_bulleted</span>
+<span class="font-headline text-[10px] font-bold tracking-widest uppercase">LOGS</span>
+</button>
+</div>
 </nav>
-
-<!-- DAY DETAIL PANEL -->
-<div class="day-detail" id="dayDetail">
-  <div class="dd-header">
-    <div class="dd-title">
-      <span class="dd-eyebrow">训练详情</span>
-      <span class="dd-date" id="ddDate">—</span>
-    </div>
-    <div class="dd-close" onclick="closeDayDetail()">✕</div>
-  </div>
-  <div class="dd-scroll" id="ddScroll"></div>
-</div>
-
 <script>
-// ══════════════════════════════════════════════
-// CONFIG
-// ══════════════════════════════════════════════
-const WORKER_URL = 'https://polished-pond-d9e9.chenrinan.workers.dev';
-const CACHE_KEY  = 'trainingCache_v2';
-
-// ══════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════
-let allRows = [], chartInst = null, chartRange = '30d';
-let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
-let rowByDate = {}; // key: YYYY-MM-DD → row
-
-// ══════════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════════
-function switchTab(idx, animate=true) {
-  const wrap = document.getElementById('pagesWrap');
-  if (!animate) wrap.classList.add('no-anim');
-  wrap.style.transform = idx===0 ? 'translateX(0)' : 'translateX(-50%)';
-  if (!animate) requestAnimationFrame(()=>wrap.classList.remove('no-anim'));
-  ['tab-today','tab-cal'].forEach((t,i)=>document.getElementById(t).classList.toggle('active',i===idx));
-  document.getElementById('tabLine').style.left = idx===0?'0':'50%';
-  if (idx===1 && allRows.length) renderCalendar();
-}
-
-// ══════════════════════════════════════════════
-// CSV PARSER
-// ══════════════════════════════════════════════
-function parseCSV(raw){
-  const rows=[];let i=0,n=raw.length;
-  while(i<n){
-    const row=[];let eol=false;
-    while(!eol&&i<n){
-      let val='';
-      if(raw[i]==='"'){i++;while(i<n){if(raw[i]==='"'&&raw[i+1]==='"'){val+='"';i+=2;}else if(raw[i]==='"'){i++;break;}else val+=raw[i++];}}
-      else{while(i<n&&raw[i]!==','&&raw[i]!=='\r'&&raw[i]!=='\n')val+=raw[i++];}
-      row.push(val.trim());
-      if(i<n&&raw[i]===',')i++;else eol=true;
-    }
-    while(i<n&&(raw[i]==='\r'||raw[i]==='\n'))i++;
-    if(row.some(v=>v))rows.push(row);
-  }
-  if(!rows.length)return[];
-  const hdrs=rows[0].map(h=>h.replace(/\s+/g,' ').trim());
-  return rows.slice(1).map(cols=>{const o={};hdrs.forEach((h,j)=>{o[h]=(cols[j]||'').trim();});return o;}).filter(r=>r[hdrs[0]]);
-}
-
-// ══════════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════════
-const f = v => parseFloat(v)||0;
-const R = (v,d=1) => v.toFixed(d);
-
-function acwrColor(v){
-  if(v<=0)return'var(--muted)';
-  if(v<0.8)return'var(--blue)';
-  if(v<=1.3)return'var(--teal)';
-  if(v<=1.5)return'var(--amber)';
-  return'var(--red)';
-}
-
-function fmtDate(s){
-  if(!s)return'—';
-  const d=new Date(s.replace(/\//g,'-'));if(isNaN(d))return s;
-  const wk=['日','一','二','三','四','五','六'];
-  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} 周${wk[d.getDay()]}`;
-}
-function fmtShort(s){const d=new Date((s||'').replace(/\//g,'-'));if(isNaN(d))return s||'';return`${d.getMonth()+1}/${d.getDate()}`;}
-function daysSince(s){const d=new Date((s||'').replace(/\//g,'-'));if(isNaN(d))return null;return Math.floor((Date.now()-d.getTime())/86400000);}
-function isoDate(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-
-function trend(curr,prev,dec=0,cls='t-cell-trend'){
-  if(prev===null)return'';
-  const d=curr-prev,e=Math.pow(10,-dec)*.5;
-  if(Math.abs(d)<e)return`<span class="${cls} flat">—</span>`;
-  return d>0?`<span class="${cls} up">↑</span>`:`<span class="${cls} dn">↓</span>`;
-}
-
-function deltaTag(curr,prev,dec=0,label='vs 昨日'){
-  if(prev===null)return'';
-  const d=curr-prev,e=Math.pow(10,-dec)*.5;
-  if(Math.abs(d)<e)return`<span class="t-hero-delta d-flat">— ${label}</span>`;
-  const s=d>0?'+':'−',cls=d>0?'d-up':'d-dn';
-  return`<span class="t-hero-delta ${cls}">${s}${Math.abs(d).toFixed(dec)} ${label}</span>`;
-}
-
-function weekAvg(rows,field,upToIdx){
-  const now=new Date(),mon=new Date(now);
-  mon.setDate(now.getDate()-(now.getDay()===0?6:now.getDay()-1));mon.setHours(0,0,0,0);
-  const sl=rows.slice(0,upToIdx).filter(r=>{const d=new Date((r['Date']||'').replace(/\//g,'-'));return!isNaN(d)&&d>=mon;});
-  if(!sl.length)return null;
-  return sl.reduce((a,r)=>a+f(r[field]),0)/sl.length;
-}
-
-// load → heat bucket 0–5
-function loadBucket(load){
-  if(load===0)return'rest';
-  if(load<100)return 1;
-  if(load<300)return 2;
-  if(load<500)return 3;
-  if(load<700)return 4;
-  return 5;
-}
-
-// ══════════════════════════════════════════════
-// CHART
-// ══════════════════════════════════════════════
-function getSlice(range){
-  if(range==='7d'){
-    const now=new Date(),mon=new Date(now);
-    mon.setDate(now.getDate()-(now.getDay()===0?6:now.getDay()-1));mon.setHours(0,0,0,0);
-    const r=allRows.filter(r=>{const d=new Date((r['Date']||'').replace(/\//g,'-'));return!isNaN(d)&&d>=mon;});
-    return r.length?r:allRows.slice(-7);
-  }
-  if(range==='ytd'){const yr=new Date().getFullYear();const r=allRows.filter(r=>{const d=new Date((r['Date']||'').replace(/\//g,'-'));return!isNaN(d)&&d.getFullYear()===yr;});return r.length?r:allRows;}
-  return allRows.slice(-30);
-}
-
-function drawChart(range){
-  chartRange=range;
-  document.querySelectorAll('.rpill').forEach(p=>p.classList.toggle('active',p.dataset.range===range));
-  const slice=getSlice(range);
-  const labels=slice.map(r=>fmtShort(r['Date']));
-  const ctlD=slice.map(r=>f(r['CTL(体能)']));
-  const atlD=slice.map(r=>f(r['ATL(疲劳)']));
-  const tsbD=slice.map(r=>f(r['TSB(恢复)']));
-
-  // resolve CSS vars at runtime
-  const s=getComputedStyle(document.documentElement);
-  const cCTL=s.getPropertyValue('--ctl').trim();
-  const cATL=s.getPropertyValue('--atl').trim();
-  const cTSB=s.getPropertyValue('--tsb').trim();
-  const cBorder=s.getPropertyValue('--border').trim();
-  const cMuted=s.getPropertyValue('--muted').trim();
-  const cBg=s.getPropertyValue('--bg').trim();
-
-  if(chartInst)chartInst.destroy();
-  const ctx=document.getElementById('pmcCanvas').getContext('2d');
-
-  const zeroLine={id:'zeroLine',afterDraw(c){
-    const{ctx:x,scales:{y}}=c;if(!y)return;
-    const yZ=y.getPixelForValue(0);
-    if(yZ<c.chartArea.top||yZ>c.chartArea.bottom)return;
-    x.save();x.beginPath();x.moveTo(c.chartArea.left,yZ);x.lineTo(c.chartArea.right,yZ);
-    x.strokeStyle=cMuted;x.lineWidth=.5;x.setLineDash([3,5]);x.stroke();x.restore();
-  }};
-  const lastGlow={id:'lastGlow',afterDatasetsDraw(c){
-    const{ctx:x}=c;
-    c.data.datasets.forEach((ds,di)=>{
-      if(ds.type!=='line')return;
-      const m=c.getDatasetMeta(di),last=m.data[m.data.length-1];if(!last)return;
-      const{x:px,y:py}=last.getCenterPoint();
-      x.save();
-      x.beginPath();x.arc(px,py,5,0,Math.PI*2);x.fillStyle=ds.borderColor+'33';x.fill();
-      x.beginPath();x.arc(px,py,3,0,Math.PI*2);x.fillStyle=ds.borderColor;x.shadowColor=ds.borderColor;x.shadowBlur=8;x.fill();
-      x.restore();
-    });
-  }};
-
-  chartInst=new Chart(ctx,{
-    plugins:[zeroLine,lastGlow],
-    data:{labels,datasets:[
-      {type:'bar', label:'CTL',data:ctlD,backgroundColor:cCTL+'28',borderWidth:0,borderRadius:2,order:3,yAxisID:'y'},
-      {type:'line',label:'ATL',data:atlD,borderColor:cATL,backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.35,order:1,yAxisID:'y'},
-      {type:'line',label:'TSB',data:tsbD,borderColor:cTSB,backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.35,order:2,yAxisID:'y'},
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{backgroundColor:cBg,borderColor:cBorder,borderWidth:1,titleColor:cMuted,bodyColor:s.getPropertyValue('--text').trim(),padding:10,titleFont:{family:'DM Mono',size:10},bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}`}}},
-      scales:{
-        x:{ticks:{color:cMuted,font:{family:'DM Mono',size:9},maxRotation:0,maxTicksLimit:8},grid:{color:'transparent'},border:{color:cBorder}},
-        y:{ticks:{color:cMuted,font:{family:'DM Mono',size:9},maxTicksLimit:5},grid:{color:cBorder+'88'},border:{color:'transparent'}}
-      }
-    }
-  });
-}
-
-// ══════════════════════════════════════════════
-// RENDER TODAY (Suunto-style rows)
-// ══════════════════════════════════════════════
-function render(rows){
-  allRows=rows;
-  rowByDate={};
-  rows.forEach(r=>{ const k=(r['Date']||'').trim(); if(k) rowByDate[k]=r; });
-
-  const main=document.getElementById('main');
-  if(!rows.length){main.innerHTML=`<div class="state"><span class="err">表格无数据。</span></div>`;return;}
-
-  const ti=rows.length-1, today=rows[ti], prev=ti>0?rows[ti-1]:null;
-
-  const date   = today['Date']||'';
-  const load   = f(today['Load(体感强度)']);
-  const trimp  = f(today['TRIMP(心肺强度)']);
-  const ctl    = f(today['CTL(体能)']);
-  const atl    = f(today['ATL(疲劳)']);
-  const tsb    = f(today['TSB(恢复)']);
-  const acwr   = f(today['ACWR(急慢性负荷比)']);
-  const rhr    = f(today['RHR']);
-  const hrv    = f(today['HRV']);
-  const hrv7   = f(today['7天平均 HRV']);
-  const hrvR   = f(today['HRV Ratio']);
-  const ind    = today['指示器']||'';
-
-  const p = k => prev?f(prev[k]):null;
-  const pLoad=p('Load(体感强度)'),pTrimp=p('TRIMP(心肺强度)');
-  const pCtl=p('CTL(体能)'),pAtl=p('ATL(疲劳)'),pTsb=p('TSB(恢复)');
-  const pRhr=p('RHR'),pHrv=p('HRV');
-
-  const wkLoad  = weekAvg(rows,'Load(体感强度)',ti);
-  const wkTrimp = weekAvg(rows,'TRIMP(心肺强度)',ti);
-  const isRest  = load===0&&trimp===0;
-
-  document.getElementById('hDate').textContent = fmtDate(date);
-  const ds=daysSince(date), staleEl=document.getElementById('hStale');
-  if(ds!==null&&ds>0){staleEl.textContent=`最近数据来自 ${ds} 天前`;staleEl.style.display='block';}
-  else staleEl.style.display='none';
-
-  const acwrPct=Math.min(Math.max((acwr/3)*100,2),98).toFixed(1);
-
-  main.innerHTML=`
-    <!-- HERO: Load -->
-    <div class="t-hero fade">
-      ${ind?`<div class="t-hero-indicator">${ind}</div>`:''}
-      <div class="t-hero-row">
-        <span class="t-hero-num" style="color:${isRest?'var(--muted)':''}">${load.toFixed(0)}</span>
-        <span class="t-hero-unit">Load 体感负荷</span>
-        ${isRest?`<span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;align-self:flex-end;padding-bottom:10px">休息日</span>`:''}
-      </div>
-      ${!isRest?deltaTag(load,wkLoad,0,'vs 本周均'):''}
-      <div class="t-hero-sub" style="margin-top:14px">
-        <div class="t-hero-kv">
-          <span class="t-hero-kv-val" style="color:var(--pink)">${trimp.toFixed(0)}</span>
-          <span class="t-hero-kv-lbl">TRIMP 心肺负荷</span>
-          ${!isRest?deltaTag(trimp,wkTrimp,0,'vs 本周均'):''}
-        </div>
-        <div class="t-hero-kv">
-          <span class="t-hero-kv-val" style="color:${acwrColor(acwr)}">${acwr>0?R(acwr,1):'—'}</span>
-          <span class="t-hero-kv-lbl">ACWR 受伤风险</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- BODY STATE 2-col -->
-    <div class="t-section fade">
-      <div class="t-sec-title">体能状态</div>
-      <div class="t-grid">
-        <div class="t-cell">
-          <span class="t-cell-lbl">CTL 体能</span>
-          <div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--ctl)">${R(ctl,1)}</span>${trend(ctl,pCtl,1)}</div>
-        </div>
-        <div class="t-cell">
-          <span class="t-cell-lbl">ATL 疲劳</span>
-          <div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--atl)">${R(atl,1)}</span>${trend(atl,pAtl,1)}</div>
-        </div>
-        <div class="t-cell">
-          <span class="t-cell-lbl">TSB 恢复</span>
-          <div class="t-cell-val-row"><span class="t-cell-val" style="color:${tsb>=0?'var(--teal)':'var(--red)'}">${R(tsb,1)}</span>${trend(tsb,pTsb,1)}</div>
-        </div>
-        <div class="t-cell">
-          <span class="t-cell-lbl">ACWR 受伤风险</span>
-          <div class="t-cell-val-row"><span class="t-cell-val" style="color:${acwrColor(acwr)}">${acwr>0?R(acwr,1):'—'}</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- HRV 2-col -->
-    <div class="t-section fade">
-      <div class="t-sec-title">心率 · HRV</div>
-      <div class="t-grid">
-        <div class="t-cell">
-          <span class="t-cell-lbl">静息心率 RHR</span>
-          <div class="t-cell-val-row"><span class="t-cell-val">${rhr>0?rhr.toFixed(0):'—'}</span><span class="t-cell-unit">bpm</span>${rhr>0?trend(rhr,pRhr,0):''}</div>
-        </div>
-        <div class="t-cell">
-          <span class="t-cell-lbl">HRV</span>
-          <div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--teal)">${hrv>0?hrv.toFixed(0):'—'}</span><span class="t-cell-unit">ms</span>${hrv>0?trend(hrv,pHrv,0):''}</div>
-        </div>
-        ${hrv7>0?`<div class="t-cell">
-          <span class="t-cell-lbl">7天均 HRV</span>
-          <div class="t-cell-val-row"><span class="t-cell-val">${hrv7.toFixed(0)}</span><span class="t-cell-unit">ms</span></div>
-        </div>`:''}
-        ${hrvR>0?`<div class="t-cell">
-          <span class="t-cell-lbl">HRV Ratio</span>
-          <div class="t-cell-val-row"><span class="t-cell-val" style="color:${hrvR>=1?'var(--teal)':'var(--amber)'}">${R(hrvR,2)}</span></div>
-        </div>`:''}
-      </div>
-    </div>
-
-    <!-- PMC -->
-    <div class="t-pmc fade">
-      <div class="t-pmc-head">
-        <span class="t-pmc-title">PMC — 体能管理</span>
-        <div class="rpills">
-          <span class="rpill" data-range="7d" onclick="drawChart('7d')">本周</span>
-          <span class="rpill active" data-range="30d" onclick="drawChart('30d')">近30天</span>
-          <span class="rpill" data-range="ytd" onclick="drawChart('ytd')">今年</span>
-        </div>
-      </div>
-      <div class="t-chart-wrap"><canvas id="pmcCanvas"></canvas></div>
-      <div class="t-pmc-legend">
-        <div class="t-leg"><div class="t-leg-bar" style="background:var(--ctl)"></div>CTL</div>
-        <div class="t-leg"><div class="t-leg-dot" style="background:var(--atl)"></div>ATL</div>
-        <div class="t-leg"><div class="t-leg-dot" style="background:var(--tsb)"></div>TSB</div>
-      </div>
-    </div>
-  `;
-  drawChart(chartRange);
-}
-
-// ══════════════════════════════════════════════
-// CALENDAR
-// ══════════════════════════════════════════════
-function renderCalendar(){
-  if(!allRows.length) return;
-  const el=document.getElementById('cal-main');
-
-  // find max load for relative scaling
-  const maxLoad = Math.max(...allRows.map(r=>f(r['Load(体感强度)'])),1);
-
-  const y=calYear, m=calMonth;
-  const first=new Date(y,m,1), last=new Date(y,m+1,0);
-  const startDow=(first.getDay()+6)%7; // Mon=0
-  const daysInMonth=last.getDate();
-
-  // build cells
-  let cells='';
-  for(let i=0;i<startDow;i++) cells+=`<div class="cal-day empty"></div>`;
-
-  for(let d=1;d<=daysInMonth;d++){
-    const key=isoDate(new Date(y,m,d));
-    const row=rowByDate[key];
-    const load=row?f(row['Load(体感强度)']):null;
-    const isRest= row && load===0 && f(row['TRIMP(心肺强度)'])===0;
-    const ind=row?(row['指示器']||''):'';
-    const today=isoDate(new Date());
-
-    let cls='cal-day';
-    if(key===today) cls+=' today';
-    if(load!==null){
-      if(isRest) cls+=' load-rest';
-      else{
-        const bkt=loadBucket(load);
-        cls+=` load-${bkt}`;
-      }
-    } else {
-      cls+=' load-0';
-    }
-
-    const dotColor = ind.includes('🔴')?'var(--red)':ind.includes('🟡')?'var(--amber)':'transparent';
-
-    cells+=`<div class="${cls}" onclick="openDayDetail('${key}')">
-      <span class="cal-day-num">${d}</span>
-      <div class="cal-day-dot" style="background:${dotColor}"></div>
-    </div>`;
-  }
-
-  const monthName=`${y}年${m+1}月`;
-
-  // week summary for displayed month
-  const ws=calcWeekSummary(y,m);
-
-  el.innerHTML=`
-    <div class="cal-header fade">
-      <div class="cal-month-nav">
-        <div class="cal-nav-btn" onclick="calNav(-1)">‹</div>
-        <span class="cal-month-lbl">${monthName}</span>
-        <div class="cal-nav-btn" onclick="calNav(1)">›</div>
-      </div>
-    </div>
-
-    <div class="cal-grid-wrap fade">
-      <div class="cal-dow">
-        ${['一','二','三','四','五','六','日'].map(d=>`<div class="cal-dow-cell">${d}</div>`).join('')}
-      </div>
-      <div class="cal-grid">${cells}</div>
-    </div>
-
-    ${ws}
-
-    <div class="cal-legend fade">
-      <div class="cal-legend-title">图例说明</div>
-      <div class="cal-legend-row">
-        <div class="cal-legend-item">
-          <div style="width:24px;height:24px;border-radius:50%;background:#fff3cd;flex-shrink:0"></div>
-          <span>低强度训练 (Load &lt;100)</span>
-        </div>
-        <div class="cal-legend-item">
-          <div style="width:24px;height:24px;border-radius:50%;background:#ffbb66;flex-shrink:0"></div>
-          <span>中等强度 (100–500)</span>
-        </div>
-        <div class="cal-legend-item">
-          <div style="width:24px;height:24px;border-radius:50%;background:#e03a1e;flex-shrink:0"></div>
-          <span>高强度训练 (Load &gt;700)</span>
-        </div>
-        <div class="cal-legend-item">
-          <div style="width:24px;height:24px;border-radius:50%;background:var(--bg2);flex-shrink:0;border:1px solid var(--border)"></div>
-          <span>休息日（无训练记录）</span>
-        </div>
-        <div class="cal-legend-item">
-          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <div style="width:24px;height:24px;border-radius:50%;background:#ffbb66;display:flex;align-items:center;justify-content:center">
-              <div style="width:5px;height:5px;border-radius:50%;background:var(--red)"></div>
-            </div>
-          </div>
-          <span>底部红点 = 当日指示器为 🔴（需注意）</span>
-        </div>
-        <div class="cal-legend-item">
-          <div style="width:24px;height:24px;border-radius:50%;border:1.5px solid var(--text);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;font-weight:700">今</div>
-          <span>外圈描边 = 今天</span>
-        </div>
-      </div>
-    </div>
-  `;
-
-}
-
-function calNav(dir){
-  calMonth+=dir;
-  if(calMonth>11){calMonth=0;calYear++;}
-  if(calMonth<0){calMonth=11;calYear--;}
-  renderCalendar();
-}
-
-// ══════════════════════════════════════════════
-// WEEK SUMMARY (full month analysis)
-// ══════════════════════════════════════════════
-function calcWeekSummary(y,m){
-  const monthRows=allRows.filter(r=>{
-    const d=new Date((r['Date']||'').replace(/\//g,'-'));
-    return !isNaN(d)&&d.getFullYear()===y&&d.getMonth()===m;
-  });
-  if(!monthRows.length) return '';
-
-  // prev month
-  const pm=m===0?11:m-1, py=m===0?y-1:y;
-  const prevMonthRows=allRows.filter(r=>{
-    const d=new Date((r['Date']||'').replace(/\//g,'-'));
-    return !isNaN(d)&&d.getFullYear()===py&&d.getMonth()===pm;
-  });
-
-  // 3-month avg (prev 3 calendar months, not incl current)
-  const threeMonthRows=allRows.filter(r=>{
-    const d=new Date((r['Date']||'').replace(/\//g,'-'));
-    if(isNaN(d))return false;
-    // go back up to 3 months from current month
-    const cur=new Date(y,m,1);
-    const back3=new Date(y,m-3,1);
-    return d>=back3&&d<cur;
-  });
-
-  const totalLoad=monthRows.reduce((a,r)=>a+f(r['Load(体感强度)']),0);
-  const totalTrimp=monthRows.reduce((a,r)=>a+f(r['TRIMP(心肺强度)']),0);
-  const trainingDays=monthRows.filter(r=>f(r['Load(体感强度)'])>0).length;
-  const daysInCalMonth=new Date(y,m+1,0).getDate();
-
-  const pmLoad=prevMonthRows.reduce((a,r)=>a+f(r['Load(体感强度)']),0);
-  const pmTrimp=prevMonthRows.reduce((a,r)=>a+f(r['TRIMP(心肺强度)']),0);
-  const pmTraining=prevMonthRows.filter(r=>f(r['Load(体感强度)'])>0).length;
-
-  const avg3Load=threeMonthRows.length?threeMonthRows.reduce((a,r)=>a+f(r['Load(体感强度)']),0)/3:null;
-  const avg3Trimp=threeMonthRows.length?threeMonthRows.reduce((a,r)=>a+f(r['TRIMP(心肺强度)']),0)/3:null;
-
-  const hrvVals=monthRows.map(r=>f(r['HRV'])).filter(v=>v>0);
-  const avgHrv=hrvVals.length?hrvVals.reduce((a,b)=>a+b,0)/hrvVals.length:null;
-  const rhrVals=monthRows.map(r=>f(r['RHR'])).filter(v=>v>0);
-
-  const lastRow=monthRows[monthRows.length-1];
-  const firstRow=monthRows[0];
-  const ctlGain=f(lastRow['CTL(体能)'])-f(firstRow['CTL(体能)']);
-  const tsbEnd=f(lastRow['TSB(恢复)']);
-  const overloadDays=monthRows.filter(r=>f(r['ACWR(急慢性负荷比)'])>1.5).length;
-  const lowHrvDays=monthRows.filter(r=>{const v=f(r['HRV Ratio']);return v>0&&v<0.85;}).length;
-  const avgLoad=trainingDays>0?(totalLoad/trainingDays):0;
-  const density=trainingDays/(daysInCalMonth||1);
-
-  // comparison helpers
-  function cmpTag(curr,prev,unit='',higherIsBetter=true){
-    if(!prev||prev===0)return'';
-    const d=curr-prev,pct=Math.abs(d/prev*100).toFixed(0);
-    const up=d>0,good=(higherIsBetter?up:!up);
-    const col=good?'var(--teal)':'var(--red)';
-    const arr=up?'↑':'↓';
-    return`<span style="font-size:11px;font-family:'DM Mono',monospace;color:${col};margin-left:6px">${arr}${pct}%</span>`;
-  }
-  function avg3Tag(curr,avg,higherIsBetter=true){
-    if(!avg)return'';
-    const d=curr-avg,pct=Math.abs(d/avg*100).toFixed(0);
-    const up=d>0,good=(higherIsBetter?up:!up);
-    const col=good?'var(--teal)':'var(--red)';
-    const arr=up?'↑':'↓';
-    return`<span style="font-size:10px;font-family:'DM Mono',monospace;color:${col};opacity:.7"> ${arr}${pct}% vs 3月均</span>`;
-  }
-
-  const bullets=[];
-  if(density>=0.7) bullets.push({icon:'🔥',text:`本月已记录 <strong>${trainingDays} 训练日</strong>（共 ${daysInCalMonth} 天），密度较高，注意保留足够恢复时间`});
-  else if(density>=0.5) bullets.push({icon:'✅',text:`本月已记录 <strong>${trainingDays} 训练日</strong>（共 ${daysInCalMonth} 天），训练与休息比例合理`});
-  else bullets.push({icon:'📉',text:`本月已记录 <strong>${trainingDays} 训练日</strong>（共 ${daysInCalMonth} 天），训练频率偏低，可适当增加`});
-
-  if(ctlGain>2) bullets.push({icon:'📈',text:`体能（CTL）本月增长 <strong>+${ctlGain.toFixed(1)}</strong>，适应性持续提升`});
-  else if(ctlGain<-2) bullets.push({icon:'📉',text:`体能（CTL）本月下降 <strong>${ctlGain.toFixed(1)}</strong>，需保持训练连续性`});
-
-  if(tsbEnd>5) bullets.push({icon:'💤',text:`月末 TSB <strong>${tsbEnd.toFixed(1)}</strong>，处于超量恢复阶段，可安排大负荷训练`});
-  else if(tsbEnd<-10) bullets.push({icon:'⚠️',text:`月末 TSB <strong>${tsbEnd.toFixed(1)}</strong>，累积疲劳偏高，建议安排减量周`});
-
-  if(overloadDays>3) bullets.push({icon:'🚨',text:`本月有 <strong>${overloadDays} 天</strong> ACWR 超 1.5，受伤风险较高，建议控制单次负荷`});
-  else if(overloadDays>0) bullets.push({icon:'⚡',text:`本月 <strong>${overloadDays} 天</strong> ACWR 偏高，整体仍在可控范围`});
-
-  if(avgHrv!==null&&lowHrvDays>3) bullets.push({icon:'❤️',text:`本月有 <strong>${lowHrvDays} 天</strong> HRV Ratio 偏低，自主神经系统压力较大`});
-  else if(avgHrv!==null) bullets.push({icon:'❤️',text:`本月均 HRV <strong>${avgHrv.toFixed(0)} ms</strong>，恢复质量${avgHrv>=35?'良好':'一般'}`});
-
-  const bulletsHTML=bullets.map(b=>`
-    <div class="ws-analysis-item">
-      <span class="ws-badge">${b.icon}</span>
-      <span class="ws-analysis-text">${b.text}</span>
-    </div>`).join('');
-
-  return`
-    <div class="week-summary fade">
-      <div class="ws-title">本月概览 — ${y}年${m+1}月</div>
-
-      <div class="ws-big-row">
-        <div class="ws-big-num">
-          <div style="display:flex;align-items:baseline;gap:4px">
-            <span class="ws-num">${totalLoad.toFixed(0)}</span>
-            ${cmpTag(totalLoad,pmLoad)}
-          </div>
-          <span class="ws-lbl">总 Load ${avg3Load?avg3Tag(totalLoad,avg3Load):''}</span>
-        </div>
-        <div class="ws-big-num">
-          <div style="display:flex;align-items:baseline;gap:4px">
-            <span class="ws-num">${totalTrimp.toFixed(0)}</span>
-            ${cmpTag(totalTrimp,pmTrimp)}
-          </div>
-          <span class="ws-lbl">总 TRIMP ${avg3Trimp?avg3Tag(totalTrimp,avg3Trimp):''}</span>
-        </div>
-      </div>
-
-      <div class="ws-big-row" style="margin-top:12px">
-        <div class="ws-big-num">
-          <div style="display:flex;align-items:baseline;gap:4px">
-            <span class="ws-num" style="font-size:24px">${trainingDays}<span style="font-size:14px;color:var(--muted)"> / ${daysInCalMonth}</span></span>
-            ${pmTraining?cmpTag(trainingDays,pmTraining):''}
-          </div>
-          <span class="ws-lbl">训练天数</span>
-        </div>
-        <div class="ws-big-num">
-          <span class="ws-num" style="font-size:24px">${avgLoad.toFixed(0)}</span>
-          <span class="ws-lbl">日均 Load</span>
-        </div>
-      </div>
-
-      <div class="ws-analysis-row">${bulletsHTML}</div>
-    </div>`;
-}
-
-// ══════════════════════════════════════════════
-// DAY DETAIL
-// ══════════════════════════════════════════════
-function openDayDetail(dateKey){
-  const row=rowByDate[dateKey];
-  const panel=document.getElementById('dayDetail');
-  const wk=['日','一','二','三','四','五','六'];
-  const d=new Date(dateKey.replace(/\//g,'-'));
-  const dateLabel=isNaN(d)?dateKey:`${d.getMonth()+1}月${d.getDate()}日 周${wk[d.getDay()]}`;
-  document.getElementById('ddDate').textContent=dateLabel;
-
-  const scroll=document.getElementById('ddScroll');
-  if(!row){
-    scroll.innerHTML=`<div class="state"><span style="color:var(--muted)">该日无数据</span></div>`;
-  } else {
-    const load=f(row['Load(体感强度)']),trimp=f(row['TRIMP(心肺强度)']);
-    const ctl=f(row['CTL(体能)']),atl=f(row['ATL(疲劳)']),tsb=f(row['TSB(恢复)']);
-    const acwr=f(row['ACWR(急慢性负荷比)']),srpe=f(row['单日总sRPE']);
-    const rhr=f(row['RHR']),hrv=f(row['HRV']),hrv7=f(row['7天平均 HRV']),hrvR=f(row['HRV Ratio']);
-    const ind=row['指示器']||'';
-    const isRest=load===0&&trimp===0;
-
-    scroll.innerHTML=`
-      <!-- hero -->
-      <div class="t-hero">
-        ${ind?`<div class="t-hero-indicator">${ind}</div>`:''}
-        <div class="t-hero-row">
-          <span class="t-hero-num" style="color:${isRest?'var(--muted)':''}">${load.toFixed(0)}</span>
-          <span class="t-hero-unit">Load 体感负荷</span>
-          ${isRest?`<span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;align-self:flex-end;padding-bottom:10px">休息日</span>`:''}
-        </div>
-        <div class="t-hero-sub" style="margin-top:14px">
-          <div class="t-hero-kv">
-            <span class="t-hero-kv-val" style="color:var(--pink)">${trimp.toFixed(0)}</span>
-            <span class="t-hero-kv-lbl">TRIMP 心肺负荷</span>
-          </div>
-          ${srpe>0?`<div class="t-hero-kv">
-            <span class="t-hero-kv-val">${srpe.toFixed(0)}</span>
-            <span class="t-hero-kv-lbl">sRPE 感知训练量</span>
-          </div>`:''}
-          <div class="t-hero-kv">
-            <span class="t-hero-kv-val" style="color:${acwrColor(acwr)}">${acwr>0?R(acwr,1):'—'}</span>
-            <span class="t-hero-kv-lbl">ACWR 受伤风险</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="t-section">
-        <div class="t-sec-title">体能状态</div>
-        <div class="t-grid">
-          <div class="t-cell"><span class="t-cell-lbl">CTL 体能</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--ctl)">${R(ctl,1)}</span></div></div>
-          <div class="t-cell"><span class="t-cell-lbl">ATL 疲劳</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--atl)">${R(atl,1)}</span></div></div>
-          <div class="t-cell"><span class="t-cell-lbl">TSB 恢复</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:${tsb>=0?'var(--teal)':'var(--red)'}">${R(tsb,1)}</span></div></div>
-          <div class="t-cell"><span class="t-cell-lbl">ACWR 受伤风险</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:${acwrColor(acwr)}">${acwr>0?R(acwr,1):'—'}</span></div></div>
-        </div>
-      </div>
-
-      <div class="t-section">
-        <div class="t-sec-title">心率 · HRV</div>
-        <div class="t-grid">
-          <div class="t-cell"><span class="t-cell-lbl">静息心率 RHR</span><div class="t-cell-val-row"><span class="t-cell-val">${rhr>0?rhr.toFixed(0):'—'}</span><span class="t-cell-unit">bpm</span></div></div>
-          <div class="t-cell"><span class="t-cell-lbl">HRV</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:var(--teal)">${hrv>0?hrv.toFixed(0):'—'}</span><span class="t-cell-unit">ms</span></div></div>
-          ${hrv7>0?`<div class="t-cell"><span class="t-cell-lbl">7天均 HRV</span><div class="t-cell-val-row"><span class="t-cell-val">${hrv7.toFixed(0)}</span><span class="t-cell-unit">ms</span></div></div>`:''}
-          ${hrvR>0?`<div class="t-cell"><span class="t-cell-lbl">HRV Ratio</span><div class="t-cell-val-row"><span class="t-cell-val" style="color:${hrvR>=1?'var(--teal)':'var(--amber)'}">${R(hrvR,2)}</span></div></div>`:''}
-        </div>
-      </div>
-    `;
-  }
-  panel.classList.add('open');
-  document.body.style.overflow='hidden';
-}
-
-function closeDayDetail(){
-  document.getElementById('dayDetail').classList.remove('open');
-  document.body.style.overflow='';
-}
-
-// ══════════════════════════════════════════════
-// CACHE + LOAD
-// ══════════════════════════════════════════════
-function saveCache(t){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),csv:t}));}catch(e){}}
-function loadCache(){try{const d=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');return d?d.csv:null;}catch(e){return null;}}
-
-function fetchWithTimeout(url,ms=8000){
-  return new Promise((res,rej)=>{
-    const t=setTimeout(()=>rej(new Error('请求超时')),ms);
-    fetch(url,{cache:'no-store'}).then(r=>{clearTimeout(t);res(r);}).catch(e=>{clearTimeout(t);rej(e);});
-  });
-}
-
-async function loadData(){
-  const btn=document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
-  document.getElementById('main').innerHTML=`<div class="state"><div class="spinner"></div><span>加载数据中…</span></div>`;
-  try{
-    const res=await fetchWithTimeout(WORKER_URL);
-    if(!res.ok)throw new Error(`HTTP ${res.status}`);
-    const text=await res.text();
-    if(!text||text.length<10)throw new Error('数据为空');
-    saveCache(text);render(parseCSV(text));
-  }catch(e){
-    const cached=loadCache();
-    if(cached){
-      render(parseCSV(cached));
-      const s=document.getElementById('hStale');
-      s.textContent='离线模式 · 显示上次缓存';s.style.display='block';
-    }else{
-      document.getElementById('main').innerHTML=`
-        <div class="state"><span class="err">加载失败<br><br>${e.message}</span>
-        <button onclick="loadData()" style="margin-top:8px;background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 28px;border-radius:8px;font-size:14px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;">重试</button></div>`;
-    }
-  }finally{btn.classList.remove('spinning');}
-}
-
-loadData();
-</script>
-</body>
-</html>
+        function switchView(viewId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show target section
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+
+            // Update nav styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-[#f9ffb5]', 'active-tab-indicator');
+                btn.classList.add('text-white/40');
+            });
+            
+            const activeBtn = document.getElementById('btn-' + viewId);
+            activeBtn.classList.remove('text-white/40');
+            activeBtn.classList.add('text-[#f9ffb5]', 'active-tab-indicator');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body></html>
