@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="PRECISION"/>
+  <meta name="theme-color" content="#0e0e0e"/>
+  <title>PRECISION — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <style>
+    :root{
+      --bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--border:#282828;--border2:#333;
+      --text:#f0f0f0;--sub:#aaa;--muted:#555;
+      --accent:#c8f000;--red:#ff3b30;--orange:#ff6b35;--yellow:#f5d020;--green:#a8e063;--blue:#5b9cf6;
+      --safe-top:env(safe-area-inset-top,44px);--safe-bot:env(safe-area-inset-bottom,0px);
+      --nav-h:calc(58px + var(--safe-bot));
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{overflow-x:hidden;touch-action:pan-y;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100dvh;overscroll-behavior:none}
+    ::-webkit-scrollbar{display:none}*{scrollbar-width:none}
+
+    /* NAV */
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);padding-bottom:var(--safe-bot);background:rgba(14,14,14,.97);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding-top:10px;text-decoration:none;color:var(--muted);transition:color .2s}
+    .nav-item svg{width:20px;height:20px}
+    .nav-item span{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.1em}
+    .nav-item.active{color:var(--accent)}
+    .nav-item.active svg{filter:drop-shadow(0 0 5px var(--accent))}
+
+    .page-wrap{padding-bottom:var(--nav-h);max-width:430px;margin:0 auto}
+    .spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:12px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.12em}
+    .state-box button{margin-top:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 24px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.1em;cursor:pointer}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .fade{animation:fadeUp .4s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── HEADER ── */
+    .header{padding:calc(var(--safe-top) + 10px) 20px 12px;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-icon{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;color:#000;letter-spacing:.05em}
+    .logo-name{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+    .header-right{display:flex;gap:6px}
+    .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;border:none;background:transparent}
+    .icon-btn:active{background:var(--border)}
+    .icon-btn svg{width:20px;height:20px}
+    .icon-btn.spinning{animation:spin .7s linear infinite}
+
+    /* ── SECTION LABEL ── */
+    .sec-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;color:var(--muted);padding:0 20px;margin-bottom:10px}
+
+    /* ── PERFORMANCE STATUS CARD ── */
+    .perf-card{margin:0 16px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px}
+    .perf-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .perf-form-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.18em;color:var(--muted)}
+    .perf-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;display:flex;align-items:center;gap:5px}
+    .badge-dot{width:6px;height:6px;border-radius:50%}
+    .perf-main{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+    .perf-form-word{font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;letter-spacing:.02em;line-height:1}
+    .perf-tsb-block{text-align:right}
+    .perf-tsb-val{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;line-height:1;letter-spacing:-.02em}
+    .perf-tsb-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.18em;color:var(--muted);margin-top:2px}
+    .perf-sub-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .perf-sub-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px}
+    .perf-sub-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
+    .perf-sub-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1;letter-spacing:-.01em}
+    .perf-sub-bar{height:3px;border-radius:999px;background:var(--border);margin-top:8px;overflow:hidden}
+    .perf-sub-fill{height:100%;border-radius:999px;transition:width .8s ease}
+
+    /* ── CTL/ATL RINGS ── */
+    .rings-row{margin:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .ring-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px 12px 12px;display:flex;flex-direction:column;align-items:center;gap:10px}
+    .ring-card-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.2em;color:var(--muted);text-align:center}
+    .ring-wrap{position:relative;width:100px;height:100px}
+    .ring-wrap svg{width:100px;height:100px;transform:rotate(-90deg)}
+    .ring-bg{fill:none;stroke:var(--border);stroke-width:6}
+    .ring-fg{fill:none;stroke-width:6;stroke-linecap:round}
+    .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .ring-val{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;line-height:1}
+    .ring-sub{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.1em;color:var(--muted);margin-top:2px}
+
+    /* ── 7 DAY ACTIVITY ── */
+    .activity-card{margin:0 16px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 16px}
+    .activity-chart-wrap{height:80px;display:flex;align-items:flex-end;gap:6px;margin-bottom:14px}
+    .activity-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+    .activity-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+    .activity-bar{width:80%;border-radius:4px 4px 0 0;min-height:3px;transition:height .6s cubic-bezier(.4,0,.2,1)}
+    .activity-bar-day{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.08em;color:var(--muted)}
+    .activity-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border);padding-top:14px}
+    .act-stat{display:flex;flex-direction:column;gap:2px;padding:0 4px}
+    .act-stat+.act-stat{border-left:1px solid var(--border)}
+    .act-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;line-height:1}
+    .act-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.14em;color:var(--muted)}
+
+    /* ── RECENT ACTIVITY ── */
+    .recent-header{padding:0 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .view-all-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--accent);text-decoration:none}
+    .workout-card{margin:0 16px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;gap:14px;align-items:center}
+    .workout-icon{width:44px;height:44px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .workout-info{flex:1;min-width:0}
+    .workout-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em;line-height:1.2;margin-bottom:3px}
+    .workout-date{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--muted)}
+    .workout-meta{display:flex;gap:12px;margin-top:8px}
+    .wmeta-item{display:flex;flex-direction:column;gap:1px}
+    .wmeta-val{font-family:'DM Mono',sans-serif;font-size:14px;font-weight:500;line-height:1}
+    .wmeta-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:.12em;color:var(--muted)}
+    .workout-arrow{color:var(--muted);font-size:16px;flex-shrink:0}
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">P</div>
+      <div class="logo-name">PRECISION</div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="refreshBtn" onclick="init(true)" aria-label="Refresh">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115.4-4.4M20 15a9 9 0 01-15.4 4.4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="content"><div class="state-box"><div class="spinner"></div><span>LOADING</span></div></div>
+
+</div>
+<div id="nav-placeholder"></div>
+
+<script>
+document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+setNav('dashboard');
+
+async function init(force=false) {
+  const btn = document.getElementById('refreshBtn');
+  if(btn) btn.classList.add('spinning');
+  const el = document.getElementById('content');
+  showLoading(el);
+  try {
+    const { daily, workouts } = await loadData(force);
+    render(daily, workouts);
+  } catch(e) {
+    showError(el, e.message);
+  } finally {
+    if(btn) btn.classList.remove('spinning');
+  }
+}
+
+function render(daily, workouts) {
+  const el = document.getElementById('content');
+  if(!daily.length){ showError(el,'No data'); return; }
+
+  const today   = daily[daily.length-1];
+  const ctl     = getCTL(today), atl = getATL(today), tsb = getTSB(today);
+  const acwr    = getACWR(today), hrv = getHRV(today);
+  const load    = getLoad(today), trimp = getTrimp(today);
+  const form    = formLabel(tsb);
+  const acwrLbl = acwrLabel(acwr);
+
+  // 7-day window
+  const now = new Date();
+  const week7 = [];
+  for(let d=6; d>=0; d--) {
+    const dt = new Date(now); dt.setDate(now.getDate()-d);
+    const key = isoDate(dt);
+    const row = daily.find(r=>getDate(r)===key)||null;
+    week7.push({ dt, key, row, dow:['MON','TUE','WED','THU','FRI','SAT','SUN'][(dt.getDay()+6)%7] });
+  }
+  const weekLoad  = week7.reduce((a,x)=>a+(x.row?getLoad(x.row):0),0);
+  const weekTrimp = week7.reduce((a,x)=>a+(x.row?getTrimp(x.row):0),0);
+  const maxBarLoad = Math.max(...week7.map(x=>x.row?getLoad(x.row):0),1);
+
+  // Bar colors based on load intensity
+  const barColor = load => {
+    const b = loadBucket(load);
+    return {rest:'#333', low:'#5b9cf6', medium:'#f5d020', high:'#ff6b35', peak:'#ff3b30'}[b];
+  };
+
+  const barsHTML = week7.map(x => {
+    const v = x.row ? getLoad(x.row) : 0;
+    const h = Math.max((v/maxBarLoad)*72, v>0?4:0);
+    const isToday = x.key === isoDate(now);
+    return `<div class="activity-bar-col">
+      <div class="activity-bar-wrap">
+        <div class="activity-bar" style="height:${h}px;background:${isToday?'var(--accent)':barColor(v)}"></div>
+      </div>
+      <div class="activity-bar-day" style="color:${isToday?'var(--accent)':'var(--muted)'}">${x.dow.slice(0,3)}</div>
+    </div>`;
+  }).join('');
+
+  // Recent workouts (last 3)
+  const recentW = [...workouts].reverse().slice(0,3);
+  const workoutsHTML = recentW.map(w => {
+    const sport = wkSport(w);
+    const d = new Date((wkDate(w)||'').replace(/\//g,'-'));
+    const dateStr = isNaN(d) ? wkDate(w) : `${d.toLocaleString('en',{month:'short'}).toUpperCase()} ${d.getDate()}, ${d.getFullYear()} · ${fmtDuration(wkDur(w))}`;
+    const rpe = wkRPE(w), loadV = wkLoad(w);
+    return `<div class="workout-card fade">
+      <div class="workout-icon">${sportIcon(sport)}</div>
+      <div class="workout-info">
+        <div class="workout-name">${sport||'Training Session'}</div>
+        <div class="workout-date">${dateStr}</div>
+        <div class="workout-meta">
+          ${rpe>0?`<div class="wmeta-item"><div class="wmeta-val" style="color:var(--orange)">${rpe.toFixed(1)} / 10</div><div class="wmeta-lbl">RPE</div></div>`:''}
+          ${wkDur(w)>0?`<div class="wmeta-item"><div class="wmeta-val">${fmtDuration(wkDur(w))}</div><div class="wmeta-lbl">TIME</div></div>`:''}
+          ${loadV>0?`<div class="wmeta-item"><div class="wmeta-val">${loadV.toFixed(0)}</div><div class="wmeta-lbl">LOAD</div></div>`:''}
+        </div>
+      </div>
+      <div class="workout-arrow">›</div>
+    </div>`;
+  }).join('');
+
+  // CTL ring (treat ~150 as max for ring display)
+  const ctlMax=150, atlMax=200;
+  const ctlCirc=2*Math.PI*40, atlCirc=2*Math.PI*40;
+  const ctlOff  = ctlCirc*(1-Math.min(ctl/ctlMax,1));
+  const atlOff  = atlCirc*(1-Math.min(atl/atlMax,1));
+
+  el.innerHTML = `
+    <div class="sec-lbl fade">PERFORMANCE STATUS <span style="float:right;color:${form.col}">${acwrLbl.label}</span></div>
+
+    <div class="perf-card fade">
+      <div class="perf-top">
+        <span class="perf-form-lbl">CURRENT FORM</span>
+        <span class="perf-badge" style="color:${form.col}">
+          <span class="badge-dot" style="background:${form.col}"></span>
+          HIGH STRAIN
+        </span>
+      </div>
+      <div class="perf-main">
+        <div class="perf-form-word" style="color:${form.col}">${form.label}</div>
+        <div class="perf-tsb-block">
+          <div class="perf-tsb-val" style="color:${tsb<0?'var(--red)':'var(--green)'}">${tsb>=0?'+':''}${tsb.toFixed(1)}</div>
+          <div class="perf-tsb-lbl">TSB INDICATOR</div>
+        </div>
+      </div>
+      <div class="perf-sub-row">
+        <div class="perf-sub-card">
+          <div class="perf-sub-lbl">ACWR</div>
+          <div class="perf-sub-val" style="color:${acwrLbl.col}">${acwr>0?acwr.toFixed(1):'—'}</div>
+          <div class="perf-sub-bar"><div class="perf-sub-fill" style="width:${Math.min(acwr/2*100,100)}%;background:${acwrLbl.col}"></div></div>
+        </div>
+        <div class="perf-sub-card">
+          <div class="perf-sub-lbl">HRV</div>
+          <div class="perf-sub-val" style="color:var(--blue)">${hrv>0?hrv.toFixed(0)+'ms':'—'}</div>
+          <div class="perf-sub-bar"><div class="perf-sub-fill" style="width:${Math.min(hrv/80*100,100)}%;background:var(--blue)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rings-row fade fade-1">
+      <div class="ring-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="40"/>
+            <circle class="ring-fg" cx="50" cy="50" r="40" stroke="#f5d020"
+              stroke-dasharray="${ctlCirc.toFixed(1)}"
+              stroke-dashoffset="${ctlOff.toFixed(1)}"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-val" style="color:#f5d020">${ctl.toFixed(0)}</div>
+            <div class="ring-sub">CTL</div>
+          </div>
+        </div>
+        <div class="ring-card-lbl">CHRONIC LOAD</div>
+      </div>
+      <div class="ring-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="40"/>
+            <circle class="ring-fg" cx="50" cy="50" r="40" stroke="var(--orange)"
+              stroke-dasharray="${atlCirc.toFixed(1)}"
+              stroke-dashoffset="${atlOff.toFixed(1)}"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-val" style="color:var(--orange)">${atl.toFixed(0)}</div>
+            <div class="ring-sub">ATL</div>
+          </div>
+        </div>
+        <div class="ring-card-lbl">ACUTE LOAD</div>
+      </div>
+    </div>
+
+    <div class="sec-lbl fade fade-2" style="margin-top:4px">LAST 7 DAYS ACTIVITY</div>
+    <div class="activity-card fade fade-2">
+      <div class="activity-chart-wrap">${barsHTML}</div>
+      <div class="activity-stats">
+        <div class="act-stat">
+          <div class="act-stat-val">${weekLoad.toFixed(0)}</div>
+          <div class="act-stat-lbl">TOTAL LOAD</div>
+        </div>
+        <div class="act-stat" style="padding-left:16px">
+          <div class="act-stat-val">${weekTrimp.toFixed(0)}</div>
+          <div class="act-stat-lbl">TRIMP</div>
+        </div>
+        <div class="act-stat" style="padding-left:16px">
+          <div class="act-stat-val">${week7.filter(x=>x.row&&getLoad(x.row)>0).length}</div>
+          <div class="act-stat-lbl">SESSIONS</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="recent-header fade fade-3">
+      <span class="sec-lbl" style="padding:0">RECENT ACTIVITY</span>
+      <a class="view-all-btn" href="logs.html">VIEW ALL</a>
+    </div>
+    ${workoutsHTML}
+    <div style="height:8px"></div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>
